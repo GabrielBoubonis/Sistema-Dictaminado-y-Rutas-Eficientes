@@ -1,0 +1,72 @@
+{
+  "distritos": [
+    "Centro",
+    "Noroeste",
+    "Norte",
+    "Oeste",
+    "Sudoeste",
+    "Sur"
+  ],
+  "nivel_dano_vereda": [
+    "Alto",
+    "Medio",
+    "Bajo"
+  ],
+  "motivo_extraccion": [
+    "Árbol muerto",
+    "Con riesgo de caída por ahuecamiento",
+    "Con riesgo de caída por inclinación",
+    "Afectado por enfermedad incurable",
+    "Con pronunciado desequilibrio estructural",
+    "En precario estado vegetativo",
+    "No es posible implementar solución técnica",
+    "Por daño intencional irreversible",
+    "Obra pública",
+    "Especie no apta para el lugar implantado",
+    "Cepa verde",
+    "Cepa muerta"
+  ],
+  "trabajos_subterraneos": [
+    "Corte vertical de raíces",
+    "Corte horizontal de raíces",
+    "Agrandamiento de cazuela"
+  ],
+  "trabajos_aereos": [
+    "Poda de formación",
+    "Liberación de conductores eléctricos",
+    "Liberación de tránsito peatonal",
+    "Liberación de tránsito vehicular",
+    "Despeje de espacio aéreo privado",
+    "Despeje de luminarias",
+    "Equilibrio del ejemplar",
+    "Raleo y limpieza",
+    "Elevación de copa",
+    "Reducción de altura de copa",
+    "Reducción volumétrica",
+    "Eliminación de ramas peligro"
+  ],
+  "motivo_sin_trabajo": [
+    "Ejemplar extraído",
+    "Trabajos realizados en ramas y raíces",
+    "El/los ejemplar/es no ocasionan problemas visibles",
+    "El domicilio no existe",
+    "Ejemplar/es en propiedad privada",
+    "En el domicilio no existe arbolado público"
+  ],
+  "complejidad": [
+    "Baja",
+    "Media",
+    "Alta",
+    "Máxima"
+  ],
+  "plantar": [
+    "Cazuela",
+    "Construir cazuela",
+    "Vereda jardín"
+  ],
+  "nivel_prioridad": [
+    "Alta",
+    "Media",
+    "Baja"
+  ]
+}

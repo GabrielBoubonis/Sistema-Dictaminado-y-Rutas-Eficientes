@@ -1,0 +1,290 @@
+// Esquema de datos traducido de er-modelo.md / diagramas/er.puml.
+// Notas:
+//  - Los campos "enum" del ER se guardan como texto y se validan en el servidor contra src/catalogos.ts (RF-56, responde 422).
+//  - Las columnas decimales del ER (coordenadas, perímetro, distancias) usan Float para simplificar la demo.
+//  - Las tablas solicitudes_sua y usuarios_institucionales simulan al SUA y a la Autenticación Institucional (arquitectura-tecnica.md §3).
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  nombre_usuario  String   @id
+  nombre_completo String
+  contrasena_hash String
+  rol             String
+  activo          Boolean  @default(true)
+  fecha_alta      DateTime @default(now()) @db.Date
+
+  dictamenes   Dictamen[]
+  rutas        Ruta[]
+  auditorias   RegistroAuditoria[]
+  credenciales WebauthnCredential[]
+
+  @@map("usuario")
+}
+
+model RefreshToken {
+  id             String   @id
+  nombre_usuario String
+  token_hash     String   @unique
+  cadena_inicio  DateTime
+  expira         DateTime
+  revocado       Boolean  @default(false)
+  dispositivo_id String?
+  creado         DateTime @default(now())
+
+  @@map("refresh_token")
+}
+
+model Dispositivo {
+  id_dispositivo   String    @id
+  codigo_visible   String    @unique
+  nombre_usuario   String?
+  estado           String    @default("Activo")
+  fecha_bloqueo    DateTime?
+  fecha_desbloqueo DateTime?
+  desbloqueado_por String?
+
+  @@map("dispositivo")
+}
+
+model WebauthnCredential {
+  id             String  @id
+  nombre_usuario String
+  public_key     String
+  counter        Int     @default(0)
+  transports     String?
+  usuario        Usuario @relation(fields: [nombre_usuario], references: [nombre_usuario])
+
+  @@map("webauthn_credential")
+}
+
+// ---- Simulación de sistemas externos (solo para la demo) ----
+
+model SolicitudSua {
+  numero_sua          String
+  anio                Int
+  tipo                String
+  subtipo             String
+  area_derivada       String
+  distrito            String
+  prioridad           String
+  direccion           String
+  descripcion_reclamo String
+  es_tormenta         Boolean  @default(false)
+  es_rederivacion     Boolean  @default(false)
+  fecha_derivacion    DateTime @db.Date
+
+  @@id([numero_sua, anio])
+  @@map("solicitudes_sua")
+}
+
+model UsuarioInstitucional {
+  nombre_usuario  String  @id
+  vigente         Boolean @default(true)
+  nombre_completo String
+
+  @@map("usuarios_institucionales")
+}
+
+// ---- Modelo propio del sistema ----
+
+model Solicitud {
+  numero_sua              String
+  anio                    Int
+  distrito                String
+  prioridad               String
+  direccion               String
+  latitud                 Float?
+  longitud                Float?
+  geo_ultimo_intento      DateTime?
+  descripcion_reclamo     String
+  estado                  String   @default("Pendiente")
+  es_tormenta             Boolean  @default(false)
+  fecha_ultima_derivacion DateTime @db.Date
+
+  historial   HistorialDerivacion[]
+  dictamenes  Dictamen[]
+  enRutas     RutaSolicitud[]
+
+  @@id([numero_sua, anio])
+  @@map("solicitud")
+}
+
+model HistorialDerivacion {
+  id_derivacion    Int       @id @default(autoincrement())
+  numero_sua       String
+  anio             Int
+  fecha_derivacion DateTime  @db.Date
+  motivo           String
+  solicitud        Solicitud @relation(fields: [numero_sua, anio], references: [numero_sua, anio])
+
+  @@map("historial_derivacion")
+}
+
+model Especie {
+  id_especie         Int      @id @default(autoincrement())
+  nombre_comun       String
+  nombre_cientifico  String?
+  nombre_normalizado String   @unique
+  activa             Boolean  @default(true)
+  creada_por         String?
+  dictamenes         Dictamen[]
+
+  @@map("especie")
+}
+
+model Dictamen {
+  id_dictamen                    Int       @id @default(autoincrement())
+  uuid_dictamen                  String    @unique
+  numero_sua                     String
+  anio                           Int
+  nombre_usuario                 String
+  nota_numero                    Int?
+  expediente_numero              Int?
+  fecha_emision                  DateTime  @db.Date
+  fecha_firma                    DateTime
+  domicilio_ejemplar             String?
+  latitud_ejemplar               Float?
+  longitud_ejemplar              Float?
+  calle_esquina                  String?
+  numero_esquina                 String?
+  referencia_ubicacion           String?
+  id_especie                     Int
+  distancia_medianera_referencia Float?
+  cantidad_frente                Int?
+  nivel_dano_vereda              String?
+  es_extraccion                  Boolean   @default(false)
+  perimetro_tronco               Float?
+  motivo_extraccion              String?
+  es_sin_trabajo                 Boolean   @default(false)
+  motivo_sin_trabajo             String?
+  complejidad                    String
+  urgente                        Boolean   @default(false)
+  arbol_frente_garage            Boolean   @default(false)
+  media_tension                  Boolean   @default(false)
+  de_oficio                      Boolean   @default(false)
+  plantar                        String?
+  nivel_prioridad                String
+  observaciones                  String?
+  vigente                        Boolean?  @default(true)
+  hash_firma                     String
+  estado_sincronizacion          String    @default("sincronizado")
+  firmado_sin_conexion           Boolean   @default(false)
+  sua_intentos                   Int       @default(0)
+  sua_proximo_intento            DateTime?
+
+  solicitud   Solicitud             @relation(fields: [numero_sua, anio], references: [numero_sua, anio])
+  usuario     Usuario               @relation(fields: [nombre_usuario], references: [nombre_usuario])
+  especie     Especie               @relation(fields: [id_especie], references: [id_especie])
+  fotos       Fotografia[]
+  aereos      TrabajoAereo[]
+  subterraneos TrabajoSubterraneo[]
+
+  @@map("dictamen")
+}
+
+model Fotografia {
+  id_foto            Int      @id @default(autoincrement())
+  id_dictamen        Int
+  archivo_referencia String
+  orden              Int
+  dictamen           Dictamen @relation(fields: [id_dictamen], references: [id_dictamen], onDelete: Cascade)
+
+  @@map("fotografia")
+}
+
+model TrabajoAereo {
+  id_trabajo_aereo Int      @id @default(autoincrement())
+  id_dictamen      Int
+  tipo_trabajo     String
+  dictamen         Dictamen @relation(fields: [id_dictamen], references: [id_dictamen], onDelete: Cascade)
+
+  @@map("trabajo_aereo")
+}
+
+model TrabajoSubterraneo {
+  id_trabajo_subterraneo Int      @id @default(autoincrement())
+  id_dictamen            Int
+  tipo_trabajo           String
+  distancia_borde        Float?
+  dictamen               Dictamen @relation(fields: [id_dictamen], references: [id_dictamen], onDelete: Cascade)
+
+  @@map("trabajo_subterraneo")
+}
+
+model Ruta {
+  id_ruta             Int      @id @default(autoincrement())
+  nombre_usuario      String
+  fecha               DateTime @db.Date
+  tipo                String   @default("Normal")
+  estado              String   @default("Activa")
+  modo_desplazamiento String
+  creada              DateTime @default(now())
+  criterios           Json?
+  distancia_total_m   Float?
+  tiempo_total_s      Float?
+  optimizada          Boolean  @default(true)
+  usuario             Usuario  @relation(fields: [nombre_usuario], references: [nombre_usuario])
+  solicitudes         RutaSolicitud[]
+
+  @@map("ruta")
+}
+
+model RutaSolicitud {
+  id_ruta           Int
+  numero_sua        String
+  anio              Int
+  orden             Int
+  fecha_incorporacion DateTime  @default(now())
+  liberada          Boolean   @default(false)
+  fecha_liberacion  DateTime?
+  motivo_liberacion String?
+  ruta              Ruta      @relation(fields: [id_ruta], references: [id_ruta], onDelete: Cascade)
+  solicitud         Solicitud @relation(fields: [numero_sua, anio], references: [numero_sua, anio])
+
+  @@id([id_ruta, numero_sua, anio])
+  @@map("ruta_solicitud")
+}
+
+model RegistroAuditoria {
+  id_auditoria    Int      @id @default(autoincrement())
+  nombre_usuario  String
+  accion          String
+  entidad_afectada String
+  valor_anterior  String?
+  valor_nuevo     String?
+  fecha_hora      DateTime @default(now())
+  usuario         Usuario  @relation(fields: [nombre_usuario], references: [nombre_usuario])
+
+  @@map("registro_auditoria")
+}
+
+model CasoRevision {
+  id_caso              Int      @id @default(autoincrement())
+  tipo                 String
+  referencia_solicitud String
+  id_dictamen          Int?
+  motivo               String
+  fecha_hora           DateTime @default(now())
+
+  @@map("caso_revision")
+}
+
+// Simula lo que recibe el SUA como "datos complementarios" de la solicitud (RF-24).
+model SuaDatosComplementarios {
+  numero_sua String
+  anio       Int
+  recibido_en DateTime @default(now())
+  payload    Json
+
+  @@id([numero_sua, anio])
+  @@map("sua_datos_complementarios")
+}
