@@ -21,8 +21,8 @@ const sinTildes = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLo
 /** Formato definido en Alcance/Requisitos: inicial del nombre + hasta 6 letras del apellido + número incremental si se repite. */
 async function generarNombreUsuario(nombre: string, apellido: string): Promise<string> {
   const base = (sinTildes(nombre).charAt(0) + sinTildes(apellido).slice(0, 6)) || 'usuario';
-  if (!(await prisma.usuario.findUnique({ where: { nombre_usuario: base } }))) return base;
-  for (let n = 1; ; n++) {
+  // Siempre lleva número al final (ej. gboubon0); el primero libre desde 0.
+  for (let n = 0; ; n++) {
     if (!(await prisma.usuario.findUnique({ where: { nombre_usuario: base + n } }))) return base + n;
   }
 }

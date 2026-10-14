@@ -1,9 +1,35 @@
-# PostgreSQL para desarrollo. Uso:  docker compose up -d
+# Desarrollo:   docker compose up -d db            (solo PostgreSQL, 5432)
+# Todo junto:   docker compose --profile app up --build      → http://localhost:3000
+# Celulares:    docker compose --profile app --profile tunel up --build   (ver README: "Probar en celulares")
+# El contexto es la carpeta de arriba porque la imagen también incluye ../datos-prueba (datos de demostración).
 services:
   db:
     image: postgres:16
     environment: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: arbolado }
     ports: ["5432:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U postgres"], interval: 3s, retries: 20 }
+
+  app:
+    profiles: [app]
+    build: { context: .., dockerfile: sistema/Dockerfile }
+    depends_on: { db: { condition: service_healthy } }
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/arbolado
+      JWT_SECRET: ${JWT_SECRET:-cambiar-este-secreto-largo-de-demostracion-123456}
+      SEED: ${SEED:-1}            # 1 = si la base está vacía, carga usuarios y datos de demostración (usuarios con clave Demo2026!)
+      ORS_API_KEY: ${ORS_API_KEY:-}
+      # WEBAUTHN_RP_ID / WEBAUTHN_ORIGIN: si no se definen se toman del navegador (cómodo para la demo).
+    ports: ["3000:3000"]
+    volumes: [uploads:/data/uploads]
+
+  # Túnel HTTPS gratuito de Cloudflare sin cuenta: muestra la URL https://xxxx.trycloudflare.com en los logs.
+  tunel:
+    profiles: [tunel]
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://app:3000
+    depends_on: [app]
+
 volumes:
   pgdata:
+  uploads:

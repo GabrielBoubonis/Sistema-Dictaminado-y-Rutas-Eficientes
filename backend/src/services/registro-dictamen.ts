@@ -113,7 +113,7 @@ export async function registrarDictamen(usuario: string, raw: unknown, segundoFa
           nota_numero: p.nota_numero ?? null, expediente_numero: p.expediente_numero ?? null,
           fecha_emision: new Date(p.fecha_emision + 'T00:00:00Z'), fecha_firma: new Date(p.fecha_firma),
           domicilio_ejemplar: p.domicilio_ejemplar ?? null, latitud_ejemplar: p.latitud_ejemplar ?? null, longitud_ejemplar: p.longitud_ejemplar ?? null,
-          calle_esquina: p.calle_esquina ?? null, numero_esquina: p.numero_esquina ?? null, referencia_ubicacion: p.referencia_ubicacion ?? null,
+          referencia_ubicacion: p.referencia_ubicacion ?? null,
           id_especie: p.id_especie, distancia_medianera_referencia: p.distancia_medianera_referencia ?? null, cantidad_frente: p.cantidad_frente ?? null,
           nivel_dano_vereda: p.nivel_dano_vereda ?? null, es_extraccion: p.es_extraccion, perimetro_tronco: p.perimetro_tronco ?? null,
           motivo_extraccion: p.motivo_extraccion ?? null, es_sin_trabajo: p.es_sin_trabajo, motivo_sin_trabajo: p.motivo_sin_trabajo ?? null,
@@ -162,7 +162,7 @@ export async function armarPayloadSua(idDictamen: number) {
   return {
     numero_sua: d.numero_sua, anio: d.anio, autor: d.nombre_usuario, fecha_emision: d.fecha_emision.toISOString().slice(0, 10),
     nota_numero: d.nota_numero, expediente_numero: d.expediente_numero,
-    ubicacion: { domicilio_ejemplar: d.domicilio_ejemplar, latitud: d.latitud_ejemplar, longitud: d.longitud_ejemplar, calle_esquina: d.calle_esquina, numero_esquina: d.numero_esquina, referencia: d.referencia_ubicacion },
+    ubicacion: { domicilio_ejemplar: d.domicilio_ejemplar, latitud: d.latitud_ejemplar, longitud: d.longitud_ejemplar, referencia: d.referencia_ubicacion },
     especie: { nombre_comun: d.especie.nombre_comun, nombre_cientifico: d.especie.nombre_cientifico },
     distancia_medianera_referencia: d.distancia_medianera_referencia, cantidad_frente: d.cantidad_frente, nivel_dano_vereda: d.nivel_dano_vereda,
     extraccion: d.es_extraccion ? { perimetro_tronco: d.perimetro_tronco, motivo: d.motivo_extraccion } : null,

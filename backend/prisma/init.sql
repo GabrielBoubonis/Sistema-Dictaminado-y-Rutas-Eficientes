@@ -111,8 +111,6 @@ CREATE TABLE IF NOT EXISTS dictamen (
   domicilio_ejemplar             TEXT,
   latitud_ejemplar               DOUBLE PRECISION,
   longitud_ejemplar              DOUBLE PRECISION,
-  calle_esquina                  TEXT,
-  numero_esquina                 TEXT,
   referencia_ubicacion           TEXT,
   id_especie                     INTEGER NOT NULL REFERENCES especie(id_especie),
   distancia_medianera_referencia DOUBLE PRECISION,
@@ -234,3 +232,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_reserva_activa ON ruta_solicitud(numero_sua
 -- Reintentos de envío al SUA con espera creciente (RF-25, RNF-17).
 ALTER TABLE dictamen ADD COLUMN IF NOT EXISTS sua_intentos INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE dictamen ADD COLUMN IF NOT EXISTS sua_proximo_intento TIMESTAMP(3);
+
+-- Se quitó "calle de esquina" del dictamen (decisión de la Dirección).
+ALTER TABLE dictamen DROP COLUMN IF EXISTS calle_esquina;
+ALTER TABLE dictamen DROP COLUMN IF EXISTS numero_esquina;

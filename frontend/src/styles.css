@@ -52,3 +52,11 @@ input:disabled,select:disabled,textarea:disabled{background:#eef0ee;color:#777}
 .num{font-size:1.9rem;font-weight:800;color:var(--verde)}
 .vacio{text-align:center;color:var(--gris);padding:2rem 1rem}
 .sr{position:absolute;left:-9999px}
+
+.graf{margin:.8rem 0;background:#fff;border:1px solid var(--borde);border-radius:var(--radio);padding:.8rem 1rem}
+.graf figcaption{font-weight:700;margin-bottom:.3rem}
+.graf svg{display:block;max-width:100%}
+.graficos .graf{margin:.4rem 0;text-align:center}.graficos .graf svg{width:150px;margin:0 auto}
+.leyenda{display:flex;gap:1rem;font-size:.85rem;color:#52514e;margin-bottom:.4rem}
+.leyenda i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:.35rem;vertical-align:-1px}
+.barra rect,.graf rect{transition:opacity .12s}.graf svg:hover rect{opacity:.75}.graf svg rect:hover{opacity:1}

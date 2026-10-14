@@ -28,8 +28,7 @@
   ],
   "trabajos_subterraneos": [
     "Corte vertical de raíces",
-    "Corte horizontal de raíces",
-    "Agrandamiento de cazuela"
+    "Corte horizontal de raíces"
   ],
   "trabajos_aereos": [
     "Poda de formación",
@@ -62,7 +61,8 @@
   "plantar": [
     "Cazuela",
     "Construir cazuela",
-    "Vereda jardín"
+    "Vereda jardín",
+    "Agrandar cazuela"
   ],
   "nivel_prioridad": [
     "Alta",

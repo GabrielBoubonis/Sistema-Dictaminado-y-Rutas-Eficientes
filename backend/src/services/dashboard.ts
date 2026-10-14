@@ -24,13 +24,15 @@ export async function calcularDashboard(anio: number, mes?: number) {
 
   const general = vacio(), tormenta = vacio();
   const porDistrito: Record<string, Metricas> = {};
+  const porPrioridad: Record<string, Metricas> = {};
+  const porMes: Metricas[] = Array.from({ length: 12 }, vacio);
   for (const e of eventos) {
     const siguiente = todosEventos.find((x) => x.numero_sua === e.numero_sua && x.anio === e.anio && x.fecha_derivacion > e.fecha_derivacion && x.id_derivacion !== e.id_derivacion);
     const dictaminado = dictamenes.some((d) => d.numero_sua === e.numero_sua && d.anio === e.anio
       && d.fecha_emision >= e.fecha_derivacion && (!siguiente || d.fecha_emision < siguiente.fecha_derivacion));
-    const destinos = [general, (porDistrito[e.solicitud.distrito] ??= vacio())];
+    const destinos = [general, (porDistrito[e.solicitud.distrito] ??= vacio()), (porPrioridad[e.solicitud.prioridad] ??= vacio()), porMes[e.fecha_derivacion.getUTCMonth()]];
     if (e.solicitud.es_tormenta) destinos.push(tormenta);
     for (const m of destinos) { m.derivadas++; if (dictaminado) m.dictaminadas++; else m.sin_dictaminar++; }
   }
-  return { periodo: { anio, mes: mes ?? null }, general, tormenta, por_distrito: porDistrito };
+  return { periodo: { anio, mes: mes ?? null }, general, tormenta, por_distrito: porDistrito, por_prioridad: porPrioridad, por_mes: porMes };
 }

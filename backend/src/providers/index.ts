@@ -113,6 +113,36 @@ export class OrsGeocoder implements IGeocoder {
   }
 }
 
+/**
+ * Nominatim (OpenStreetMap): gratis y sin clave. Política de uso: máximo 1 pedido por segundo y User-Agent
+ * identificable; por eso se serializan los pedidos con una espera mínima de 1,1 s entre uno y otro.
+ */
+export class NominatimGeocoder implements IGeocoder {
+  private ultimo = 0;
+  private cola: Promise<unknown> = Promise.resolve();
+  async geocodificar(direccion: string): Promise<Coord | null> {
+    const tarea = this.cola.then(async () => {
+      const espera = this.ultimo + 1100 - Date.now();
+      if (espera > 0) await new Promise((r) => setTimeout(r, espera));
+      try { return await this.consultar(direccion); } finally { this.ultimo = Date.now(); }
+    });
+    this.cola = tarea.catch(() => undefined);
+    return tarea;
+  }
+  private async consultar(direccion: string): Promise<Coord | null> {
+    const sede = config.sede;
+    const q = /rosario/i.test(direccion) ? direccion : `${direccion}, Rosario, Santa Fe`;
+    // viewbox ≈ ±0,25° alrededor de la sede, bounded=0: prioriza la zona sin excluir el resto.
+    const url = `${config.nominatimUrl}/search?format=jsonv2&limit=1&countrycodes=ar&q=${encodeURIComponent(q)}` +
+      `&viewbox=${sede.lng - 0.25},${sede.lat + 0.25},${sede.lng + 0.25},${sede.lat - 0.25}`;
+    const r = await fetch(url, { headers: { 'User-Agent': `arbolado-rosario/1.0 (${config.nominatimContacto})`, 'Accept-Language': 'es' } });
+    if (!r.ok) throw new ProveedorNoDisponible(`Nominatim ${r.status}`);
+    const j: any = await r.json();
+    if (!Array.isArray(j) || !j[0]) return null;
+    return { lat: Number(j[0].lat), lng: Number(j[0].lon) };
+  }
+}
+
 export class OrsMatriz implements IMatriz {
   async matriz(puntos: Coord[], modo: Modo): Promise<MatrizResultado> {
     const perfil = modo === 'Caminando' ? 'foot-walking' : 'driving-car';
@@ -133,6 +163,6 @@ export const providers: {
 } = {
   auth: new MockAuthProvider(),
   reclamo: new MockReclamoProvider(),
-  geocoder: config.orsKey ? new OrsGeocoder() : new MockGeocoder(),
+  geocoder: config.geocoder === 'ors' && config.orsKey ? new OrsGeocoder() : config.geocoder === 'mock' ? new MockGeocoder() : new NominatimGeocoder(),
   matriz: config.orsKey ? new OrsMatriz() : new MockMatriz(),
 };

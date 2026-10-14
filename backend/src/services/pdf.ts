@@ -36,7 +36,6 @@ export async function generarPdf(idDictamen: number): Promise<PDFKit.PDFDocument
   fila('Domicilio del reclamo', d.solicitud.direccion); fila('Distrito', d.solicitud.distrito);
   titulo('Ejemplar');
   fila('Domicilio del ejemplar', d.domicilio_ejemplar);
-  fila('Calle esquina', d.calle_esquina ? `${d.calle_esquina} ${d.numero_esquina ?? ''}`.trim() : null);
   fila('Referencia', d.referencia_ubicacion);
   if (d.latitud_ejemplar !== null) fila('Coordenadas', `${d.latitud_ejemplar?.toFixed(6)}, ${d.longitud_ejemplar?.toFixed(6)}`);
   fila('Especie', `${d.especie.nombre_comun}${d.especie.nombre_cientifico ? ` (${d.especie.nombre_cientifico})` : ''}`);

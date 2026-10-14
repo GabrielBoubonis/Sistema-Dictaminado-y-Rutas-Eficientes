@@ -2,7 +2,7 @@ import catalogos from '../catalogos.json';
 
 export interface FormDictamen {
   nota_numero: string; expediente_numero: string; fecha_emision: string;
-  latitud_ejemplar: number | null; longitud_ejemplar: number | null; calle_esquina: string; numero_esquina: string; referencia_ubicacion: string;
+  latitud_ejemplar: number | null; longitud_ejemplar: number | null; referencia_ubicacion: string;
   id_especie: number | null; distancia_medianera_referencia: string; cantidad_frente: string; nivel_dano_vereda: string;
   es_extraccion: boolean; perimetro_tronco: string; motivo_extraccion: string; es_sin_trabajo: boolean; motivo_sin_trabajo: string;
   trabajos_aereos: string[]; trabajos_subterraneos: { tipo_trabajo: string; distancia_borde: string }[];
@@ -12,7 +12,7 @@ export interface FormDictamen {
 
 export const CORTE_VERTICAL = 'Corte vertical de raíces';
 export const vacioFormulario = (hoy: string): FormDictamen => ({
-  nota_numero: '', expediente_numero: '', fecha_emision: hoy, latitud_ejemplar: null, longitud_ejemplar: null, calle_esquina: '', numero_esquina: '',
+  nota_numero: '', expediente_numero: '', fecha_emision: hoy, latitud_ejemplar: null, longitud_ejemplar: null,
   referencia_ubicacion: '', id_especie: null, distancia_medianera_referencia: '', cantidad_frente: '', nivel_dano_vereda: '',
   es_extraccion: false, perimetro_tronco: '', motivo_extraccion: '', es_sin_trabajo: false, motivo_sin_trabajo: '', trabajos_aereos: [],
   trabajos_subterraneos: [], complejidad: '', urgente: false, arbol_frente_garage: false, media_tension: false, de_oficio: false, plantar: '',

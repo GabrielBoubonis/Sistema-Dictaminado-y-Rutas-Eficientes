@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 process.env.DATABASE_URL = process.env.TEST_DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/arbolado_test';
 process.env.BCRYPT_COST = '4';
+process.env.GEOCODER = 'mock';
 process.env.JWT_SECRET = 'test-secret';
 process.env.UPLOADS_DIR = require('os').tmpdir() + '/arbolado-test-uploads';
 

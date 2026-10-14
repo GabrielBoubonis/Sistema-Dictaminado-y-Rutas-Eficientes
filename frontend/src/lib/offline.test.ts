@@ -21,22 +21,22 @@ describe('cola cifrada (RNF-16)', () => {
 
 describe('reanudar sin señal (RF-57)', () => {
   it('acepta la contraseña local el mismo día y rechaza otra contraseña', async () => {
-    await guardarSesionLocal('mrossi', 'Martín Rossi', 'Operador', 'Demo2026!');
-    expect((await reanudarSinConexion('mrossi', 'Demo2026!')).ok).toBe(true);
-    expect(await reanudarSinConexion('mrossi', 'Otra2026!')).toEqual({ ok: false, motivo: 'password' });
+    await guardarSesionLocal('mrossi0', 'Martín Rossi', 'Operador', 'Demo2026!');
+    expect((await reanudarSinConexion('mrossi0', 'Demo2026!')).ok).toBe(true);
+    expect(await reanudarSinConexion('mrossi0', 'Otra2026!')).toEqual({ ok: false, motivo: 'password' });
     expect(await reanudarSinConexion('nadie', 'Demo2026!')).toEqual({ ok: false, motivo: 'sin_sesion' });
   });
   it('no deja reanudar al día siguiente ni pasados 7 días', async () => {
-    await guardarSesionLocal('mrossi', 'Martín Rossi', 'Operador', 'Demo2026!');
-    const s = (await db.sesiones.get('mrossi'))!;
+    await guardarSesionLocal('mrossi0', 'Martín Rossi', 'Operador', 'Demo2026!');
+    const s = (await db.sesiones.get('mrossi0'))!;
     const manana = s.ultimoLoginOnline + 26 * 3600 * 1000;
     expect(mismoDia(s.ultimoLoginOnline, manana)).toBe(false);
-    expect(await reanudarSinConexion('mrossi', 'Demo2026!', manana)).toEqual({ ok: false, motivo: 'otro_dia' });
+    expect(await reanudarSinConexion('mrossi0', 'Demo2026!', manana)).toEqual({ ok: false, motivo: 'otro_dia' });
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(Date.now() - 8 * 24 * 3600 * 1000);
-    await guardarSesionLocal('lfernan', 'Lucía Fernández', 'Operador', 'Demo2026!'); // primer ingreso hace 8 días
+    await guardarSesionLocal('lfernan0', 'Lucía Fernández', 'Operador', 'Demo2026!'); // primer ingreso hace 8 días
     vi.useRealTimers();
-    expect(await reanudarSinConexion('lfernan', 'Demo2026!')).toEqual({ ok: false, motivo: 'tope_7_dias' });
+    expect(await reanudarSinConexion('lfernan0', 'Demo2026!')).toEqual({ ok: false, motivo: 'tope_7_dias' });
   });
   it('el código del captor tiene el formato esperado y es estable', async () => {
     const a = await codigoDispositivo('6f2b1c7e-93aa-4d1b-8f10-2a7c9e4d5b11');

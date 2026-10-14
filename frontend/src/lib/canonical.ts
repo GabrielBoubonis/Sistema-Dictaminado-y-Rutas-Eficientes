@@ -27,7 +27,7 @@ export function contenidoFirmado(p: Record<string, any>) {
     nota_numero: n(p.nota_numero), expediente_numero: n(p.expediente_numero),
     fecha_emision: p.fecha_emision, domicilio_ejemplar: n(p.domicilio_ejemplar),
     latitud_ejemplar: n(p.latitud_ejemplar), longitud_ejemplar: n(p.longitud_ejemplar),
-    calle_esquina: n(p.calle_esquina), numero_esquina: n(p.numero_esquina), referencia_ubicacion: n(p.referencia_ubicacion),
+    referencia_ubicacion: n(p.referencia_ubicacion),
     id_especie: p.id_especie, distancia_medianera_referencia: n(p.distancia_medianera_referencia), cantidad_frente: n(p.cantidad_frente),
     nivel_dano_vereda: n(p.nivel_dano_vereda),
     es_extraccion: !!p.es_extraccion, perimetro_tronco: n(p.perimetro_tronco), motivo_extraccion: n(p.motivo_extraccion),

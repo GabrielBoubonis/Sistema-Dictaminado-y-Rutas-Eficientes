@@ -154,8 +154,6 @@ model Dictamen {
   domicilio_ejemplar             String?
   latitud_ejemplar               Float?
   longitud_ejemplar              Float?
-  calle_esquina                  String?
-  numero_esquina                 String?
   referencia_ubicacion           String?
   id_especie                     Int
   distancia_medianera_referencia Float?

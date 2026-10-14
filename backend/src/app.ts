@@ -17,11 +17,18 @@ import { revisionRouter } from './routes/revision';
 import { auditoriaRouter } from './routes/auditoria';
 import { dashboardRouter } from './routes/dashboard';
 import { tormentaRouter } from './routes/tormenta';
+import { origenDelPedido } from './config';
 import { providers, MockAuthProvider, MockReclamoProvider, MockMatriz, MockGeocoder } from './providers';
 
 export function createApp() {
   const app = express();
   app.disable('x-powered-by');
+  if (process.env.TRUST_PROXY) app.set('trust proxy', Number(process.env.TRUST_PROXY) || process.env.TRUST_PROXY);
+  // WebAuthn: rpId/origin del pedido a partir de la cabecera Origin (ver config.ts)
+  app.use((req, _res, next) => {
+    const o = req.headers.origin;
+    origenDelPedido.run(typeof o === 'string' && /^https?:\/\/[^/\s]+$/.test(o) ? o : undefined, next);
+  });
   app.use(securityHeaders);
   app.use(express.json({ limit: '25mb' }));
 

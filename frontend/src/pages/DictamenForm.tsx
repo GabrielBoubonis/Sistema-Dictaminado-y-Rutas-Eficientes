@@ -8,7 +8,7 @@ import { calcularHashFirma } from '../lib/canonical';
 import { firmarConHuella, registrarHuella, credencialesDe } from '../lib/biometria';
 import { comprimirFoto } from '../lib/imagen';
 import { aNumero, CORTE_VERTICAL, vacioFormulario, validarPaso, type FormDictamen } from '../lib/reglas';
-import { conCache, marcarFirmadaLocal, nombreDeCalle, type Ruta, type Solicitud } from '../lib/datos';
+import { conCache, marcarFirmadaLocal, type Ruta, type Solicitud } from '../lib/datos';
 import { encolar } from '../lib/sync';
 import { Mapa } from '../components/Mapa';
 import { Modal, textoError } from '../components/ui';
@@ -25,7 +25,6 @@ export function DictamenForm() {
   const nav = useNavigate();
   const [sol, setSol] = useState<Solicitud | null>(null);
   const [especies, setEspecies] = useState<Especie[]>([]);
-  const [calles, setCalles] = useState<string[]>([]);
   const [paso, setPaso] = useState(1);
   const [f, setF] = useState<FormDictamen>(vacioFormulario(hoy()));
   const [errores, setErrores] = useState<string[]>([]);
@@ -54,8 +53,6 @@ export function DictamenForm() {
       setSol(s);
       const esp = await conCache<Especie[]>('especies', () => api('/especies'));
       setEspecies(esp.datos ?? []);
-      const lista = await conCache<Solicitud[]>('solicitudes', () => api('/solicitudes'));
-      setCalles([...new Set((lista.datos ?? []).map((x) => nombreDeCalle(x.direccion)))].sort());
       const b = await db.borradores.get(claveBorrador);
       if (b) { try { setF({ ...vacioFormulario(hoy()), ...(await descifrar<FormDictamen>(b.datos as any)) }); } catch { /* borrador ilegible: se descarta */ } }
       else if (s.latitud !== null) setF((p) => ({ ...p, latitud_ejemplar: s!.latitud, longitud_ejemplar: s!.longitud }));
@@ -98,7 +95,7 @@ export function DictamenForm() {
       uuid_dictamen: uuid, fecha_firma: new Date().toISOString(), numero_sua: sol!.numero_sua, anio: sol!.anio,
       nota_numero: aNumero(f.nota_numero), expediente_numero: aNumero(f.expediente_numero), fecha_emision: f.fecha_emision,
       domicilio_ejemplar: sol!.direccion, latitud_ejemplar: f.latitud_ejemplar, longitud_ejemplar: f.longitud_ejemplar,
-      calle_esquina: f.calle_esquina || null, numero_esquina: f.numero_esquina || null, referencia_ubicacion: f.referencia_ubicacion.trim() || null,
+      referencia_ubicacion: f.referencia_ubicacion.trim() || null,
       id_especie: f.id_especie, distancia_medianera_referencia: aNumero(f.distancia_medianera_referencia),
       cantidad_frente: f.cantidad_frente ? Number(f.cantidad_frente) : null, nivel_dano_vereda: f.nivel_dano_vereda || null,
       es_extraccion: f.es_extraccion, perimetro_tronco: f.es_extraccion ? aNumero(f.perimetro_tronco) : null, motivo_extraccion: f.es_extraccion ? f.motivo_extraccion : null,
@@ -163,10 +160,6 @@ export function DictamenForm() {
         <label>Domicilio de la solicitud</label><input type="text" value={sol.direccion} disabled />
         <label>Domicilio del ejemplar * <span className="ayuda">tocá el mapa en el punto exacto</span></label>
         <Mapa punto={f.latitud_ejemplar !== null ? { lat: f.latitud_ejemplar, lng: f.longitud_ejemplar! } : null} onPunto={(p) => { set('latitud_ejemplar', p.lat); set('longitud_ejemplar', p.lng); }} etiquetaAria="Mapa para marcar la ubicación del ejemplar" />
-        <div className="grid2">
-          <div><label htmlFor="calle">Calle esquina</label><input id="calle" type="text" list="calles" value={f.calle_esquina} onChange={(e) => set('calle_esquina', e.target.value)} placeholder="Elegí una calle sugerida" /><datalist id="calles">{calles.map((c) => <option key={c} value={c} />)}</datalist></div>
-          <div><label htmlFor="ncalle">Número esquina</label><input id="ncalle" type="text" inputMode="numeric" value={f.numero_esquina} onChange={(e) => set('numero_esquina', e.target.value.replace(/\D/g, ''))} /></div>
-        </div>
         <label htmlFor="ref">Referencia de ubicación</label><input id="ref" type="text" maxLength={300} value={f.referencia_ubicacion} onChange={(e) => set('referencia_ubicacion', e.target.value)} />
         <SelectorEspecie especies={especies} valor={especie} onElegir={(e) => set('id_especie', e.id_especie)} onNueva={(e) => { setEspecies([...especies, e]); set('id_especie', e.id_especie); }} online={online} />
         <div className="grid2">
@@ -220,7 +213,7 @@ export function DictamenForm() {
           {([['urgente', 'Urgente'], ['arbol_frente_garage', 'Árbol frente a garage'], ['media_tension', 'Media tensión'], ['de_oficio', 'De oficio']] as const).map(([k, t]) => (
             <label key={k} className="check"><input type="checkbox" checked={f[k]} onChange={(e) => set(k, e.target.checked)} />{t}</label>))}
         </div>
-        <label htmlFor="pl">Plantar</label>
+        <label htmlFor="pl">Plantar (árbol nuevo)</label>
         <select id="pl" value={f.plantar} onChange={(e) => set('plantar', e.target.value)}><option value="">Ninguna</option>{catalogos.plantar.filter((p) => p !== 'ninguna').map((p) => <option key={p}>{p}</option>)}</select>
         <label>Fotografías del ejemplar * <span className="ayuda">(mínimo 1, máximo 10)</span></label>
         <input type="file" accept="image/*" capture="environment" multiple aria-label="Agregar fotografías" onChange={(e) => { void agregarFotos(e.target.files); e.target.value = ''; }} />

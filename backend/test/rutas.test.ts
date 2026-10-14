@@ -11,7 +11,7 @@ const generar = (t: string, body: object) => api().post('/api/rutas').set(auth(t
 
 describe('Listado de solicitudes (RF-09 a RF-13, RF-39)', () => {
   it('lista pendientes y pendientes-revisión de todos, sin las de tormenta', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     const r = await api().get('/api/solicitudes').set(auth(t));
     expect(r.status).toBe(200);
     expect(r.body.every((s: any) => ['Pendiente', 'Pendiente-revisión'].includes(s.estado))).toBe(true);
@@ -23,7 +23,7 @@ describe('Listado de solicitudes (RF-09 a RF-13, RF-39)', () => {
   });
 
   it('filtra por estado y distrito, rechaza valores fuera del catálogo y marca las sin ubicar', async () => {
-    const t = await token('pgimene');
+    const t = await token('pgimene0');
     const d = await api().get('/api/solicitudes?distrito=Norte&estado=Pendiente').set(auth(t));
     expect(d.body.length).toBeGreaterThan(0);
     expect(d.body.every((s: any) => s.distrito === 'Norte' && s.estado === 'Pendiente')).toBe(true);
@@ -33,7 +33,7 @@ describe('Listado de solicitudes (RF-09 a RF-13, RF-39)', () => {
   });
 
   it('detalle con historial de derivaciones; 404 si no existe; Lector sin acceso', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     const multi = await prisma.historialDerivacion.groupBy({ by: ['numero_sua', 'anio'], _count: true, having: { numero_sua: { _count: { gte: 2 } } } });
     expect(multi.length).toBeGreaterThan(0);
     const s = multi[0];
@@ -41,13 +41,13 @@ describe('Listado de solicitudes (RF-09 a RF-13, RF-39)', () => {
     expect(d.status).toBe(200);
     expect(d.body.historial.length).toBeGreaterThanOrEqual(2);
     expect((await api().get('/api/solicitudes/99999/2026').set(auth(t))).status).toBe(404);
-    expect((await api().get('/api/solicitudes').set(auth(await token('tmolina')))).status).toBe(403);
+    expect((await api().get('/api/solicitudes').set(auth(await token('tmolina0')))).status).toBe(403);
   });
 });
 
 describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
   it('suma las cantidades por prioridad, optimiza el orden y calcula distancia/tiempo', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     const r = await generar(t, { modo: 'Caminando', distrito: 'Centro', cantidades: { Alta: 2, Media: 1, Baja: 1 } });
     expect(r.status).toBe(201);
     expect(r.body.solicitudes).toHaveLength(4);
@@ -61,21 +61,21 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
   });
 
   it('RF-15: sin distrito considera todos', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     const r = await generar(t, { modo: 'Vehículo', cantidades: { Alta: 8 } });
     expect(r.status).toBe(201);
     expect(new Set(r.body.solicitudes.map((s: any) => s.distrito)).size).toBeGreaterThan(1);
   });
 
   it('RF-49: el modo cambia el tiempo pero no la distancia en el simulador', async () => {
-    const a = await generar(await token('mrossi'), { modo: 'Caminando', cantidades: { Alta: 3 } });
-    const b = await generar(await token('pgimene'), { modo: 'Vehículo', cantidades: { Alta: 3 } });
+    const a = await generar(await token('mrossi0'), { modo: 'Caminando', cantidades: { Alta: 3 } });
+    const b = await generar(await token('pgimene0'), { modo: 'Vehículo', cantidades: { Alta: 3 } });
     expect(a.body.tiempo_total_s).toBeGreaterThan(0);
     expect(b.body.modo_desplazamiento).toBe('Vehículo');
   });
 
   it('RF-16: lo reservado por un ingeniero no entra en la ruta de otro y la carrera no duplica', async () => {
-    const [t1, t2] = [await token('mrossi'), await token('pgimene')];
+    const [t1, t2] = [await token('mrossi0'), await token('pgimene0')];
     const [a, b] = await Promise.all([
       generar(t1, { modo: 'Caminando', cantidades: { Alta: 6 } }),
       generar(t2, { modo: 'Caminando', cantidades: { Alta: 6 } }),
@@ -89,15 +89,15 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
   });
 
   it('una sola ruta activa por usuario (409) y el listado muestra quién reservó', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     await generar(t, { modo: 'Caminando', cantidades: { Alta: 2 } });
     expect((await generar(t, { modo: 'Caminando', cantidades: { Alta: 2 } })).status).toBe(409);
-    const lista = await api().get('/api/solicitudes').set(auth(await token('pgimene')));
-    expect(lista.body.filter((s: any) => s.reservada_por === 'mrossi')).toHaveLength(2);
+    const lista = await api().get('/api/solicitudes').set(auth(await token('pgimene0')));
+    expect(lista.body.filter((s: any) => s.reservada_por === 'mrossi0')).toHaveLength(2);
   });
 
   it('RF-47: con más candidatas que cupo prefiere las más antiguas', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     const r = await generar(t, { modo: 'Caminando', cantidades: { Alta: 3 } });
     const elegidas = r.body.solicitudes.map((s: any) => `${s.numero_sua}-${s.anio}`);
     const todas = await prisma.solicitud.findMany({ where: { prioridad: 'Alta', es_tormenta: false, estado: { in: ['Pendiente', 'Pendiente-revisión'] }, latitud: { not: null }, dictamenes: { none: { vigente: null } } } });
@@ -109,7 +109,7 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
 
   it('si OpenRouteService no responde: selecciona por antigüedad, sin optimizar y avisa', async () => {
     (providers.matriz as MockMatriz).caido = true;
-    const r = await generar(await token('mrossi'), { modo: 'Caminando', cantidades: { Alta: 3 } });
+    const r = await generar(await token('mrossi0'), { modo: 'Caminando', cantidades: { Alta: 3 } });
     expect(r.status).toBe(201);
     expect(r.body.optimizada).toBe(false);
     expect(r.body.distancia_total_m).toBeNull();
@@ -117,7 +117,7 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
   });
 
   it('zona dibujada: solo entran solicitudes dentro del polígono', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     const todas = await prisma.solicitud.findMany({ where: { prioridad: 'Alta', latitud: { not: null }, es_tormenta: false } });
     const lats = todas.map((s) => s.latitud!).sort((a, b) => a - b);
     const corte = lats[Math.floor(lats.length / 2)];
@@ -129,18 +129,18 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
   });
 
   it('sin candidatas → 422; datos inválidos → 422; Lector → 403', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     await prisma.solicitud.updateMany({ data: { estado: 'Dictaminada' } });
     expect((await generar(t, { modo: 'Caminando', cantidades: { Alta: 1 } })).status).toBe(422);
     expect((await generar(t, { modo: 'Bicicleta', cantidades: { Alta: 1 } })).status).toBe(422);
     expect((await generar(t, { modo: 'Caminando', cantidades: {} })).status).toBe(422);
-    expect((await generar(await token('tmolina'), { modo: 'Caminando', cantidades: { Alta: 1 } })).status).toBe(403);
+    expect((await generar(await token('tmolina0'), { modo: 'Caminando', cantidades: { Alta: 1 } })).status).toBe(403);
   });
 
   it('las sin coordenadas quedan fuera de la ruta (RF-62) hasta que el reintento las ubica', async () => {
     const sin = await prisma.solicitud.findFirstOrThrow({ where: { latitud: null } });
     await prisma.solicitud.updateMany({ where: { NOT: { numero_sua: sin.numero_sua } }, data: { estado: 'Dictaminada' } });
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     expect((await generar(t, { modo: 'Caminando', cantidades: { Alta: 5, Media: 5, Baja: 5 } })).status).toBe(422);
     await prisma.solicitud.update({ where: { numero_sua_anio: { numero_sua: sin.numero_sua, anio: sin.anio } }, data: { direccion: 'Pellegrini 1500, Rosario' } });
     expect(await reintentarGeocodificacion()).toBe(1);
@@ -151,7 +151,7 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
 
 describe('Ruta activa, restablecer y corte de las 18:00 (RF-17, RF-18)', () => {
   it('GET /rutas/activa devuelve la ruta o null', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     expect((await api().get('/api/rutas/activa').set(auth(t))).body).toBeNull();
     await generar(t, { modo: 'Caminando', cantidades: { Alta: 2 } });
     const a = await api().get('/api/rutas/activa').set(auth(t));
@@ -160,7 +160,7 @@ describe('Ruta activa, restablecer y corte de las 18:00 (RF-17, RF-18)', () => {
   });
 
   it('Restablecer libera todas y permite que otro ingeniero las tome; solo el dueño', async () => {
-    const [t1, t2] = [await token('mrossi'), await token('pgimene')];
+    const [t1, t2] = [await token('mrossi0'), await token('pgimene0')];
     const r = await generar(t1, { modo: 'Caminando', cantidades: { Alta: 3 } });
     expect((await api().post(`/api/rutas/${r.body.id_ruta}/restablecer`).set(auth(t2))).status).toBe(404);
     const x = await api().post(`/api/rutas/${r.body.id_ruta}/restablecer`).set(auth(t1));
@@ -171,7 +171,7 @@ describe('Ruta activa, restablecer y corte de las 18:00 (RF-17, RF-18)', () => {
   });
 
   it('el corte de las 18:00 libera las rutas creadas antes del corte', async () => {
-    const t = await token('mrossi');
+    const t = await token('mrossi0');
     const r = await generar(t, { modo: 'Caminando', cantidades: { Alta: 2 } });
     expect(await cerrarRutasVencidas(new Date(Date.now() + 1000))).toBe(0 + (ultimoCorte(new Date()) > new Date(r.body.creada) ? 1 : 0));
     await prisma.ruta.update({ where: { id_ruta: r.body.id_ruta }, data: { creada: new Date(Date.now() - 36 * 3600 * 1000) } });

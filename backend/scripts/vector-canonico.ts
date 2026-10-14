@@ -11,4 +11,4 @@ const p = dictamenSchema.parse({
   complejidad: 'Baja', plantar: 'Cazuela', nivel_prioridad: 'Media', observaciones: 'Ñandú: acentos y "comillas"',
   fotos: [{ contenido_base64: Buffer.from('/9j/AAAAAAAAAA==').toString('base64') }, { contenido_base64: 'QUJDREVGR0g=' }],
 });
-console.log(JSON.stringify({ entrada: { ...p, fotos: p.fotos.map((f) => f.contenido_base64) }, usuario: 'mrossi', hash: calcularHash(p, 'mrossi').hash }, null, 1));
+console.log(JSON.stringify({ entrada: { ...p, fotos: p.fotos.map((f) => f.contenido_base64) }, usuario: 'mrossi0', hash: calcularHash(p, 'mrossi0').hash }, null, 1));

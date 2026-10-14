@@ -22,7 +22,7 @@ cp .env.example .env        # completar JWT_SECRET; el resto sirve tal cual para
 npm install
 npm run db:generate         # genera el cliente de Prisma (necesita internet la primera vez)
 npm run db:init             # crea las tablas (prisma/init.sql)
-npm run seed                # carga los datos de prueba (42 solicitudes, 10 dictámenes, 7 usuarios)
+npm run seed                # carga los datos de prueba (42 solicitudes, 10 dictámenes, 7 usuarios); sin internet las solicitudes quedan sin geolocalizar (usar GEOCODER=mock)
 
 cd ../frontend
 npm install
@@ -36,31 +36,53 @@ Para desarrollar el frontend con recarga en caliente: `npm run dev` en `frontend
 
 ### Usuarios de prueba (contraseña de todos: `Demo2026!`)
 
+Los nombres de usuario siempre terminan en un número: inicial del nombre + apellido (hasta 6 letras) + 0, 1, 2… (ej. `gboubon0`). Si ya existe, el siguiente libre.
+
+
 | Usuario | Rol | Para probar |
 |---|---|---|
-| `mrossi`, `cbenite`, `lfernan` | Operador | rutas, dictámenes, captor |
-| `pgimene` | Jefe | dashboard, elegir dictamen vigente cuando hay dos |
-| `asuarez` | Administrador | usuarios, desbloquear captor, auditoría, "Para revisar" |
-| `tmolina` | Lector | dashboard y tormenta (solo lectura) |
-| `jdiaz` | Operador | existe localmente pero NO está vigente en la Autenticación Institucional simulada: no puede ingresar |
+| `mrossi0`, `cbenite0`, `lfernan0` | Operador | rutas, dictámenes, captor |
+| `pgimene0` | Jefe | dashboard, elegir dictamen vigente cuando hay dos |
+| `asuarez0` | Administrador | usuarios, desbloquear captor, auditoría, "Para revisar" |
+| `tmolina0` | Lector | dashboard y tormenta (solo lectura) |
+| `jdiaz0` | Operador | existe localmente pero NO está vigente en la Autenticación Institucional simulada: no puede ingresar |
 
 Un usuario creado desde "Gestión de usuarios" solo puede ingresar si además figura como vigente en la Autenticación Institucional. Como es simulada, en desarrollo se lo da de alta con `POST /api/dev/institucional {"nombre_usuario": "..."}`.
 
 ### Probarlo en un celular real
 
-WebAuthn (la huella al firmar) y la instalación de la PWA **exigen HTTPS** en el celular (`localhost` solo vale en la misma computadora). Opciones gratuitas: un túnel como `cloudflared tunnel --url http://localhost:3000`, o desplegarlo detrás de un dominio con certificado. Hay que ajustar en `backend/.env`:
+WebAuthn (la huella al firmar) y la instalación de la PWA **exigen HTTPS** en el celular (`localhost` solo vale en la misma computadora). La app ya viene lista para servirse de un único origen (el servidor sirve la API y la PWA), así que alcanza con exponer el puerto 3000 por HTTPS. Si no se definen `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN`, el servidor los toma de la cabecera `Origin` del navegador, por lo que funciona con cualquier URL sin tocar nada.
 
-```
-WEBAUTHN_RP_ID=el-dominio-del-tunel
-WEBAUTHN_ORIGIN=https://el-dominio-del-tunel
+**Opción A: túnel gratuito de Cloudflare (la más rápida, para probar)**
+
+```bash
+# con el servidor andando en la PC (npm run dev, puerto 3000):
+cloudflared tunnel --url http://localhost:3000     # imprime https://algo.trycloudflare.com
 ```
 
-y abrir la app desde esa dirección. La primera vez que un ingeniero firma, la app le pide registrar su huella (una sola vez por usuario y captor).
+o todo en contenedores (necesita `../datos-prueba` junto a `sistema/`):
+
+```bash
+docker compose --profile app --profile tunel up --build
+docker compose logs tunel | grep trycloudflare      # la URL https para abrir en el celular
+```
+
+La URL cambia cada vez y el túnel funciona mientras la PC esté encendida. Sirve para demostrar, no como instalación definitiva.
+
+**Opción B: servidor permanente.** La app necesita un proceso Node siempre activo (tareas programadas, envío al SUA con reintentos), PostgreSQL y disco para las fotos, por eso **Vercel no es adecuado** (funciones sin estado, sin disco persistente ni procesos de fondo). Sirven Render, Fly.io o Railway (o un VPS) con la imagen del `Dockerfile` y una base PostgreSQL (la propia del proveedor o Neon, que tiene plan gratuito). Definir `DATABASE_URL`, `JWT_SECRET` (largo y aleatorio), `WEBAUTHN_RP_ID` y `WEBAUTHN_ORIGIN` con el dominio final y montar un volumen en `/data/uploads`. **Cloudflare Pages/Workers tampoco** corre este backend; sí sirve su túnel (Opción A).
+
+Nada de esto pudo probarse acá (no hay Docker daemon ni salida a internet en el entorno de desarrollo): el `Dockerfile` y el `docker-compose.yml` están escritos pero **sin ejecutar**; la derivación del origen de WebAuthn sí tiene test.
+
+La primera vez que un ingeniero firma, la app le pide registrar su huella (una sola vez por usuario y captor).
+
+### Mapa y geocodificación
+
+El mapa usa teselas de OpenStreetMap y la geocodificación de direcciones usa **Nominatim (OpenStreetMap, gratuito y sin clave)** por defecto, a razón de 1 consulta por segundo como pide su política de uso; con `ORS_API_KEY` se usa OpenRouteService, y `GEOCODER=mock` fuerza el simulador (lo usan los tests). Las direcciones se geocodifican una sola vez, al derivar. Si el servicio no responde, la solicitud queda "sin geolocalizar" y se puede ubicar a mano (RF-62). Con el simulador las coordenadas **no** coinciden con la realidad: para ver las solicitudes en su lugar hay que correr con Nominatim u ORS y con internet.
 
 ### Tests
 
 ```bash
-cd backend && npm test              # 63 tests contra una PostgreSQL real (crea la base arbolado_test sola)
+cd backend && npm test              # 66 tests contra una PostgreSQL real (crea la base arbolado_test sola)
 cd frontend && npm test             # 11 tests (hash de firma compartido con el servidor, cola cifrada, reanudar sin señal, reglas del formulario)
 ```
 
@@ -71,7 +93,7 @@ Prueba de punta a punta (con el servidor corriendo y la PWA compilada): `pip ins
 ## Qué se probó y qué no
 
 **Probado automáticamente**
-- Backend (63 tests con PostgreSQL real): login y mensaje genérico (RF-50), límite de intentos con espera creciente (RNF-19), caída de la Autenticación Institucional sin contar como intento, tope de sesión de 7 días (RNF-20), bloqueo, desbloqueo y revocación de captores con auditoría (RF-52, RF-60), auditoría inmutable a nivel de base de datos (RF-54), rutas (distrito opcional, cantidades por prioridad, zona, franjas de 2 días, vecino más próximo, caída de ORS, reservas sin duplicar aunque dos ingenieros pidan a la vez, corte de las 18:00), dictámenes (RF-45, RF-46, RF-56, RF-61, RF-21 con dos envíos simultáneos, idempotencia por UUID), segundo factor WebAuthn con un autenticador por software (la aserción tiene que corresponder al contenido y a una credencial del mismo usuario), hash de firma, sincronización offline con integridad no verificada (RF-53), conflicto entre dos dictámenes y elección del Jefe (RF-59), envío al SUA con reintentos de espera creciente (RF-25), dashboard (RF-37 y RF-44), tormenta, validación de datos del SUA (RNF-18).
+- Backend (66 tests con PostgreSQL real): login y mensaje genérico (RF-50), límite de intentos con espera creciente (RNF-19), caída de la Autenticación Institucional sin contar como intento, tope de sesión de 7 días (RNF-20), bloqueo, desbloqueo y revocación de captores con auditoría (RF-52, RF-60), auditoría inmutable a nivel de base de datos (RF-54), rutas (distrito opcional, cantidades por prioridad, zona, franjas de 2 días, vecino más próximo, caída de ORS, reservas sin duplicar aunque dos ingenieros pidan a la vez, corte de las 18:00), dictámenes (RF-45, RF-46, RF-56, RF-61, RF-21 con dos envíos simultáneos, idempotencia por UUID), segundo factor WebAuthn con un autenticador por software (la aserción tiene que corresponder al contenido y a una credencial del mismo usuario), hash de firma, sincronización offline con integridad no verificada (RF-53), conflicto entre dos dictámenes y elección del Jefe (RF-59), envío al SUA con reintentos de espera creciente (RF-25), dashboard (RF-37 y RF-44), tormenta, validación de datos del SUA (RNF-18).
 - Frontend (11 tests): el hash de firma calculado en el navegador coincide con el del servidor para el mismo dictamen; la cola offline se guarda cifrada y no se puede alterar; reanudar sin señal solo el mismo día y antes de los 7 días; reglas del formulario.
 - Prueba de punta a punta en Chromium con pantalla de celular: login, generar ruta, completar los 5 pasos, registrar huella y firmar (autenticador virtual), repetir **sin conexión** (queda cifrado en IndexedDB y no llega al servidor), volver la conexión (se sincroniza solo y se vacía la cola), reanudar sin señal, bloqueo a los 5 intentos con código y desbloqueo por un Administrador, y las pantallas de Administrador y Jefe.
 
@@ -94,7 +116,6 @@ Prueba de punta a punta (con el servidor corriendo y la PWA compilada): `pip ins
 
 ## Pendientes y cuestiones abiertas
 
-- **Calle esquina (RF-56):** no existe un catálogo de calles, así que el formulario sugiere las calles de las solicitudes cargadas, pero el servidor acepta cualquier texto de hasta 120 caracteres. Para cumplir la lista cerrada hace falta un catálogo (por ejemplo, del callejero municipal).
 - **Motivo de extracción:** se modeló como una sola opción; falta confirmar si el formulario en papel permite marcar más de una.
 - `POST /auth/dispositivo/bloqueo` no pide sesión (el captor aún no inició sesión cuando se bloquea); el UUID aleatorio del captor hace de secreto. Un atacante que conozca ese UUID podría bloquearlo, nunca desbloquearlo.
 - Falta pulir cuando haya un celular real: tamaños de foto, textos y flujos de error.

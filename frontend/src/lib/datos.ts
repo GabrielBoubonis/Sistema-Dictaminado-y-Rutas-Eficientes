@@ -35,4 +35,3 @@ export async function firmadasLocales(): Promise<string[]> { return (await cache
 export async function marcarFirmadaLocal(sua: string, anio: number) {
   const l = new Set(await firmadasLocales()); l.add(`${sua}-${anio}`); await cacheSet('firmadasLocales', [...l]);
 }
-export const nombreDeCalle = (direccion: string) => direccion.replace(/\s+\d+.*$/, '').trim();

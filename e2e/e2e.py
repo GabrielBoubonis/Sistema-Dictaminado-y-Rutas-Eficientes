@@ -52,7 +52,7 @@ with sync_playwright() as p:
     page = ctx.new_page()
     errores = []
     page.on('pageerror', lambda e: errores.append(str(e)))
-    page.on('console', lambda m: errores.append(m.text) if m.type == 'error' and 'tile.openstreetmap' not in m.text and 'ERR_' not in m.text and 'Failed to load resource' not in m.text else None)
+    page.on('console', lambda m: errores.append(m.text) if m.type == 'error' and ('Content Security Policy' in m.text or 'tile.openstreetmap' not in m.text) and 'ERR_' not in m.text and 'Failed to load resource' not in m.text else None)
     cdp = ctx.new_cdp_session(page)
     cdp.send('WebAuthn.enable')
     cdp.send('WebAuthn.addVirtualAuthenticator', {'options': {'protocol': 'ctap2', 'transport': 'internal', 'hasResidentKey': False,
@@ -60,7 +60,7 @@ with sync_playwright() as p:
 
     paso('login con credenciales inválidas muestra el mensaje genérico y cuenta el intento')
     page.goto('/')
-    page.get_by_label('Usuario', exact=True).fill('mrossi'); page.get_by_label('Contraseña', exact=True).fill('mala')
+    page.get_by_label('Usuario', exact=True).fill('mrossi0'); page.get_by_label('Contraseña', exact=True).fill('mala')
     page.get_by_role('button', name='Ingresar').click()
     expect(page.get_by_role('alert')).to_contain_text('Usuario o contraseña incorrectos (intento 1 de 5)')
 
@@ -116,7 +116,7 @@ with sync_playwright() as p:
     paso('reanudar sin señal tras cerrar sesión por inactividad (simulado: logout local)')
     page.get_by_role('button', name='Salir').click()
     ctx.set_offline(True)
-    page.get_by_label('Usuario', exact=True).fill('mrossi'); page.get_by_label('Contraseña', exact=True).fill('Demo2026!')
+    page.get_by_label('Usuario', exact=True).fill('mrossi0'); page.get_by_label('Contraseña', exact=True).fill('Demo2026!')
     page.get_by_role('button', name='Reanudar sin señal').click()
     expect(page.get_by_text('Reanudaste la sesión sin señal')).to_be_visible(timeout=10000)
     ctx.set_offline(False)
@@ -125,13 +125,13 @@ with sync_playwright() as p:
     paso('5 contraseñas incorrectas bloquean el captor; el Administrador lo desbloquea con el código')
     page.get_by_role('button', name='Salir').click()
     for i in range(5):
-        page.get_by_label('Usuario', exact=True).fill('lfernan'); page.get_by_label('Contraseña', exact=True).fill('incorrecta')
+        page.get_by_label('Usuario', exact=True).fill('lfernan0'); page.get_by_label('Contraseña', exact=True).fill('incorrecta')
         page.get_by_role('button', name='Ingresar').click()
         if i < 4: expect(page.get_by_role('alert')).to_contain_text(f'intento {i+1} de 5')
     expect(page.get_by_role('heading', name='Captor bloqueado')).to_be_visible(timeout=10000)
     codigo = page.locator('.codigo').inner_text()
     paso(f'   código mostrado: {codigo}')
-    admin = api('/auth/login', {'usuario': 'asuarez', 'password': 'Demo2026!'})['accessToken']
+    admin = api('/auth/login', {'usuario': 'asuarez0', 'password': 'Demo2026!'})['accessToken']
     lista = api(f'/usuarios/captores-bloqueados?codigo={codigo}', token=admin)
     assert lista and lista[0]['estado'] == 'Bloqueado', lista
     api(f'/usuarios/captores/{codigo}/desbloquear', {}, token=admin)
@@ -139,7 +139,7 @@ with sync_playwright() as p:
     page.screenshot(path=os.path.join(HERE, 'capturas', '05-desbloqueado.png'))
 
     paso('Administrador: usuarios y para revisar')
-    page.get_by_label('Usuario', exact=True).fill('asuarez'); page.get_by_label('Contraseña', exact=True).fill('Demo2026!')
+    page.get_by_label('Usuario', exact=True).fill('asuarez0'); page.get_by_label('Contraseña', exact=True).fill('Demo2026!')
     page.get_by_role('button', name='Ingresar').click()
     expect(page.get_by_role('heading', name='Gestión de usuarios')).to_be_visible()
     page.get_by_role('link', name='Para revisar').click()
@@ -151,11 +151,14 @@ with sync_playwright() as p:
     paso('Jefe: dashboard y elección de dictamen en conflicto')
     page.get_by_role('button', name='Salir').click()
     expect(page.get_by_role('heading', name='Dictaminado y Rutas Eficientes')).to_be_visible()
-    page.get_by_label('Usuario', exact=True).fill('pgimene'); page.get_by_label('Contraseña', exact=True).fill('Demo2026!')
+    page.get_by_label('Usuario', exact=True).fill('pgimene0'); page.get_by_label('Contraseña', exact=True).fill('Demo2026!')
     page.get_by_role('button', name='Ingresar').click()
     page.get_by_role('link', name='Dashboard').click()
     expect(page.get_by_text('General (incluye tormenta)')).to_be_visible()
-    page.screenshot(path=os.path.join(HERE, 'capturas', '06-dashboard.png'))
+    expect(page.get_by_role('img', name='Derivadas por mes')).to_be_visible()
+    expect(page.get_by_role('img', name='Por distrito')).to_be_visible()
+    expect(page.get_by_role('img', name='Por prioridad')).to_be_visible()
+    page.screenshot(path=os.path.join(HERE, 'capturas', '06-dashboard.png'), full_page=True)
     page.get_by_label('Principal').get_by_role('link', name='Solicitudes', exact=True).click()
     page.get_by_text('esperando decisión del Jefe').first.click()
     expect(page.get_by_role('heading', name='Elegir dictamen vigente')).to_be_visible()
