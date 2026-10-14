@@ -26,6 +26,8 @@ export const securityHeaders = helmet({
   },
   hsts: { maxAge: 31536000, includeSubDomains: true },
   frameguard: { action: 'deny' },
+  // OpenStreetMap exige el encabezado Referer en los pedidos de teselas (su política de uso); con 'no-referrer' las bloquea.
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   crossOriginEmbedderPolicy: false,
 });
 

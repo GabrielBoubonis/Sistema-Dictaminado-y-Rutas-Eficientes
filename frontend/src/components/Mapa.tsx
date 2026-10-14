@@ -21,7 +21,7 @@ export function Mapa({ marcadores = [], linea, centro, poligono, onPoligono, pun
   useEffect(() => {
     if (!el.current || mapa.current) return;
     const m = L.map(el.current, { zoomControl: true }).setView(centro ?? [-32.9468, -60.6393], 13);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(m);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(m);
     capa.current = L.layerGroup().addTo(m);
     m.on('click', (e: L.LeafletMouseEvent) => {
       if (cb.current.onPoligono) cb.current.onPoligono([...(cb.current.poligono ?? []), [e.latlng.lat, e.latlng.lng]]);

@@ -227,3 +227,12 @@ describe('WebAuthn desde cualquier URL (celulares / túnel)', () => {
     expect(raro.body.rp.id).toBe('localhost');
   });
 });
+
+describe('Encabezados de seguridad', () => {
+  it('envía Referer a otros orígenes (OpenStreetMap lo exige para las teselas) y mantiene CSP y X-Frame-Options', async () => {
+    const r = await api().get('/api/health');
+    expect(r.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+    expect(r.headers['content-security-policy']).toContain('https://tile.openstreetmap.org');
+    expect(r.headers['x-frame-options']).toBe('DENY');
+  });
+});
