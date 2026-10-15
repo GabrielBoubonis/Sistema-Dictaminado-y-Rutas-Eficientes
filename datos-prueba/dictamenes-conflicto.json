@@ -1,0 +1,93 @@
+{
+  "descripcion": "Dos dictámenes firmados para la misma solicitud (48495-2026). Al cargarlos, la solicitud debe quedar en Pendiente-revisión y un Jefe (pgimene0) elige cuál queda vigente (RF-59, CU-15). Ambos tienen vigente = null hasta que se elige.",
+  "dictamenes": [
+    {
+      "id_dictamen": 101,
+      "numero_sua": "48495",
+      "anio": 2026,
+      "nombre_usuario": "mrossi0",
+      "nota_numero": 1200,
+      "expediente_numero": 30500,
+      "fecha_emision": "2026-10-10",
+      "domicilio_ejemplar": "Av. Ovidio Lagos 2764",
+      "latitud_ejemplar": null,
+      "longitud_ejemplar": null,
+      "referencia_ubicacion": null,
+      "id_especie": 15,
+      "distancia_medianera_referencia": 1.4,
+      "cantidad_frente": 2,
+      "nivel_dano_vereda": "Alto",
+      "es_extraccion": true,
+      "perimetro_tronco": 1.35,
+      "motivo_extraccion": "Con riesgo de caída por inclinación",
+      "es_sin_trabajo": false,
+      "motivo_sin_trabajo": null,
+      "complejidad": "Alta",
+      "urgente": false,
+      "arbol_frente_garage": true,
+      "media_tension": false,
+      "de_oficio": false,
+      "plantar": "ninguna",
+      "nivel_prioridad": "Alta",
+      "observaciones": "Dictamen A: extracción.",
+      "hash_firma": "<CALCULAR_EN_SEED>",
+      "estado_sincronizacion": "sincronizado",
+      "trabajos_aereos": [],
+      "trabajos_subterraneos": [],
+      "fotografias": [
+        {
+          "archivo_referencia": "fotos/foto-prueba-2.jpg",
+          "orden": 1
+        }
+      ],
+      "nota_prueba": "Uno de los dos dictámenes en conflicto para la misma solicitud (RF-59). El segundo se firmó sin conexión.",
+      "vigente": null
+    },
+    {
+      "id_dictamen": 102,
+      "numero_sua": "48495",
+      "anio": 2026,
+      "nombre_usuario": "cbenite0",
+      "nota_numero": 1200,
+      "expediente_numero": 30500,
+      "fecha_emision": "2026-10-10",
+      "domicilio_ejemplar": "Av. Ovidio Lagos 2764",
+      "latitud_ejemplar": null,
+      "longitud_ejemplar": null,
+      "referencia_ubicacion": null,
+      "id_especie": 15,
+      "distancia_medianera_referencia": 1.4,
+      "cantidad_frente": 2,
+      "nivel_dano_vereda": "Alto",
+      "es_extraccion": false,
+      "perimetro_tronco": null,
+      "motivo_extraccion": null,
+      "es_sin_trabajo": false,
+      "motivo_sin_trabajo": null,
+      "complejidad": "Media",
+      "urgente": false,
+      "arbol_frente_garage": true,
+      "media_tension": false,
+      "de_oficio": false,
+      "plantar": "ninguna",
+      "nivel_prioridad": "Media",
+      "observaciones": "Dictamen B: poda, firmado sin conexión.",
+      "hash_firma": "<CALCULAR_EN_SEED>",
+      "estado_sincronizacion": "sincronizado",
+      "trabajos_aereos": [
+        {
+          "tipo_trabajo": "Reducción de altura de copa"
+        }
+      ],
+      "trabajos_subterraneos": [],
+      "fotografias": [
+        {
+          "archivo_referencia": "fotos/foto-prueba-2.jpg",
+          "orden": 1
+        }
+      ],
+      "nota_prueba": "Uno de los dos dictámenes en conflicto para la misma solicitud (RF-59). El segundo se firmó sin conexión.",
+      "vigente": null
+    }
+  ]
+}

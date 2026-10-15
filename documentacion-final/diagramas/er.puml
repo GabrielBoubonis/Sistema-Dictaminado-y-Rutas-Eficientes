@@ -1,0 +1,247 @@
+@startuml er-modelo
+title Sistema de Dictaminación Técnica de Arbolado Público — Modelo Entidad-Relación
+
+skinparam linetype ortho
+skinparam roundcorner 8
+skinparam class {
+  BackgroundColor White
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+entity "Usuario" as usuario {
+  * nombre_usuario : string <<PK>>
+  --
+  contraseña_hash : string
+  rol : string
+  activo : boolean
+  fecha_alta : date
+}
+
+entity "Solicitud" as solicitud {
+  * numero_sua : string <<PK>>
+  * anio : int <<PK>>
+  --
+  distrito : string
+  prioridad : string
+  direccion : string
+  latitud : decimal
+  longitud : decimal
+  descripcion_reclamo : string
+  estado : string
+  es_tormenta : boolean
+  fecha_ultima_derivacion : date
+}
+
+note right of solicitud
+  <b>latitud / longitud</b>: resultado de geocodificar
+  `direccion` una sola vez, al momento de la derivación
+  (API de Geocoding de OpenRouteService), y cachearlo
+  acá para no volver a geocodificar cada vez que se
+  genera una ruta. Si la geocodificación falla, la
+  Solicitud queda disponible igual pero sin estos dos
+  campos hasta corregirse manualmente. Ver Decisión 9
+  en er-modelo.md y RNF-14 en requisitos.md.
+end note
+
+entity "HistorialDerivacion" as historial {
+  * id_derivacion : int <<PK>>
+  --
+  numero_sua : string <<FK>>
+  anio : int <<FK>>
+  fecha_derivacion : date
+  motivo : string
+}
+
+entity "Dictamen" as dictamen {
+  * id_dictamen : int <<PK>>
+  --
+  numero_sua : string <<FK>>
+  anio : int <<FK>>
+  nombre_usuario : string <<FK>>
+  nota_numero : int
+  expediente_numero : int
+  fecha_emision : date
+  domicilio_ejemplar : string
+  latitud_ejemplar : decimal
+  longitud_ejemplar : decimal
+  referencia_ubicacion : string
+  id_especie : int <<FK>>
+  distancia_medianera_referencia : decimal
+  cantidad_frente : int
+  nivel_dano_vereda : enum
+  --
+  es_extraccion : boolean
+  perimetro_tronco : decimal
+  motivo_extraccion : enum
+  --
+  es_sin_trabajo : boolean
+  motivo_sin_trabajo : enum
+  --
+  complejidad : enum
+  urgente : boolean
+  arbol_frente_garage : boolean
+  media_tension : boolean
+  de_oficio : boolean
+  plantar : enum
+  --
+  nivel_prioridad : enum
+  observaciones : string
+  vigente : boolean
+  hash_firma : string
+  estado_sincronizacion : string
+}
+
+note right of dictamen
+  <b>Regla de validación — exclusión extracción/trabajos</b>
+  Si es_extraccion = true, el sistema NO debe permitir
+  que este Dictamen tenga filas asociadas en
+  TrabajoAereo ni en TrabajoSubterraneo (sería
+  incongruente podar o intervenir raíces sobre un
+  ejemplar que se va a extraer). El modelo relacional
+  no lo impide por sí solo (no hay una restricción de
+  base de datos que lo exprese de forma directa): es
+  una regla de negocio que valida la aplicación antes
+  de guardar o firmar el dictamen.
+  Ver Decisión 5 en er-modelo.md y RF-46 en requisitos.md.
+  --
+  <b>complejidad</b> es la complejidad de la intervención
+  a realizar, un dato propio del dictamen (Baja / Media /
+  Alta / Máxima). No interviene en los criterios de
+  generación de rutas (RF-15): son dos conceptos
+  independientes.
+  --
+  <b>Fotografia es obligatoria</b>: no se puede firmar un
+  Dictamen sin al menos una fila asociada en Fotografia
+  (RF-45). Ver relación más abajo.
+  --
+  <b>nivel_prioridad</b> (Alta/Media/Baja) es la urgencia
+  con la que hay que EJECUTAR la intervención ya
+  dictaminada (la define el ingeniero al cerrar el
+  dictamen). No es lo mismo que Solicitud.prioridad, que
+  es la prioridad de TRIAGE asignada al crear el reclamo
+  y se usa para armar rutas (RF-15). Se ubica al final del
+  formulario, junto a observaciones, como el último dato
+  que se define justo antes de firmar. Ver Decisión 6.
+end note
+
+note right of ruta
+  <b>modo_desplazamiento</b> (Caminando/Vehículo) lo elige
+  el ingeniero al generar la ruta (RF-49). Junto con
+  antigüedad y eficiencia del recorrido, define qué
+  solicitudes se seleccionan (RF-47) y en qué orden se
+  visitan (RF-48), partiendo de la sede de la Dirección
+  General de Parques y Paseos. Ver Decisión 7.
+end note
+
+entity "Especie" as especie {
+  * id_especie : int <<PK>>
+  --
+  nombre_comun : string
+  nombre_cientifico : string
+  activa : boolean
+  creada_por : string <<FK>>
+}
+
+entity "Fotografia" as foto {
+  * id_foto : int <<PK>>
+  --
+  id_dictamen : int <<FK>>
+  archivo_referencia : string
+  orden : int
+}
+
+entity "TrabajoAereo" as trabajo_aereo {
+  * id_trabajo_aereo : int <<PK>>
+  --
+  id_dictamen : int <<FK>>
+  tipo_trabajo : enum
+}
+
+entity "TrabajoSubterraneo" as trabajo_subterraneo {
+  * id_trabajo_subterraneo : int <<PK>>
+  --
+  id_dictamen : int <<FK>>
+  tipo_trabajo : enum
+  distancia_borde : decimal
+}
+
+entity "Ruta" as ruta {
+  * id_ruta : int <<PK>>
+  --
+  nombre_usuario : string <<FK>>
+  fecha : date
+  tipo : string
+  estado : string
+  modo_desplazamiento : string
+}
+
+entity "RutaSolicitud" as ruta_solicitud {
+  * id_ruta : int <<PK, FK>>
+  * numero_sua : string <<PK, FK>>
+  * anio : int <<PK, FK>>
+  --
+  fecha_incorporacion : datetime
+  liberada : boolean
+  fecha_liberacion : datetime
+}
+
+entity "Dispositivo" as dispositivo {
+  * id_dispositivo : string <<PK>>
+  --
+  codigo_visible : string
+  nombre_usuario : string <<FK>>
+  estado : enum
+  fecha_bloqueo : datetime
+  fecha_desbloqueo : datetime
+  desbloqueado_por : string <<FK>>
+}
+
+entity "CasoRevision" as caso_revision {
+  * id_caso : int <<PK>>
+  --
+  tipo : enum
+  referencia_solicitud : string
+  id_dictamen : int <<FK>>
+  motivo : string
+  fecha_hora : datetime
+}
+
+entity "RegistroAuditoria" as auditoria {
+  * id_auditoria : int <<PK>>
+  --
+  nombre_usuario : string <<FK>>
+  accion : string
+  entidad_afectada : string
+  valor_anterior : string
+  valor_nuevo : string
+  fecha_hora : datetime
+}
+
+note right of auditoria
+  <b>Append-only</b>: esta entidad solo admite
+  INSERT y SELECT. Ningún flujo del sistema
+  expone UPDATE ni DELETE sobre sus filas
+  (registro inmutable, RF-54). Ver Decisión 8
+  en er-modelo.md y CU-13 en casos-de-uso.md.
+end note
+
+usuario ||--o{ dictamen : firma
+usuario ||--o{ ruta : genera
+usuario ||--o{ auditoria : genera
+usuario |o--o{ dispositivo : "usa"
+dictamen |o--o{ caso_revision : "puede originar"
+
+solicitud ||--o{ dictamen : "tiene historial de"
+solicitud ||--o{ historial : "registra derivaciones"
+
+especie ||--o{ dictamen : "se elige de un catálogo"
+usuario |o--o{ especie : "agrega"
+dictamen ||--|{ foto : "incluye (mínimo 1, obligatoria)"
+dictamen ||--o{ trabajo_aereo : "incluye (0..N, excluyente con es_extraccion)"
+dictamen ||--o{ trabajo_subterraneo : "incluye (0..N, excluyente con es_extraccion)"
+
+ruta ||--o{ ruta_solicitud : agrupa
+solicitud ||--o{ ruta_solicitud : "pertenece a"
+
+@enduml

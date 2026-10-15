@@ -1,0 +1,50 @@
+@startuml secuencia-login-firma
+title Secuencia — Inicio de sesión (CU-01) y firma de dictamen con segundo factor (CU-06)
+
+skinparam roundcorner 10
+skinparam sequence {
+  ParticipantBackgroundColor #FBFBF8
+  ParticipantBorderColor #2C3E50
+  ArrowColor #2C3E50
+  LifeLineBorderColor #7E8E96
+}
+autonumber
+
+actor "Ingeniero" as ING
+participant "PWA\n(captor)" as PWA
+participant "API\ndel sistema" as API
+participant "Autenticación\nInstitucional" as AUTH
+database "Base de datos\npropia" as DB
+
+== Inicio de sesión (RF-01 a RF-05, RNF-19) ==
+ING -> PWA : usuario y contraseña
+PWA -> API : POST /auth/login
+API -> AUTH : validar usuario institucional\n(usuario + API key propia)
+AUTH --> API : vigente / no vigente
+alt usuario no vigente o contraseña local incorrecta
+  API --> PWA : error genérico (no revela cuál falló)
+  note right of API : Límite: 10 intentos / 15 min\npor IP + usuario (RNF-19)
+else credenciales válidas
+  API -> DB : comparar contraseña local (bcrypt)
+  DB --> API : coincide
+  API --> PWA : JWT (30 min) + refresh token (tope 7 días, RNF-20)
+end
+
+== Firma del dictamen (RF-22, RF-51) ==
+ING -> PWA : confirma el envío del dictamen
+PWA -> ING : solicita verificación biométrica (WebAuthn)
+ING --> PWA : huella o reconocimiento facial
+alt verificación fallida o cancelada
+  PWA --> ING : el dictamen queda sin firmar,\nvuelve al Paso 5
+else verificación correcta
+  PWA -> PWA : hash SHA-256 + timestamp + usuario
+  PWA -> API : POST /sync/dictamenes (con UUID)
+  API -> API : recalcula el hash (RF-53)\ny revalida RF-21
+  API -> DB : guarda dictamen (+ registro de auditoría\nsi corresponde, misma transacción)
+  DB --> API : ok
+  API --> PWA : confirmación
+  PWA -> PWA : borra la copia local (RNF-16)
+  PWA --> ING : dictamen firmado y sincronizado
+end
+
+@enduml

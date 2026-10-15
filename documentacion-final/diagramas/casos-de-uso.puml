@@ -1,0 +1,98 @@
+@startuml casos-de-uso
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+title Sistema de Dictaminación Técnica de Arbolado Público — Casos de Uso
+
+actor "Operador" as OP
+actor "Jefe" as JF
+actor "Administrador\n(CIL)" as AD
+actor "Lector" as LE
+
+actor "SUA" as SUA
+actor "Autenticación\nInstitucional" as AUTH
+
+rectangle "Sistema de Dictaminación Técnica" {
+
+  usecase "CU-01\nIniciar sesión" as CU01
+  usecase "CU-02\nGestionar usuarios y roles" as CU02
+  usecase "CU-03\nConsultar solicitudes\nderivadas" as CU03
+  usecase "CU-04\nGenerar ruta de trabajo" as CU04
+  usecase "CU-05\nRestablecer ruta" as CU05
+  usecase "CU-06\nEmitir dictamen técnico" as CU06
+  usecase "CU-07\nSincronizar dictamen\ncon el SUA" as CU07
+  usecase "CU-08\nDescargar dictamen\nen PDF" as CU08
+  usecase "CU-09\nConsultar dictamen\nanterior" as CU09
+  usecase "CU-10\nDictaminar sin conexión" as CU10
+  usecase "CU-11\nConsultar dashboard" as CU11
+  usecase "CU-12\nAtender protocolo\npor tormenta" as CU12
+  usecase "CU-13\nConsultar registro\nde auditoría" as CU13
+  usecase "CU-14\nRevisar casos\npara revisar" as CU14
+  usecase "CU-15\nResolver dictámenes\nen conflicto" as CU15
+  usecase "CU-16\nDesbloquear captor" as CU16
+
+}
+
+' --- Actores principales ---
+OP --> CU01
+JF --> CU01
+AD --> CU01
+LE --> CU01
+
+OP --> CU03
+JF --> CU03
+
+OP --> CU04
+JF --> CU04
+
+OP --> CU05
+JF --> CU05
+
+OP --> CU06
+JF --> CU06
+
+OP --> CU08
+JF --> CU08
+
+OP --> CU12
+JF --> CU12
+AD --> CU12
+LE --> CU12
+
+AD --> CU02
+AD --> CU13
+AD --> CU14
+AD --> CU16
+JF --> CU15
+
+JF --> CU11
+AD --> CU11
+LE --> CU11
+
+' --- Actores secundarios (sistemas externos) ---
+CU01 ..> AUTH
+CU03 ..> SUA
+CU07 ..> SUA
+
+' --- Relaciones entre casos de uso ---
+CU06 ..> CU07 : <<include>>
+CU04 ..> CU03 : <<include>>
+CU12 ..> CU04 : <<include>>
+
+CU09 ..> CU06 : <<extend>>
+CU10 ..> CU06 : <<extend>>
+
+note right of CU10
+  Extiende a CU-06 cuando
+  el dispositivo no tiene
+  conexión al momento de firmar.
+end note
+
+note right of CU09
+  Extiende a CU-06 solo si la
+  solicitud está en estado
+  Pendiente-revisión.
+end note
+
+@enduml

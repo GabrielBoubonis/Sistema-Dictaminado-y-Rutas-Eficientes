@@ -1,0 +1,18 @@
+[
+  {
+    "id_caso": 1,
+    "tipo": "Integridad no verificada",
+    "referencia_solicitud": "48070-2026",
+    "id_dictamen": null,
+    "motivo": "El hash recalculado no coincide con el de la firma (caso de prueba: modificar un byte del contenido antes de sincronizar).",
+    "fecha_hora": "2026-10-11T16:40:00-03:00"
+  },
+  {
+    "id_caso": 2,
+    "tipo": "Datos inválidos del SUA",
+    "referencia_solicitud": "5521-2026",
+    "id_dictamen": null,
+    "motivo": "El campo distrito (\"Zona Franca\") no pertenece a la lista de distritos.",
+    "fecha_hora": "2026-10-11T09:12:00-03:00"
+  }
+]

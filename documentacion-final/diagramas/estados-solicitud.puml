@@ -1,0 +1,39 @@
+@startuml estados-solicitud
+title Estados de la Solicitud y del Dictamen (RF-09 a RF-13, RF-31 a RF-34)
+
+skinparam roundcorner 10
+skinparam state {
+  BackgroundColor #FBFBF8
+  BorderColor #2C3E50
+  ArrowColor #2C3E50
+}
+
+state "Solicitud.estado" as SOL {
+  state "Pendiente-revisión" as PendienteRevision
+  [*] --> Pendiente : derivación desde el SUA\n(RF-09)
+  Pendiente --> Dictaminada : dictamen firmado\ny sincronizado
+  Dictaminada --> PendienteRevision : re-derivada por Procesamiento\nde Datos con el mismo N° SUA-Año\n(RF-12)
+  PendienteRevision --> Dictaminada : nuevo dictamen firmado\ny sincronizado
+}
+
+state "Dictamen.estado_sincronizacion" as DIC {
+  [*] --> pendiente_sincronizar : firmado\n(local, cifrado AES-GCM)
+  pendiente_sincronizar --> sincronizado : el servidor confirma\nla recepción y recalcula el hash\n(RF-33, RF-53)
+  pendiente_sincronizar --> pendiente_sincronizar : falla el envío:\nreintento automático con espera creciente\n(RNF-17)
+  sincronizado --> [*] : se borra la copia local\n(RNF-16)
+}
+
+note right of SOL
+  La reserva en una ruta no es un estado:
+  se registra en RutaSolicitud (liberada = true/false)
+  y no cambia Solicitud.estado.
+end note
+
+note right of DIC
+  Conflicto: si al sincronizar ya existe otro
+  dictamen activo para el mismo ejemplar (RF-21),
+  la Solicitud pasa a Pendiente-revisión para que
+  un Jefe decida cuál prevalece.
+end note
+
+@enduml

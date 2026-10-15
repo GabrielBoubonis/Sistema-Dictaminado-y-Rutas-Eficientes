@@ -1,0 +1,69 @@
+@startuml actividad-dictamen
+title Flujo de actividad — Emitir dictamen (CU-06), con modo offline (CU-10) y sincronización (CU-07)
+
+skinparam roundcorner 10
+skinparam activity {
+  BackgroundColor #FBFBF8
+  BorderColor #2C3E50
+  DiamondBackgroundColor #EAF2F8
+}
+skinparam ArrowColor #2C3E50
+
+|Ingeniero (captor)|
+start
+:Abre una solicitud Pendiente\no Pendiente-revisión;
+:Completa los pasos 1 a 5 del formulario;
+
+if (¿Marcó "Extracción" en el Paso 2?) then (sí)
+  :Pasos de trabajos aéreos y subterráneos\nquedan deshabilitados (RF-46);
+else (no)
+  :Puede cargar trabajos aéreos\ny subterráneos (Paso 3);
+endif
+
+if (¿Hay al menos 1 fotografía\ny campos obligatorios completos?) then (no)
+  :Se informa qué falta\ny no se habilita la firma (RF-20, RF-45);
+  stop
+else (sí)
+endif
+
+:Toca el botón de firma;
+:Verificación biométrica WebAuthn\n(RF-51);
+
+if (¿Verificación correcta?) then (no)
+  :El dictamen queda sin firmar;\nvuelve al Paso 5 con los datos intactos;
+  stop
+else (sí)
+  :Se calcula el hash SHA-256\ny se agrega timestamp y usuario (RF-22);
+endif
+
+if (¿Hay conexión?) then (sí)
+  |Servidor|
+  :Recibe el dictamen (UUID como\nclave de idempotencia);
+  :Recalcula el hash (RF-53)\ny revalida que no exista otro\ndictamen activo (RF-21);
+  if (¿Conflicto con otro dictamen activo?) then (sí)
+    :La Solicitud pasa a Pendiente-revisión\npara decisión de un Jefe;
+    stop
+  else (no)
+    :Guarda el dictamen y\nmarca la Solicitud como Dictaminada;
+  endif
+  |Ingeniero (captor)|
+  :Recibe la confirmación;
+  stop
+else (no)
+  :Guarda el dictamen y las fotos\ncifrados (AES-GCM) en el dispositivo;
+  if (¿Falla el guardado local?) then (sí)
+    :Muestra el error con "Reintentar guardado"\n(wireframe 04c);
+    stop
+  else (no)
+    :Estado: pendiente de sincronizar;
+    :Al detectarse conexión, envía la cola\nautomáticamente (RF-33);
+    note right
+      Se repite el tramo del servidor.
+      Si falla, reintenta con espera creciente (RNF-17).
+      Al confirmarse, se borra la copia local (RNF-16).
+    end note
+    stop
+  endif
+endif
+
+@enduml

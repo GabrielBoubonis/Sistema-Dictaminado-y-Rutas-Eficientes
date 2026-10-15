@@ -1,0 +1,397 @@
+[
+  {
+    "id_dictamen": 1,
+    "numero_sua": "48070",
+    "anio": 2026,
+    "nombre_usuario": "mrossi0",
+    "nota_numero": 1200,
+    "expediente_numero": 30500,
+    "fecha_emision": "2026-08-19",
+    "domicilio_ejemplar": "Av. Alberdi 450",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": null,
+    "id_especie": 15,
+    "distancia_medianera_referencia": 1.4,
+    "cantidad_frente": 2,
+    "nivel_dano_vereda": "Alto",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Baja",
+    "urgente": false,
+    "arbol_frente_garage": true,
+    "media_tension": false,
+    "de_oficio": false,
+    "plantar": "ninguna",
+    "nivel_prioridad": "Media",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Liberación de conductores eléctricos"
+      }
+    ],
+    "trabajos_subterraneos": [
+      {
+        "tipo_trabajo": "Corte vertical de raíces",
+        "distancia_borde": 0.8
+      }
+    ],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-1.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": null,
+    "vigente": true
+  },
+  {
+    "id_dictamen": 2,
+    "numero_sua": "48179",
+    "anio": 2026,
+    "nombre_usuario": "cbenite0",
+    "nota_numero": 1217,
+    "expediente_numero": null,
+    "fecha_emision": "2026-08-22",
+    "domicilio_ejemplar": "Presidente Roca 1037",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": "Frente a la entrada principal",
+    "id_especie": 14,
+    "distancia_medianera_referencia": 2.2,
+    "cantidad_frente": 2,
+    "nivel_dano_vereda": "Medio",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Media",
+    "urgente": false,
+    "arbol_frente_garage": false,
+    "media_tension": true,
+    "de_oficio": false,
+    "plantar": "Cazuela",
+    "nivel_prioridad": "Alta",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Liberación de tránsito vehicular"
+      },
+      {
+        "tipo_trabajo": "Liberación de tránsito peatonal"
+      }
+    ],
+    "trabajos_subterraneos": [],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-2.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": null,
+    "vigente": true
+  },
+  {
+    "id_dictamen": 3,
+    "numero_sua": "48194",
+    "anio": 2026,
+    "nombre_usuario": "lfernan0",
+    "nota_numero": 1234,
+    "expediente_numero": 30582,
+    "fecha_emision": "2026-08-27",
+    "domicilio_ejemplar": "San Martín 4464",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": null,
+    "id_especie": 22,
+    "distancia_medianera_referencia": 2.3,
+    "cantidad_frente": 1,
+    "nivel_dano_vereda": "Bajo",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Alta",
+    "urgente": false,
+    "arbol_frente_garage": false,
+    "media_tension": false,
+    "de_oficio": false,
+    "plantar": "Vereda jardín",
+    "nivel_prioridad": "Baja",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Liberación de conductores eléctricos"
+      }
+    ],
+    "trabajos_subterraneos": [],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-3.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": null,
+    "vigente": true
+  },
+  {
+    "id_dictamen": 4,
+    "numero_sua": "48321",
+    "anio": 2026,
+    "nombre_usuario": "mrossi0",
+    "nota_numero": 1251,
+    "expediente_numero": null,
+    "fecha_emision": "2026-08-30",
+    "domicilio_ejemplar": "Av. Génova 2100",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": "Frente a la entrada principal",
+    "id_especie": 3,
+    "distancia_medianera_referencia": 0.9,
+    "cantidad_frente": 1,
+    "nivel_dano_vereda": "Alto",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Máxima",
+    "urgente": true,
+    "arbol_frente_garage": false,
+    "media_tension": false,
+    "de_oficio": false,
+    "plantar": "Construir cazuela",
+    "nivel_prioridad": "Media",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Liberación de conductores eléctricos"
+      },
+      {
+        "tipo_trabajo": "Poda de formación"
+      }
+    ],
+    "trabajos_subterraneos": [
+      {
+        "tipo_trabajo": "Corte vertical de raíces",
+        "distancia_borde": 0.8
+      }
+    ],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-1.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": null,
+    "vigente": true
+  },
+  {
+    "id_dictamen": 5,
+    "numero_sua": "48388",
+    "anio": 2026,
+    "nombre_usuario": "cbenite0",
+    "nota_numero": 1268,
+    "expediente_numero": 30664,
+    "fecha_emision": "2026-09-04",
+    "domicilio_ejemplar": "Mendoza 1100",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": null,
+    "id_especie": 16,
+    "distancia_medianera_referencia": 2.2,
+    "cantidad_frente": 1,
+    "nivel_dano_vereda": "Medio",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Baja",
+    "urgente": false,
+    "arbol_frente_garage": false,
+    "media_tension": false,
+    "de_oficio": false,
+    "plantar": "ninguna",
+    "nivel_prioridad": "Alta",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Liberación de tránsito peatonal"
+      }
+    ],
+    "trabajos_subterraneos": [],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-2.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": null,
+    "vigente": true
+  },
+  {
+    "id_dictamen": 6,
+    "numero_sua": "48480",
+    "anio": 2026,
+    "nombre_usuario": "lfernan0",
+    "nota_numero": 1285,
+    "expediente_numero": null,
+    "fecha_emision": "2026-09-09",
+    "domicilio_ejemplar": "Maipú 780",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": "Frente a la entrada principal",
+    "id_especie": 10,
+    "distancia_medianera_referencia": 0.6,
+    "cantidad_frente": 2,
+    "nivel_dano_vereda": "Bajo",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Media",
+    "urgente": false,
+    "arbol_frente_garage": true,
+    "media_tension": true,
+    "de_oficio": false,
+    "plantar": "Cazuela",
+    "nivel_prioridad": "Baja",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Despeje de espacio aéreo privado"
+      },
+      {
+        "tipo_trabajo": "Liberación de tránsito peatonal"
+      }
+    ],
+    "trabajos_subterraneos": [],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-3.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": null,
+    "vigente": true
+  },
+  {
+    "id_dictamen": 7,
+    "numero_sua": "50822",
+    "anio": 2025,
+    "nombre_usuario": "mrossi0",
+    "nota_numero": 1302,
+    "expediente_numero": 30746,
+    "fecha_emision": "2025-12-03",
+    "domicilio_ejemplar": "Av. Francia 3437",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": null,
+    "id_especie": 20,
+    "distancia_medianera_referencia": 1.7,
+    "cantidad_frente": 1,
+    "nivel_dano_vereda": "Alto",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Alta",
+    "urgente": false,
+    "arbol_frente_garage": false,
+    "media_tension": false,
+    "de_oficio": false,
+    "plantar": "Vereda jardín",
+    "nivel_prioridad": "Media",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Despeje de espacio aéreo privado"
+      }
+    ],
+    "trabajos_subterraneos": [
+      {
+        "tipo_trabajo": "Corte vertical de raíces",
+        "distancia_borde": 0.8
+      }
+    ],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-1.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": "Dictamen anterior de una solicitud re-derivada (historial, RF-27)",
+    "vigente": true
+  },
+  {
+    "id_dictamen": 8,
+    "numero_sua": "50892",
+    "anio": 2025,
+    "nombre_usuario": "cbenite0",
+    "nota_numero": 1319,
+    "expediente_numero": null,
+    "fecha_emision": "2025-12-04",
+    "domicilio_ejemplar": "Av. Francia 2737",
+    "latitud_ejemplar": null,
+    "longitud_ejemplar": null,
+    "referencia_ubicacion": "Frente a la entrada principal",
+    "id_especie": 20,
+    "distancia_medianera_referencia": 1.8,
+    "cantidad_frente": 3,
+    "nivel_dano_vereda": "Medio",
+    "es_extraccion": false,
+    "perimetro_tronco": null,
+    "motivo_extraccion": null,
+    "es_sin_trabajo": false,
+    "motivo_sin_trabajo": null,
+    "complejidad": "Máxima",
+    "urgente": true,
+    "arbol_frente_garage": false,
+    "media_tension": false,
+    "de_oficio": false,
+    "plantar": "Construir cazuela",
+    "nivel_prioridad": "Alta",
+    "observaciones": "Dictamen de ejemplo cargado como dato de prueba.",
+    "hash_firma": "<CALCULAR_EN_SEED>",
+    "estado_sincronizacion": "sincronizado",
+    "trabajos_aereos": [
+      {
+        "tipo_trabajo": "Poda de formación"
+      },
+      {
+        "tipo_trabajo": "Liberación de tránsito vehicular"
+      }
+    ],
+    "trabajos_subterraneos": [],
+    "fotografias": [
+      {
+        "archivo_referencia": "fotos/foto-prueba-2.jpg",
+        "orden": 1
+      }
+    ],
+    "nota_prueba": "Dictamen anterior de una solicitud re-derivada (historial, RF-27)",
+    "vigente": true
+  }
+]

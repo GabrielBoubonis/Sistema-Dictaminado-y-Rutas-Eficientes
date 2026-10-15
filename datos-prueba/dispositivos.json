@@ -1,0 +1,29 @@
+[
+  {
+    "id_dispositivo": "6f2b1c7e-93aa-4d1b-8f10-2a7c9e4d5b11",
+    "codigo_visible": "K7M2-X9QD",
+    "nombre_usuario": "mrossi0",
+    "estado": "Bloqueado",
+    "fecha_bloqueo": "2026-10-12T08:15:00-03:00",
+    "fecha_desbloqueo": null,
+    "desbloqueado_por": null
+  },
+  {
+    "id_dispositivo": "a91d03f4-5be2-4c6a-b7d8-0e13f6a2c844",
+    "codigo_visible": "R3TB-44LN",
+    "nombre_usuario": "cbenite0",
+    "estado": "Revocado",
+    "fecha_bloqueo": null,
+    "fecha_desbloqueo": null,
+    "desbloqueado_por": null
+  },
+  {
+    "id_dispositivo": "c3e75a20-1f48-47d9-9a6b-d8b2410f7e93",
+    "codigo_visible": "M5HW-2PZA",
+    "nombre_usuario": "lfernan0",
+    "estado": "Activo",
+    "fecha_bloqueo": null,
+    "fecha_desbloqueo": null,
+    "desbloqueado_por": null
+  }
+]
