@@ -198,7 +198,9 @@ export class OrsMatriz implements IMatriz {
       method: 'POST',
       headers: { Authorization: config.orsKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ locations: puntos.map((p) => [p.lng, p.lat]), metrics: ['distance', 'duration'] }),
-    });
+      // Generar la ruta tiene que responder antes de los 10 s del cliente (RNF-04): si ORS tarda, se ordena por antigüedad.
+      signal: AbortSignal.timeout(6000),
+    }).catch((e) => { throw new ProveedorNoDisponible(`ORS matrix sin respuesta (${(e as Error).name})`); });
     if (!r.ok) throw new ProveedorNoDisponible(`ORS matrix ${r.status}`);
     const j: any = await r.json();
     return { distancias: j.distances, duraciones: j.durations };

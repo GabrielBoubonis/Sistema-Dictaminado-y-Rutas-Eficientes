@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { ApiError, ErrorRed, api, hayToken, onApiEvento } from './api';
+import { ApiError, ErrorRed, api, fetchConLimite, hayToken, onApiEvento } from './api';
 import { db, type ItemCola } from './db';
 import { cifrar, descifrar } from './cifrado';
 
@@ -36,7 +36,8 @@ export function sincronizar(): Promise<void> {
     poner({ sincronizando: true });
     try {
       for (;;) {
-        const lote = (await db.cola.orderBy('creada').limit(5).toArray());
+        // De a un dictamen por pedido: con sus fotos tiene que llegar dentro de los 10 s de RNF-04 aun con señal débil.
+        const lote = (await db.cola.orderBy('creada').limit(1).toArray());
         if (!lote.length) break;
         const items = await Promise.all(lote.map(async (f) => ({ fila: f, ...(await descifrar<DictamenFirmado>(f)) })));
         let r: { resultados: Array<{ uuid_dictamen: string; estado: string; mensaje?: string; error?: string }> };
@@ -74,7 +75,7 @@ export function iniciarSync() {
   onApiEvento((e) => { if (e === 'red-caida') poner({ online: false }); if (e === 'red-ok' && !estado.online) { poner({ online: true }); void sincronizar(); } });
   setInterval(() => { // si el navegador dice "online" pero no hay red real, o hay cola pendiente
     if (!navigator.onLine) return;
-    if (!estado.online) void fetch('/api/health').then(() => { poner({ online: true }); void sincronizar(); }).catch(() => {});
+    if (!estado.online) void fetchConLimite('/api/health').then(() => { poner({ online: true }); void sincronizar(); }).catch(() => {});
     else if (estado.pendientes > 0) void sincronizar();
   }, 15000);
   void refrescarContadores();

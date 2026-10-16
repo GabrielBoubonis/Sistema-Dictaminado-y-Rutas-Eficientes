@@ -6,7 +6,7 @@ import { cargarRutaActiva, cargarSolicitudes, firmadasLocales, type Ruta, type S
 import { RutaActiva } from '../components/RutaActiva';
 import { Mapa } from '../components/Mapa';
 import { Modal, textoError } from '../components/ui';
-import { puntoEnPoligono } from '../lib/geo';
+import { puntoEnPoligono, ubicacionActual } from '../lib/geo';
 import { cacheSet } from '../lib/db';
 import catalogos from '../catalogos.json';
 
@@ -66,7 +66,8 @@ function GenerarRuta({ alGenerar }: { alGenerar: () => void }) {
   const generar = async () => {
     setTrabajando(true); setError(null);
     try {
-      await api('/rutas', { body: { modo, ...(distrito ? { distrito } : {}), ...(zona.length >= 3 ? { zona } : {}), cantidades: cant } });
+      const ubicacion = await ubicacionActual();
+      await api('/rutas', { body: { modo, ...(distrito ? { distrito } : {}), ...(zona.length >= 3 ? { zona } : {}), cantidades: cant, ...(ubicacion ? { ubicacion } : {}) } });
       setModal(false); alGenerar();
     } catch (e) { setError(e instanceof ErrorRed ? 'Generar una ruta requiere conexión a internet.' : textoError(e)); setModal(false); }
     setTrabajando(false);
@@ -107,6 +108,7 @@ function GenerarRuta({ alGenerar }: { alGenerar: () => void }) {
       {modal && (
         <Modal titulo="Confirmar ruta" onCerrar={() => setModal(false)}>
           <p>Para tu ruta de hoy, <strong>{modo === 'Caminando' ? 'a pie' : 'en vehículo'}</strong>, se van a reservar {alcanzan} solicitudes y dejarán de estar disponibles para otros ingenieros.</p>
+          <p className="ayuda">La ruta parte de tu ubicación actual si la compartís; si no, de Parques y Paseos (Mariano Moreno 2350).</p>
           <div className="fila"><button className="btn" disabled={trabajando} onClick={generar}>{trabajando ? 'Calculando…' : 'Confirmar'}</button><button className="btn sec" onClick={() => setModal(false)}>Cancelar</button></div>
         </Modal>
       )}

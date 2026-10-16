@@ -20,7 +20,7 @@ poder trabajar sin conexión en el campo.
 | RF-01 | El sistema debe permitir el inicio de sesión mediante usuario y contraseña propios, validados contra la base de datos local del sistema. |
 | RF-02 | Si las credenciales locales son válidas, el sistema debe validar el usuario contra la Autenticación Institucional (usuario + API key propia del sistema) y obtener un token JWT. |
 | RF-03 | El sistema debe rechazar el inicio de sesión si el usuario no existe en la base local, aunque exista en la Autenticación Institucional. |
-| RF-04 | El sistema debe cerrar la sesión automáticamente luego de 30 minutos sin interacción del usuario. Si en ese momento no hay conexión, el usuario puede reanudarla con su contraseña local según RF-57. Si en ese momento no hay conexión, el usuario puede reanudarla con su contraseña local según RF-57. |
+| RF-04 | El sistema debe cerrar la sesión automáticamente luego de 30 minutos sin interacción del usuario. Si en ese momento no hay conexión, el usuario puede reanudarla con su contraseña local según RF-57. |
 | RF-05 | El sistema debe renovar la sesión mediante refresh token mientras haya actividad, sin requerir reingresar credenciales. |
 | RF-06 | El sistema debe permitir a un usuario con rol Administrador crear, modificar y dar de baja usuarios, y asignarles un rol (Administrador, Jefe, Operador o Lector). |
 | RF-07 | El sistema debe exigir que la contraseña local cumpla: mínimo 8 caracteres, al menos una mayúscula, una minúscula, un número y un carácter especial. |
@@ -49,7 +49,7 @@ poder trabajar sin conexión en el campo.
 | RF-18 | El sistema debe permitir a un ingeniero descartar su ruta completa mediante el botón "Restablecer", liberando las solicitudes no dictaminadas. |
 | RF-19 | El sistema debe requerir conexión a internet para generar o confirmar una ruta (no disponible en modo offline). |
 | RF-47 | Cuando la cantidad de solicitudes que cumplen los criterios definidos (RF-15) supere el cupo indicado por el ingeniero, el sistema debe seleccionar cuáles incluir combinando antigüedad de la solicitud (mayor preferencia a las más antiguas) y eficiencia del recorrido resultante (menor tiempo y distancia total según el modo de desplazamiento). _(Nota técnica: criterio de desempate y métrica de eficiencia concretos en `arquitectura-tecnica.md`.)_ |
-| RF-48 | El sistema debe calcular el orden de visita de las solicitudes de una ruta minimizando el tiempo y la distancia total del recorrido, tomando como punto de partida y de cierre del cálculo la sede de la Dirección General de Parques y Paseos. |
+| RF-48 | El sistema debe calcular el orden de visita de las solicitudes de una ruta minimizando el tiempo y la distancia total del recorrido, tomando como punto de partida la ubicación actual del ingeniero al generar la ruta o, si no está disponible, la sede de la Dirección General de Parques y Paseos (Mariano Moreno 2350); el recorrido termina en la última solicitud, sin regreso a la sede. |
 | RF-49 | El sistema debe permitir seleccionar el modo de desplazamiento (a pie o en vehículo) como criterio adicional al generar la ruta, y calcular el tiempo y la distancia en función del modo elegido. |
 
 ### Módulo 4 — Dictaminación

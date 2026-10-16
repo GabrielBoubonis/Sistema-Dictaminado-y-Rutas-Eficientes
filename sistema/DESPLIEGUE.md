@@ -13,7 +13,15 @@ encabezados de seguridad, permisos de fotos y backup. **Falta probarlo en la VM 
 
 1. Crear la cuenta en <https://www.oracle.com/cloud/free/>. La **región de origen no se puede cambiar** después: elegir
    una cercana (Santiago, Valparaíso, São Paulo o Vinhedo).
-2. En la PC, generar una llave SSH (PowerShell): `ssh-keygen -t ed25519 -f $HOME\.ssh\oracle-arbolado`
+2. En la PC, generar una llave SSH (PowerShell; la primera línea crea la carpeta `.ssh` si no existe):
+
+   ```powershell
+   New-Item -ItemType Directory -Force "$HOME\.ssh"
+   ssh-keygen -t ed25519 -f "$HOME\.ssh\oracle-arbolado"
+   ```
+
+   Pide una frase de contraseña (se puede dejar vacía con Enter). Crea `oracle-arbolado` (privada, no se comparte) y
+   `oracle-arbolado.pub` (pública, la que se sube a Oracle).
 3. Consola de Oracle → **Compute → Instances → Create instance**:
    - Imagen: **Ubuntu 24.04**.
    - Forma (shape): **VM.Standard.A1.Flex** (Ampere, ARM) con **2 OCPU y 12 GB** (es el máximo gratuito desde junio de 2026; con 1 OCPU y 6 GB también alcanza).

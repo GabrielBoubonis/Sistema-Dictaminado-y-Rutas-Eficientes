@@ -145,11 +145,11 @@ seguimiento para la Dirección.
   `arquitectura-tecnica.md`.)_
 - **Criterio de orden de visita:** una vez seleccionadas las solicitudes, el sistema ordena
   su visita minimizando el tiempo y la distancia total del recorrido. El punto de partida
-  del cálculo es la sede de la **Dirección General de Parques y Paseos**, usada también
-  como referencia de cierre del circuito al calcular el recorrido óptimo — esto es un
-  objetivo de cálculo, no una obligación operativa: los ingenieros agrónomos no están
-  obligados a marcar el regreso a la sede al final de la jornada. El cálculo de consumo de
-  combustible **queda fuera de alcance**.
+  es la ubicación actual del ingeniero al generar la ruta o, si no está disponible, la sede
+  de la **Dirección General de Parques y Paseos** (Mariano Moreno 2350). El recorrido
+  termina en la última solicitud: los ingenieros agrónomos no están obligados a regresar a
+  la sede al final de la jornada. El cálculo de consumo de combustible **queda fuera de
+  alcance**.
 - Un botón **"Restablecer"** descarta la ruta completa y permite generar una nueva. Los
   casos que quedaron sin dictaminar en la ruta descartada vuelven a estar disponibles como
   pendientes para una nueva ruta.

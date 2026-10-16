@@ -12,7 +12,7 @@ export interface ItemRuta {
 }
 export interface Ruta {
   id_ruta: number; tipo: string; estado: string; modo_desplazamiento: string; optimizada: boolean; distancia_total_m: number | null;
-  tiempo_total_s: number | null; creada: string; sede: { lat: number; lng: number }; solicitudes: ItemRuta[];
+  tiempo_total_s: number | null; creada: string; partida: { tipo: 'Ubicación actual' | 'Sede'; lat: number; lng: number }; solicitudes: ItemRuta[];
 }
 
 /** Trae del servidor y deja una copia local; sin señal devuelve la última copia (con `desdeCache = true`). */

@@ -19,7 +19,7 @@ export const config = {
   get nominatimUrl() { return process.env.NOMINATIM_URL ?? 'https://nominatim.openstreetmap.org'; },
   get nominatimContacto() { return process.env.NOMINATIM_CONTACTO ?? 'arbolado-rosario-tp'; },
   get sede() {
-    return { lat: Number(process.env.SEDE_LAT ?? -32.9468), lng: Number(process.env.SEDE_LNG ?? -60.6393) };
+    return { lat: Number(process.env.SEDE_LAT ?? -32.96239), lng: Number(process.env.SEDE_LNG ?? -60.65576) }; // Mariano Moreno 2350
   },
   // WebAuthn: si no se fijan WEBAUTHN_RP_ID / WEBAUTHN_ORIGIN se toman del Origin del navegador (sirve para
   // probar desde el celular por cualquier URL, p. ej. un túnel). En producción conviene fijarlos.

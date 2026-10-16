@@ -22,11 +22,14 @@ tormentaRouter.get('/', requireRol('Operador', 'Jefe', 'Administrador', 'Lector'
   });
 }));
 
-const generar = z.object({ modo: z.enum(MODOS), total: z.number().int().min(1).max(100) });
+const generar = z.object({
+  modo: z.enum(MODOS), total: z.number().int().min(1).max(100),
+  ubicacion: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).optional(),
+});
 
 /** RF-41 / RF-42: solo la cantidad; siempre las más antiguas primero; mismas reglas de exclusión y liberación. */
 tormentaRouter.post('/rutas', requireRol('Operador', 'Jefe'), ah(async (req, res) => {
   const b = validar(generar, req.body);
-  const ruta = await generarRuta({ usuario: req.sesion!.usuario, tipo: 'Tormenta', modo: b.modo, total: b.total });
+  const ruta = await generarRuta({ usuario: req.sesion!.usuario, tipo: 'Tormenta', modo: b.modo, total: b.total, ubicacion: b.ubicacion });
   res.status(201).json(await detalleRuta(ruta.id_ruta));
 }));

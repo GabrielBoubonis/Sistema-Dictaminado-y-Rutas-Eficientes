@@ -18,12 +18,20 @@ export function setTokens(t: Tokens | null) {
 export const refreshGuardado = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
 export const hayToken = () => !!tokens;
 
+/** RNF-04: ningún pedido HTTP espera más de 10 s; si no hubo respuesta se trata como falta de conexión. */
+export const TIEMPO_LIMITE_MS = 10_000;
+export async function fetchConLimite(url: string, init: RequestInit = {}): Promise<Response> {
+  const corte = new AbortController();
+  const reloj = setTimeout(() => corte.abort(), TIEMPO_LIMITE_MS);
+  try { return await fetch(url, { ...init, signal: corte.signal }); } finally { clearTimeout(reloj); }
+}
+
 async function crudo(path: string, init: RequestInit & { sinAuth?: boolean } = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
   if (tokens && !init.sinAuth) headers.set('Authorization', `Bearer ${tokens.accessToken}`);
   try {
-    const r = await fetch('/api' + path, { ...init, headers });
+    const r = await fetchConLimite('/api' + path, { ...init, headers });
     emitir('red-ok');
     return r;
   } catch {

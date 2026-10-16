@@ -230,6 +230,9 @@ model Ruta {
   distancia_total_m   Float?
   tiempo_total_s      Float?
   optimizada          Boolean  @default(true)
+  partida_tipo        String   @default("Sede")
+  partida_latitud     Float?
+  partida_longitud    Float?
   usuario             Usuario  @relation(fields: [nombre_usuario], references: [nombre_usuario])
   solicitudes         RutaSolicitud[]
 

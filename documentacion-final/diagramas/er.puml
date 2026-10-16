@@ -11,8 +11,9 @@ skinparam class {
 
 entity "Usuario" as usuario {
   * nombre_usuario : string <<PK>>
+  nombre_completo : string
   --
-  contraseña_hash : string
+  contrasena_hash : string
   rol : string
   activo : boolean
   fecha_alta : date
@@ -27,6 +28,7 @@ entity "Solicitud" as solicitud {
   direccion : string
   latitud : decimal
   longitud : decimal
+  geo_ultimo_intento : datetime
   descripcion_reclamo : string
   estado : string
   es_tormenta : boolean
@@ -62,6 +64,8 @@ entity "Dictamen" as dictamen {
   nota_numero : int
   expediente_numero : int
   fecha_emision : date
+  uuid_dictamen : string <<unique>>
+  fecha_firma : datetime
   domicilio_ejemplar : string
   latitud_ejemplar : decimal
   longitud_ejemplar : decimal
@@ -90,6 +94,9 @@ entity "Dictamen" as dictamen {
   vigente : boolean
   hash_firma : string
   estado_sincronizacion : string
+  firmado_sin_conexion : boolean
+  sua_intentos : int
+  sua_proximo_intento : datetime
 }
 
 note right of dictamen
@@ -130,8 +137,10 @@ note right of ruta
   el ingeniero al generar la ruta (RF-49). Junto con
   antigüedad y eficiencia del recorrido, define qué
   solicitudes se seleccionan (RF-47) y en qué orden se
-  visitan (RF-48), partiendo de la sede de la Dirección
-  General de Parques y Paseos. Ver Decisión 7.
+  visitan (RF-48), partiendo de la ubicación actual del
+  ingeniero o, si no está disponible, de la sede de la
+  Dirección General de Parques y Paseos, sin regreso.
+  Ver Decisión 7.
 end note
 
 entity "Especie" as especie {
@@ -139,6 +148,7 @@ entity "Especie" as especie {
   --
   nombre_comun : string
   nombre_cientifico : string
+  nombre_normalizado : string <<unique>>
   activa : boolean
   creada_por : string <<FK>>
 }
@@ -174,6 +184,14 @@ entity "Ruta" as ruta {
   tipo : string
   estado : string
   modo_desplazamiento : string
+  creada : datetime
+  criterios : json
+  distancia_total_m : decimal
+  tiempo_total_s : decimal
+  optimizada : boolean
+  partida_tipo : string
+  partida_latitud : decimal
+  partida_longitud : decimal
 }
 
 entity "RutaSolicitud" as ruta_solicitud {
@@ -181,9 +199,11 @@ entity "RutaSolicitud" as ruta_solicitud {
   * numero_sua : string <<PK, FK>>
   * anio : int <<PK, FK>>
   --
+  orden : int
   fecha_incorporacion : datetime
   liberada : boolean
   fecha_liberacion : datetime
+  motivo_liberacion : string
 }
 
 entity "Dispositivo" as dispositivo {

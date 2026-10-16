@@ -1,5 +1,6 @@
 import { api, auth, prepararBase, prisma, providers, throttle, token } from './helpers';
-import { MockMatriz, MockGeocoder } from '../src/providers';
+import { MockMatriz, MockGeocoder, haversine } from '../src/providers';
+import { config } from '../src/config';
 import { puntoEnPoligono, ultimoCorte, agruparPorFranja, seleccionar } from '../src/services/rutas';
 import { cerrarRutasVencidas } from '../src/services/rutas';
 import { reintentarGeocodificacion } from '../src/services/solicitudes';
@@ -65,6 +66,26 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
     const r = await generar(t, { modo: 'Vehículo', cantidades: { Alta: 8 } });
     expect(r.status).toBe(201);
     expect(new Set(r.body.solicitudes.map((s: any) => s.distrito)).size).toBeGreaterThan(1);
+  });
+
+  it('RF-48: parte de la ubicación actual del ingeniero y termina en la última solicitud (sin regreso)', async () => {
+    const ubicacion = { lat: config.sede.lat + 0.01, lng: config.sede.lng - 0.01 };
+    const r = await generar(await token('mrossi0'), { modo: 'Caminando', cantidades: { Alta: 3 }, ubicacion });
+    expect(r.status).toBe(201);
+    expect(r.body.partida).toEqual({ tipo: 'Ubicación actual', ...ubicacion });
+    // El simulador mide haversine × 1,3: la distancia total es partida → 1 → 2 → 3, sin tramo de vuelta.
+    const puntos = [ubicacion, ...r.body.solicitudes.map((s: any) => ({ lat: s.latitud, lng: s.longitud }))];
+    const esperada = puntos.slice(1).reduce((t: number, p: any, i: number) => t + haversine(puntos[i], p) * 1.3, 0);
+    expect(r.body.distancia_total_m).toBeCloseTo(esperada, 0);
+  });
+
+  it('RF-48: sin ubicación, o con una ubicación fuera de Rosario, parte de la sede de Parques y Paseos', async () => {
+    const sin = await generar(await token('mrossi0'), { modo: 'Caminando', cantidades: { Alta: 1 } });
+    expect(sin.body.partida.tipo).toBe('Sede');
+    const lejos = await generar(await token('pgimene0'), { modo: 'Caminando', cantidades: { Alta: 1 }, ubicacion: { lat: -34.6, lng: -58.4 } });
+    expect(lejos.body.partida).toEqual({ tipo: 'Sede', lat: config.sede.lat, lng: config.sede.lng });
+    const mala = await generar(await token('cbenite0'), { modo: 'Caminando', cantidades: { Alta: 1 }, ubicacion: { lat: 200, lng: 0 } });
+    expect(mala.status).toBe(422);
   });
 
   it('RF-49: el modo cambia el tiempo pero no la distancia en el simulador', async () => {
@@ -156,7 +177,7 @@ describe('Ruta activa, restablecer y corte de las 18:00 (RF-17, RF-18)', () => {
     await generar(t, { modo: 'Caminando', cantidades: { Alta: 2 } });
     const a = await api().get('/api/rutas/activa').set(auth(t));
     expect(a.body.solicitudes).toHaveLength(2);
-    expect(a.body.sede).toBeDefined();
+    expect(a.body.partida).toEqual({ tipo: 'Sede', lat: config.sede.lat, lng: config.sede.lng });
   });
 
   it('Restablecer libera todas y permite que otro ingeniero las tome; solo el dueño', async () => {
@@ -196,8 +217,8 @@ describe('Funciones puras', () => {
     const mk = (id: string, dia: number, lat: number) => ({ numero_sua: id, anio: 2026, prioridad: 'Alta', latitud: lat, longitud: 0, fecha_ultima_derivacion: new Date(Date.UTC(2026, 7, dia)) });
     const items = [mk('a', 1, 0), mk('b', 2, 5), mk('c', 2, 1), mk('d', 10, 0)];
     expect(agruparPorFranja(items).map((f) => f.length)).toEqual([3, 1]);
-    const dist = (x: any, y: any) => Math.abs((x === 'sede' ? 0 : x.latitud) - y.latitud);
-    // franja 1 = a,b,c; con cupo 2 y ancla sede: toma a (0) y luego c (1) antes que b (5)
+    const dist = (x: any, y: any) => Math.abs((x === 'partida' ? 0 : x.latitud) - y.latitud);
+    // franja 1 = a,b,c; con cupo 2 y ancla en la partida: toma a (0) y luego c (1) antes que b (5)
     expect(seleccionar(items, 2, dist).map((i) => i.numero_sua)).toEqual(['a', 'c']);
     // sin distancias: solo antigüedad (orden por fecha)
     expect(seleccionar(items, 2, null).map((i) => i.numero_sua)).toEqual(['a', 'b']);

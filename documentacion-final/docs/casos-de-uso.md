@@ -164,7 +164,7 @@ CU-13, CU-14, CU-15 y CU-16 no participan de relaciones `<<include>>`/`<<extend>
 | 1 | El usuario accede al apartado de rutas. | El sistema muestra las opciones de criterios disponibles. |
 | 2 | El usuario define los criterios: un distrito como filtro, cantidad por nivel de prioridad, una zona señalada en el mapa y el modo de desplazamiento (a pie o en vehículo). | El sistema toma los criterios indicados.<br>• 2.1 Si el usuario no indica distrito, el sistema deberá considerar todos los distritos y armar la ruta con el resto de los criterios seleccionados.<br>• 2.2 El modo de desplazamiento es obligatorio, ya que determina cómo se calcula el tiempo y la distancia del recorrido. |
 | 3 | El usuario confirma la generación de la ruta. | El sistema selecciona las solicitudes pendientes que cumplen los criterios, excluyendo las que ya forman parte de la ruta activa de otro ingeniero.<br>• 3.1 Si la cantidad de solicitudes candidatas supera el cupo indicado, el sistema deberá seleccionar cuáles incluir combinando antigüedad (preferencia a las más antiguas) y eficiencia del recorrido resultante. |
-| 4 | — | El sistema calcula el orden de visita minimizando tiempo y distancia según el modo de desplazamiento elegido, partiendo de la sede de la Dirección General de Parques y Paseos, arma la ruta ordenada, la muestra al usuario y reserva esas solicitudes. |
+| 4 | — | El sistema calcula el orden de visita minimizando tiempo y distancia según el modo de desplazamiento elegido, partiendo de la ubicación actual del usuario o, si no está disponible, de la sede de la Dirección General de Parques y Paseos (sin regreso), arma la ruta ordenada, la muestra al usuario y reserva esas solicitudes. |
 
 ### Excepciones
 

@@ -233,6 +233,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_reserva_activa ON ruta_solicitud(numero_sua
 ALTER TABLE dictamen ADD COLUMN IF NOT EXISTS sua_intentos INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE dictamen ADD COLUMN IF NOT EXISTS sua_proximo_intento TIMESTAMP(3);
 
+-- Punto de partida de la ruta: la ubicación actual del ingeniero o, si no la dio, la sede de Parques y Paseos (RF-48).
+ALTER TABLE ruta ADD COLUMN IF NOT EXISTS partida_tipo TEXT NOT NULL DEFAULT 'Sede';
+ALTER TABLE ruta ADD COLUMN IF NOT EXISTS partida_latitud DOUBLE PRECISION;
+ALTER TABLE ruta ADD COLUMN IF NOT EXISTS partida_longitud DOUBLE PRECISION;
+
 -- Se quitó "calle de esquina" del dictamen (decisión de la Dirección).
 ALTER TABLE dictamen DROP COLUMN IF EXISTS calle_esquina;
 ALTER TABLE dictamen DROP COLUMN IF EXISTS numero_esquina;

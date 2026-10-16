@@ -104,7 +104,7 @@ _Cada historia debe incluir formato clásico, criterios de aceptación y validac
 3. Dado que no tengo conexión a internet, cuando intento generar una ruta, el sistema no permite la operación e informa que se necesita conexión.
 4. Dado que elijo no filtrar por distrito, el sistema igual arma la ruta considerando el resto de los criterios seleccionados.
 5. Dado que genero una ruta, debo indicar el modo de desplazamiento (a pie o en vehículo), y el sistema calcula el tiempo y la distancia del recorrido en función de ese modo.
-6. Dado que las solicitudes que cumplen mis criterios superan la cantidad que pedí, el sistema selecciona cuáles incluir combinando antigüedad (las más antiguas primero) y eficiencia del recorrido resultante, y ordena su visita minimizando tiempo y distancia desde la sede de la Dirección General de Parques y Paseos.
+6. Dado que las solicitudes que cumplen mis criterios superan la cantidad que pedí, el sistema selecciona cuáles incluir combinando antigüedad (las más antiguas primero) y eficiencia del recorrido resultante, y ordena su visita minimizando tiempo y distancia desde mi ubicación actual o, si no está disponible, desde la sede de la Dirección General de Parques y Paseos.
 
 ### Validación INVEST
 

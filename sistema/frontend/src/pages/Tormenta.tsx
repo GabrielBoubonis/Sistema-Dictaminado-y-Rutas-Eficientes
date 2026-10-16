@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../auth';
 import { Estado, Prioridad, fechaCorta, textoError } from '../components/ui';
+import { ubicacionActual } from '../lib/geo';
 import type { Solicitud } from '../lib/datos';
 
 export function Tormenta() {
@@ -18,7 +19,10 @@ export function Tormenta() {
 
   const generar = async () => {
     setError(null);
-    try { await api('/tormenta/rutas', { body: { modo, total } }); setOk(true); void cargar(); } catch (e) { setError(textoError(e)); }
+    try {
+      const ubicacion = await ubicacionActual();
+      await api('/tormenta/rutas', { body: { modo, total, ...(ubicacion ? { ubicacion } : {}) } }); setOk(true); void cargar();
+    } catch (e) { setError(textoError(e)); }
   };
   return (
     <section>

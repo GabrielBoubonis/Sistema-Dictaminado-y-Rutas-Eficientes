@@ -95,7 +95,7 @@ ruta filtrando por distrito y prioridad" sí lo es)._
 
 **Criterios de aceptación**
 
-1. Dado que mi ruta ya fue generada, el sistema me muestra las solicitudes numeradas en el orden que minimiza el tiempo y la distancia total, partiendo de la sede de la Dirección General de Parques y Paseos.
+1. Dado que mi ruta ya fue generada, el sistema me muestra las solicitudes numeradas en el orden que minimiza el tiempo y la distancia total, partiendo de mi ubicación actual o, si no está disponible, de la sede de la Dirección General de Parques y Paseos, y terminando en la última solicitud.
 2. Dado que mi ruta combina solicitudes de distrito/prioridad con solicitudes dentro de una zona dibujada (Historia 3), el orden de visita las integra a todas en un único recorrido, sin agruparlas por cómo fueron seleccionadas.
 
 ---

@@ -30,7 +30,9 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
 - `nombre_usuario` (PK, `string`): identificador único del usuario. Formato: inicial del
   nombre + 6 letras del apellido + número incremental si se repite (definido en
   Alcance/Requisitos, no es un dato que el usuario elija).
-- `contraseña_hash` (`string`): hash de la contraseña propia del sistema (nunca se guarda en
+- `nombre_completo` (`string`): nombre y apellido, para mostrar en la app y en el PDF del
+  dictamen.
+- `contrasena_hash` (`string`): hash de la contraseña propia del sistema (nunca se guarda en
   texto plano; tampoco se guarda ninguna contraseña de la Autenticación Institucional).
 - `rol` (`string`): uno de Lector, Operador, Jefe, Administrador. Ver Decisión 1 sobre por
   qué es un atributo y no una entidad aparte.
@@ -53,6 +55,8 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   `domicilio_ejemplar` (ver Dictamen).
 - `latitud` (`decimal`), `longitud` (`decimal`): coordenadas resultantes de geocodificar
   `direccion`, cacheadas para el cálculo de rutas (RF-47, RF-48, RNF-14). Ver Decisión 9.
+- `geo_ultimo_intento` (`datetime`): último intento fallido de geocodificación; lo usa el
+  reintento automático de cada hora (RF-62). Nulo si la solicitud ya tiene coordenadas.
 - `descripcion_reclamo` (`string`): texto técnico del problema reportado, sin datos
   personales del vecino (RF-29).
 - `estado` (`string`): Pendiente, Dictaminada o Pendiente-revisión.
@@ -81,6 +85,9 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   firmarse).
 - `fecha_emision` (`date`): se guarda junto con el hash como parte de la firma digital
   (RF-22).
+- `uuid_dictamen` (`string`, único): generado en el captor al firmar; clave de
+  idempotencia para que un reenvío no duplique el dictamen (RF-21, RF-33).
+- `fecha_firma` (`datetime`): momento exacto de la firma (timestamp de RF-22).
 - `domicilio_ejemplar` (`string`): dirección del árbol, copiada de `Solicitud.direccion`
   (la que informa el reclamo), sin tipeo libre. **Obligatorio.** Se guarda acá y no solo en
   Solicitud — ver Decisión 3.
@@ -123,9 +130,12 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   formulario, junto a `observaciones`, como el último dato que se completa antes de firmar.
   Ver Decisión 6.
 - `observaciones` (`string`): texto libre. **Opcional.**
-- `vigente` (`boolean`): verdadero por defecto. Pasa a falso cuando un Jefe elige el otro dictamen de un caso con dos firmados (RF-59, CU-15); el dictamen no vigente se conserva en el historial.
+- `vigente` (`boolean`): verdadero por defecto. Queda nulo mientras un caso tiene dos dictámenes firmados en conflicto, y pasa a falso en el que no elige el Jefe (RF-59, CU-15); el dictamen no vigente se conserva en el historial.
 - `hash_firma` (`string`), `estado_sincronizacion` (`string`): generados por el sistema al
   firmar, no los completa el usuario (RF-22, RF-25).
+- `firmado_sin_conexion` (`boolean`): si llegó por la cola offline (CU-10, RF-53).
+- `sua_intentos` (`int`), `sua_proximo_intento` (`datetime`): reintentos del envío al SUA
+  con espera creciente (RF-25, RNF-17).
 - **Obligatorio y bloqueante para firmar** (no es un atributo de Dictamen, es una regla de
   validación): debe existir al menos una Fotografia asociada (RF-45).
 - **Obligatorio y bloqueante para firmar** (regla de validación, no un atributo): si
@@ -137,6 +147,8 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
 - `id_especie` (PK, `int`).
 - `nombre_comun` (`string`): nombre con el que figura en el catálogo (ej. Plátano, Fresno).
 - `nombre_cientifico` (`string`): opcional.
+- `nombre_normalizado` (`string`, único): nombre común en minúsculas y sin tildes; evita
+  duplicados al agregar una especie (RF-56).
 - `activa` (`boolean`): permite retirar una especie del selector sin borrar los dictámenes
   que ya la usaron.
 - `creada_por` (FK, `string`): usuario que agregó la especie desde el selector; nulo si viene del catálogo inicial.
@@ -175,19 +187,33 @@ Catálogo inicial propuesto (a validar con los ingenieros agrónomos): Fresno am
 - `nombre_usuario` (FK, `string`): quién la generó.
 - `fecha` (`date`): día de la jornada a la que corresponde.
 - `tipo` (`string`): Normal o Tormenta.
-- `estado` (`string`): Activa / Restablecida.
+- `estado` (`string`): Activa / Restablecida / Completada (se dictaminaron todas sus
+  solicitudes) / Vencida (corte de las 18:00 hs, RF-17).
+- `creada` (`datetime`): momento de generación; define a qué corte de las 18:00 hs
+  corresponde.
 - `modo_desplazamiento` (`string`): Caminando / Vehículo. Lo elige el ingeniero al generar
   la ruta (RF-49) y determina cómo se calculan el tiempo y la distancia del recorrido para
   seleccionar y ordenar las solicitudes (RF-47, RF-48). Ver Decisión 7.
+- `criterios` (`json`): distrito, zona, cantidades por prioridad o total (tormenta) con los
+  que se generó (RF-15, RF-41).
+- `distancia_total_m` (`decimal`), `tiempo_total_s` (`decimal`), `optimizada` (`boolean`):
+  resultado del cálculo (RF-48, RF-49); `optimizada` es falso si el servicio de mapas no
+  respondió y la ruta quedó ordenada solo por antigüedad.
+- `partida_tipo` (`string`): Ubicación actual / Sede. Desde dónde se calculó el recorrido
+  (RF-48).
+- `partida_latitud` (`decimal`), `partida_longitud` (`decimal`): coordenadas de la partida
+  (la ubicación del captor al generar la ruta, o la sede de la Dirección General de
+  Parques y Paseos).
 
 ### RutaSolicitud
 
 - `id_ruta` (PK, FK, `int`): la ruta.
 - `numero_sua` (PK, FK, `string`), `anio` (PK, FK, `int`): la solicitud incluida.
+- `orden` (`int`): posición en el orden de visita (RF-48).
 - `fecha_incorporacion` (`datetime`): cuándo se agregó esa solicitud a la ruta.
-- `liberada` (`boolean`), `fecha_liberacion` (`datetime`): si la solicitud dejó de estar
-  reservada (por dictaminarse, por "Restablecer" o por el corte automático de las 18:00 hs)
-  y cuándo.
+- `liberada` (`boolean`), `fecha_liberacion` (`datetime`), `motivo_liberacion` (`string`):
+  si la solicitud dejó de estar reservada, cuándo y por qué (Dictaminada, Restablecida o
+  Corte de las 18:00).
 
 ### Dispositivo
 
@@ -334,11 +360,11 @@ visita entre las seleccionadas. Se resolvió de la siguiente manera:
   producir una ruta geográficamente muy ineficiente; tampoco se usa solo eficiencia, porque
   podría postergar indefinidamente una solicitud antigua que quede "fuera de camino".
 - **Orden de visita (RF-48):** una vez seleccionadas, el sistema calcula el orden que
-  minimiza tiempo y distancia, tomando como punto de partida y de cierre del cálculo la
-  sede de la Dirección General de Parques y Paseos. Es un objetivo de cálculo, no una
-  obligación operativa: los ingenieros agrónomos no están obligados a marcar el regreso a
-  la sede al final de la jornada (a diferencia de otros roles que sí lo hacen), por lo que
-  el circuito no siempre se cierra en la práctica.
+  minimiza tiempo y distancia, partiendo de la ubicación actual del ingeniero al generar la
+  ruta o, si no está disponible, de la sede de la Dirección General de Parques y Paseos
+  (Mariano Moreno 2350). El recorrido termina en la última solicitud, sin regreso: los
+  ingenieros agrónomos no están obligados a volver a la sede al final de la jornada (a
+  diferencia de otros roles que sí lo hacen). La partida usada queda guardada en `Ruta`.
 - **Modo de desplazamiento (RF-49, atributo `Ruta.modo_desplazamiento`):** el ingeniero no
   siempre se desplaza de la misma forma — la mayoría de las veces camina, pero en ciertos
   casos usa un vehículo de la Dirección. Como el tiempo y la distancia de un mismo

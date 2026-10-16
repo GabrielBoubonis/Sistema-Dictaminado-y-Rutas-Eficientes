@@ -14,12 +14,13 @@ const generar = z.object({
   distrito: z.enum(catalogos.distritos as [string, ...string[]]).optional(), // RF-15: filtro opcional
   zona: z.array(z.tuple([z.number().min(-90).max(90), z.number().min(-180).max(180)])).min(3).optional(),
   cantidades: z.object({ Alta: cant, Media: cant, Baja: cant }),
+  ubicacion: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).optional(), // RF-48: partida desde la ubicación actual
 }).refine((b) => Object.values(b.cantidades).some((n) => (n ?? 0) > 0), { message: 'Indicá al menos una cantidad', path: ['cantidades'] });
 
 /** RF-14 a RF-19, RF-47 a RF-49. RF-19: requiere conexión (el servidor es la única fuente de reservas). */
 rutasRouter.post('/', ah(async (req, res) => {
   const b = validar(generar, req.body);
-  const ruta = await generarRuta({ usuario: req.sesion!.usuario, tipo: 'Normal', modo: b.modo, distrito: b.distrito, zona: b.zona, cantidades: b.cantidades });
+  const ruta = await generarRuta({ usuario: req.sesion!.usuario, tipo: 'Normal', modo: b.modo, distrito: b.distrito, zona: b.zona, cantidades: b.cantidades, ubicacion: b.ubicacion });
   res.status(201).json(await detalleRuta(ruta.id_ruta));
 }));
 

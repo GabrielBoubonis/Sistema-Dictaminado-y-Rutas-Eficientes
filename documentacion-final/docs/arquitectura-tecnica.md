@@ -19,15 +19,18 @@ uso en el volumen de esta demo (hasta 7 ingenieros, ~70 dictámenes/día)._
 |---|---|---|
 | Backend | Node.js + TypeScript + Express | Gratuito, mismo lenguaje que el frontend (menor curva para el equipo), tipado fuerte reduce errores de contrato entre módulos. |
 | Base de datos | PostgreSQL | Gratuita/OSS, soporta bien los tipos del Modelo ER (claves compuestas de `Solicitud`, JSON para campos opcionales), con opciones de hosting gratuito para la demo (Neon, Supabase, Railway — capa free). |
-| ORM | Prisma | Gratuito, genera tipos TypeScript desde el esquema, simplifica traducir `er-modelo.md` a migraciones SQL. |
+| ORM | Prisma | Gratuito, genera tipos TypeScript desde el esquema (`prisma/schema.prisma`). El esquema se aplica con `prisma/init.sql`, un script SQL idempotente escrito a mano que además crea el trigger que vuelve inmutable la auditoría (RF-54) y el índice único parcial de reservas (RF-16), que `prisma migrate` no genera. |
 | Frontend | React + Vite | Gratuito, ecosistema grande, Vite da un build rápido y soporte nativo para PWA vía plugin. |
 | PWA / offline | Workbox (Service Worker) + Dexie.js (IndexedDB) | Ambos gratuitos/OSS. Workbox cachea los assets de la app; Dexie maneja la cola de dictámenes/fotos "pendiente de sincronizar" (RF-31 a RF-34) con una API más simple que IndexedDB nativo. |
-| Autenticación | JWT (librería `jsonwebtoken`) + bcrypt + WebAuthn (`@simplewebauthn/server` y `/browser`) | Las tres son gratuitas/OSS. WebAuthn resuelve RF-51 usando el sensor biométrico que ya tienen los captores Android, sin depender de SMS/email. |
-| Mapas y ruteo | OpenRouteService (API gratuita, límite ~2000 requests/día en el tier free) + Leaflet (mapa interactivo, OSS) | Cubre RNF-14: cálculo de distancia/tiempo a pie y en vehículo, y dibujo de zona en el mapa (RF-15) sin costo. |
+| Autenticación | JWT (librería `jsonwebtoken`) + bcrypt (librería `bcryptjs`, la misma función de hash sin compilación nativa) + WebAuthn (`@simplewebauthn/server` y `/browser`) | Las tres son gratuitas/OSS. WebAuthn resuelve RF-51 usando el sensor biométrico que ya tienen los captores Android, sin depender de SMS/email. |
+| Mapas y ruteo | OpenRouteService (API gratuita con clave; cada matriz de distancias admite hasta 3500 pares de puntos, por eso se consulta con hasta 59) + Leaflet (mapa interactivo, OSS) con teselas de OpenStreetMap | Cubre RNF-14: cálculo de distancia/tiempo a pie y en vehículo, y dibujo de zona en el mapa (RF-15) sin costo. |
 | Geocodificación | Georef (API gratuita del Estado nacional, tramos de calle del INDEC con rangos de altura) con respaldo en Nominatim (OpenStreetMap, gratuito, 1 consulta por segundo) | Ubica cada dirección por su altura exacta dentro de Rosario; OpenStreetMap no tiene cargadas las alturas de varias avenidas. Ambos sin costo ni clave. |
 | Rate limiting | `express-rate-limit` | Gratuito/OSS, cubre RNF-19. |
-| Testing | Jest (backend) + Vitest (frontend) | Ambos gratuitos/OSS, estándar en el ecosistema Node/React. |
-| Hosting de la demo (opcional) | Render / Railway (backend, capa free) + Vercel o Netlify (frontend, capa free) + Neon/Supabase (Postgres, capa free) | Ninguno tiene costo para el volumen de una demo académica; para producción real, el CIL define el hosting institucional (fuera de este alcance, ver `alcance.md` §3). |
+| Testing | Jest + supertest contra PostgreSQL real (backend) + Vitest (frontend) + Playwright (prueba de punta a punta en Chromium) | Todos gratuitos/OSS, estándar en el ecosistema Node/React. |
+| PDF del dictamen | PDFKit | Gratuito/OSS, genera el PDF imprimible en el servidor (RF-26). |
+| Validación de datos | zod | Gratuito/OSS, valida cada pedido y cada registro del SUA contra un esquema (RF-56, RNF-18). |
+| Cabeceras de seguridad | helmet | Gratuito/OSS, aplica CSP, HSTS y X-Frame-Options (RNF-21). |
+| Hosting de la demo | Máquina virtual Always Free de Oracle Cloud con Docker Compose (PostgreSQL, la app, Caddy con certificado HTTPS de Let's Encrypt y backup diario) + subdominio gratuito de DuckDNS | Sin costo, siempre encendida y con disco propio para fotos y backups. Se descartaron los planes gratuitos de Render, Railway, Fly.io y Koyeb (se duermen, vencen o ya no existen) y Vercel/Netlify (no corren el backend). Para producción real, el CIL define el hosting institucional (fuera de este alcance, ver `alcance.md` §3). |
 
 **Fuera de esta elección (y por qué):** no se propone GraphQL (REST alcanza para la
 cantidad de recursos del sistema, y es más simple de documentar con OpenAPI) ni un
@@ -38,22 +41,28 @@ este proyecto y reduce la curva de entrada).
 
 ## 2. Contrato de API interno (resumen)
 
-API REST, JSON, autenticación por JWT en el header `Authorization: Bearer <token>` salvo en
-`/auth/login`. Agrupado por módulo de `requisitos.md`:
+API REST bajo el prefijo `/api`, JSON, autenticación por JWT en el header
+`Authorization: Bearer <token>` salvo en `/auth/login`, `/auth/refresh` y `/health`.
+Agrupado por módulo de `requisitos.md`:
 
 | Recurso | Endpoints principales | RF relacionados |
 |---|---|---|
-| `/auth` | `POST /auth/login` (paso 1 y 2, RF-01 a RF-03), `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/webauthn/verify` (segundo factor, RF-51), `POST /auth/revalidar` (al volver la conexión tras reanudar sin señal, RF-57) | RF-01 a RF-05, RF-50, RF-51, RF-57 |
+| `/auth` | `POST /auth/login` (paso 1 y 2, RF-01 a RF-03), `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `POST /auth/revalidar` (al volver la conexión tras reanudar sin señal, RF-57), `GET /auth/webauthn/estado`, `GET /auth/webauthn/credenciales`, `POST /auth/webauthn/registro/opciones` y `POST /auth/webauthn/registro/verificar` (alta de la huella del captor, RF-51), `POST /auth/dispositivo/bloqueo` y `GET /auth/dispositivo/:id` (bloqueo local y consulta del desbloqueo, RF-52, RF-60) | RF-01 a RF-05, RF-50 a RF-52, RF-57, RF-60 |
 | `/usuarios` | `GET /usuarios`, `POST /usuarios`, `PATCH /usuarios/:id`, `POST /usuarios/:id/reset-password`, `POST /usuarios/:id/revocar-captor`, `GET /usuarios/captores-bloqueados?codigo=`, `POST /usuarios/captores/:codigo/desbloquear` | RF-06 a RF-08, RF-52, RF-60 |
 | `/solicitudes` | `GET /solicitudes` (filtros de estado/distrito), `GET /solicitudes/:numeroSua/:anio` | RF-09 a RF-13 |
-| `/rutas` | `POST /rutas` (generar, RF-14 a RF-19, RF-47 a RF-49), `GET /rutas/activa`, `POST /rutas/:id/restablecer` | RF-14 a RF-19, RF-47 a RF-49 |
-| `/dictamenes` | `POST /dictamenes` (completar y firmar, dispara WebAuthn), `GET /dictamenes/:numeroSua/:anio/historial`, `GET /dictamenes/:id/pdf`, `GET /dictamenes/:numeroSua/:anio/conflicto` y `POST /dictamenes/:id/vigente` (solo Jefe, RF-59) | RF-20 a RF-29, RF-45, RF-46, RF-51, RF-59, RF-61 |
-| `/sync` | `POST /sync/dictamenes` (cola offline → servidor, recalcula hash, RF-53) | RF-30 a RF-34, RF-53 |
+| `/rutas` | `POST /rutas` (generar; acepta la ubicación actual del captor como partida, RF-14 a RF-19, RF-47 a RF-49), `GET /rutas/activa`, `POST /rutas/:id/restablecer` | RF-14 a RF-19, RF-47 a RF-49 |
+| `/dictamenes` | `POST /dictamenes` (completar y firmar, con la aserción WebAuthn incluida), `GET /dictamenes/:id`, `GET /dictamenes/:id/fotos/:orden`, `GET /dictamenes/:numeroSua/:anio/historial`, `GET /dictamenes/:id/pdf`, `GET /dictamenes/:numeroSua/:anio/conflicto` y `POST /dictamenes/:id/vigente` (solo Jefe, RF-59) | RF-20 a RF-29, RF-45, RF-46, RF-51, RF-59, RF-61 |
+| `/sync` | `POST /sync/dictamenes` (cola offline → servidor, recalcula hash y verifica la aserción WebAuthn, RF-53) | RF-30 a RF-34, RF-51, RF-53 |
 | `/especies` | `GET /especies?q=` (búsqueda para el selector), `POST /especies` (agregar una especie nueva, normalizada y sin duplicados) | RF-56 |
 | `/dashboard` | `GET /dashboard?mes=&anio=` | RF-35 a RF-37, RF-44 |
-| `/tormenta` | `GET /tormenta`, `POST /tormenta/rutas` | RF-38 a RF-43 |
+| `/tormenta` | `GET /tormenta`, `POST /tormenta/rutas` (acepta la ubicación actual como partida) | RF-38 a RF-43 |
 | `/auditoria` | `GET /auditoria?usuario=&accion=&desde=&hasta=` | RF-54, RF-55 |
 | `/revision` | `GET /revision` (apartado "Para revisar", solo Administrador, solo lectura) | RF-58, RNF-18 |
+| `/health` | `GET /health` (estado del servidor; la PWA lo usa para detectar que volvió la conexión) | RF-33 |
+
+El segundo factor (RF-51) no tiene endpoint propio: la aserción WebAuthn viaja dentro de
+`POST /dictamenes` y de `POST /sync/dictamenes`, porque la firma también se hace sin
+conexión y el desafío es el hash del contenido firmado.
 
 Cada endpoint de escritura que modifica usuarios o captores dispara
 internamente un registro en `/auditoria` (RF-54) — no es un endpoint que el cliente llame
@@ -91,6 +100,15 @@ El conector propio del sistema (`IReclamoProvider`, `IAuthProvider` — ver
 las llamadas HTTP reales sin tocar el resto del sistema cuando el CIL confirme el esquema y
 las credenciales de producción.
 
+**Tablas técnicas de soporte** (no son entidades del dominio, por eso no figuran en
+`er-modelo.md`):
+
+| Tabla | Para qué |
+|---|---|
+| `refresh_token` | Sesiones abiertas: hash del refresh token, captor, fecha del primer ingreso (tope de 7 días, RNF-20) y revocación (RF-52). |
+| `webauthn_credential` | Huellas registradas por usuario y captor: clave pública y contador (RF-51). |
+| `sua_datos_complementarios` | Lo que el sistema envió al SUA por cada dictamen (RF-24), en la demo en lugar de la API real. |
+
 ---
 
 ## 4. Mecanismos de seguridad (detalle de implementación)
@@ -98,14 +116,14 @@ las credenciales de producción.
 | Mecanismo | Elección concreta | RF/RNF que resuelve |
 |---|---|---|
 | Hash de firma del dictamen | SHA-256 sobre el JSON canónico del dictamen (campos ordenados, sin espacios) | RF-22, RF-53 |
-| Hashing de contraseñas | bcrypt, costo 12 | RNF-05 |
+| Hashing de contraseñas | bcrypt (librería `bcryptjs`), costo 12 | RNF-05 |
 | Segundo factor al firmar | WebAuthn (biometría del dispositivo); ver wireframe `04b-segundo-factor.svg` | RF-51 |
-| Cifrado at-rest en el captor | AES-GCM (Web Crypto API), clave derivada de la sesión activa | RNF-16 |
+| Cifrado at-rest en el captor | AES-GCM (Web Crypto API) con una clave aleatoria creada en el captor como no exportable y guardada en IndexedDB: sirve para cifrar y descifrar, pero no se puede leer ni copiar a otro equipo. No depende de la sesión, así la cola se sincroniza aunque la sesión se haya cerrado (RF-33); el equipo bloqueado y cifrado (RNF-22) completa la protección | RNF-16 |
 | Borrado post-sincronización | al confirmarse la sincronización (RF-33), se eliminan de IndexedDB la fotografía y el dictamen ya enviados | RNF-16 |
 | Rate limiting server-side | 10 intentos fallidos / 15 min por combinación IP + usuario (también para usuarios inexistentes), backoff exponencial; capa distinta del bloqueo local a los 5 intentos del captor | RNF-19, RF-52 |
 | Validación de campos cerrados | el servidor valida cada campo de lista cerrada contra su enumeración o tabla de catálogo y responde 422 ante cualquier valor fuera de ella | RF-56 |
 | Sesión | JWT corto (30 min) + refresh token con tope absoluto de 7 días | RF-04, RF-05, RNF-20 |
-| Cabeceras HTTP | CSP `default-src 'self'`, HSTS, `X-Frame-Options: DENY` en todas las respuestas | RNF-21 |
+| Cabeceras HTTP | CSP `default-src 'self'` (con excepciones solo para las teselas de OpenStreetMap y OpenRouteService), HSTS, `X-Frame-Options: DENY` y `Referrer-Policy: strict-origin-when-cross-origin` (OpenStreetMap exige el Referer) en todas las respuestas | RNF-21 |
 
 ---
 
@@ -128,12 +146,14 @@ las credenciales de producción.
    Decisión 9), así que generar una
    ruta no geocodifica de nuevo. Se consulta la API de Matrix de OpenRouteService (perfil
    `foot-walking` o `driving-car` según el modo elegido, RF-49) para obtener la matriz de
-   distancias entre esas coordenadas y la sede de la Dirección General de Parques y Paseos
-   (punto de partida y cierre del cálculo, ver `alcance.md` §2.5). Las solicitudes sin
+   distancias entre esas coordenadas y el punto de partida: la ubicación del captor al
+   generar la ruta (API de geolocalización del navegador; si no se da permiso, no hay GPS o
+   queda a más de 30 km de la sede, no se usa) o, en su defecto, la sede de la Dirección
+   General de Parques y Paseos, Mariano Moreno 2350 (ver `alcance.md` §2.5). Las solicitudes sin
    coordenadas (geocodificación fallida) quedan fuera del cálculo hasta corregirse.
 4. **Orden de visita (RF-48):** una vez seleccionadas las solicitudes, se resuelve el orden
    de recorrido con la misma heurística de vecino más próximo sobre la matriz de
-   distancias ya calculada, partiendo de la sede.
+   distancias ya calculada, desde el punto de partida y sin tramo de regreso.
 5. **Si OpenRouteService no responde:** la selección continúa usando solo el criterio de
    antigüedad (sin el desempate por distancia), y el orden de visita queda sin optimizar
    hasta que el servicio vuelva a responder — ver `slicing.md`, Parte B, segunda fila de la
@@ -185,7 +205,7 @@ escenario de falla._
 
 | Escenario | Qué hace el sistema |
 |---|---|
-| Dos ingenieros generan ruta casi al mismo tiempo y compiten por las mismas solicitudes. | Ya resuelto: condición de carrera analizada en `slicing.md`, Parte B (fila 1 de la tabla de excepciones). |
+| Dos ingenieros generan ruta casi al mismo tiempo y compiten por las mismas solicitudes. | Ya resuelto: condición de carrera analizada en `slicing.md`, Parte B (fila 1 de la tabla de excepciones). Implementación: la consulta a OpenRouteService se hace sin bloquear; la elección final y la reserva se hacen de a un ingeniero por vez dentro de una transacción con un bloqueo de PostgreSQL (`pg_advisory_xact_lock`), que relee las reservas, descarta las ya tomadas y completa el cupo con la siguiente. El índice único parcial de `RutaSolicitud` queda como última defensa. Probado con 7 ingenieros a la vez (RNF-02): ningún conflicto y el 95 % de los pedidos por debajo de 200 ms. |
 | Doble clic en "Confirmar ruta" o en el botón de firma del dictamen. | El botón se deshabilita apenas se registra el primer clic (UI optimista) y, del lado del servidor, la misma petición repetida no duplica nada gracias al UUID de idempotencia (igual mecanismo que en sincronización offline). |
 | Dos ingenieros cargan, sin verse entre sí (uno de ellos sin conexión), un dictamen para el mismo ejemplar. | La validación de "no existe ya un dictamen activo" (RF-21) se re-chequea en el servidor al sincronizar, no solo en el cliente. Si hay conflicto, el segundo dictamen en llegar no se descarta silenciosamente: la Solicitud pasa a estado Pendiente-revisión para que un Jefe decida cuál dictamen prevalece (mismo estado que ya usa RF-09 a RF-13). El Jefe ve ambos dictámenes en el detalle del caso y elige uno: el elegido queda con `vigente = true`, el otro con `vigente = false` y se conserva en el historial (RF-59, CU-15). |
 | Una solicitud de tormenta reservada en una ruta del Protocolo por tormenta se intenta tomar también desde una ruta normal. | No es posible: toda Solicitud solo puede tener una fila activa en `RutaSolicitud` a la vez (ver `er-modelo.md`), sin importar si la ruta que la reservó es normal o de tormenta. |
@@ -194,7 +214,7 @@ escenario de falla._
 
 | Escenario | Qué hace el sistema |
 |---|---|
-| Falla la subida de una fotografía durante la sincronización de un dictamen (las demás fotos y los datos del dictamen sí llegan). | El dictamen no se marca `sincronizado` hasta que todas sus fotos lleguen con éxito. En el próximo intento de sync solo se reintenta la foto faltante, no el dictamen completo. |
+| Falla la subida de una fotografía durante la sincronización de un dictamen. | Las fotos viajan dentro del mismo pedido que el dictamen (uno por pedido, ver sección 9): o llega todo o no llega nada, y el dictamen no se marca `sincronizado` ni sale de la cola hasta que el servidor confirma. El reintento reenvía el dictamen completo y el UUID evita duplicarlo. |
 | Una fotografía es demasiado pesada para el almacenamiento offline limitado del dispositivo. | Se comprime en el cliente antes de guardarla en IndexedDB (redimensionado vía `canvas`, apuntando a ~1-2 MB por foto) para no agotar la cuota de almacenamiento del navegador con unas pocas fotos de alta resolución. |
 | Falla la generación del PDF de un dictamen (RF-26, CU-08). | El PDF se genera on-demand en cada descarga, no se pre-genera ni se guarda una sola copia: una falla puntual no deja al dictamen sin PDF disponible para siempre, el usuario simplemente reintenta la descarga. |
 
@@ -243,14 +263,20 @@ a distancia.
 
 - **Timeout de red (RNF-04):** toda solicitud HTTP de la PWA corta a los **10 segundos**; si
   no hubo respuesta, se trata como falla de red y el dictamen sigue el camino offline
-  (guardado cifrado local y reintento con espera creciente, RNF-17).
-- **Backup y retención (RNF-10, RNF-11):** la frecuencia de los backups y el lugar donde se
-  guardan los define el **CIL**, que administra la infraestructura real. Para la demo alcanza
-  con un `pg_dump` manual u opcional; no se fija un valor en este documento.
-- **Disponibilidad 24/7 (RNF-01):** el requisito no cambia. Se aclara que la **demo** se
-  ofrece en el mejor esfuerzo, porque los planes gratuitos de hosting (Render, Neon, Supabase)
-  pueden pausar el servicio por inactividad; el 24/7 real depende del hosting institucional
-  del CIL en producción.
+  (guardado cifrado local y reintento con espera creciente, RNF-17). Para que un dictamen
+  con sus fotos entre en ese tiempo aun con señal débil, la cola se sincroniza de a un
+  dictamen por pedido. Del lado del servidor, la consulta a OpenRouteService corta a los 6
+  segundos y la ruta se ordena solo por antigüedad (sección 5, punto 5), así generar una
+  ruta siempre responde antes del límite del cliente.
+- **Backup y retención (RNF-10, RNF-11):** en producción, la frecuencia de los backups y el
+  lugar donde se guardan los define el **CIL**, que administra la infraestructura real. En la
+  demo, un servicio de `docker-compose.prod.yml` hace todos los días un `pg_dump` de la base
+  (se conservan 14 días) y una copia de las fotografías (7 días) en el servidor; conviene
+  bajarlas a otro equipo de vez en cuando (ver `sistema/DESPLIEGUE.md`).
+- **Disponibilidad 24/7 (RNF-01):** el requisito no cambia. La **demo** corre en una máquina
+  virtual gratuita que no se duerme y se levanta sola si se reinicia, pero se ofrece en el
+  mejor esfuerzo: Oracle puede recuperar una máquina gratuita que pasa 7 días casi sin uso.
+  El 24/7 real depende del hosting institucional del CIL en producción.
 
 ---
 
