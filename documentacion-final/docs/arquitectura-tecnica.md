@@ -24,6 +24,7 @@ uso en el volumen de esta demo (hasta 7 ingenieros, ~70 dictámenes/día)._
 | PWA / offline | Workbox (Service Worker) + Dexie.js (IndexedDB) | Ambos gratuitos/OSS. Workbox cachea los assets de la app; Dexie maneja la cola de dictámenes/fotos "pendiente de sincronizar" (RF-31 a RF-34) con una API más simple que IndexedDB nativo. |
 | Autenticación | JWT (librería `jsonwebtoken`) + bcrypt + WebAuthn (`@simplewebauthn/server` y `/browser`) | Las tres son gratuitas/OSS. WebAuthn resuelve RF-51 usando el sensor biométrico que ya tienen los captores Android, sin depender de SMS/email. |
 | Mapas y ruteo | OpenRouteService (API gratuita, límite ~2000 requests/día en el tier free) + Leaflet (mapa interactivo, OSS) | Cubre RNF-14: cálculo de distancia/tiempo a pie y en vehículo, y dibujo de zona en el mapa (RF-15) sin costo. |
+| Geocodificación | Georef (API gratuita del Estado nacional, tramos de calle del INDEC con rangos de altura) con respaldo en Nominatim (OpenStreetMap, gratuito, 1 consulta por segundo) | Ubica cada dirección por su altura exacta dentro de Rosario; OpenStreetMap no tiene cargadas las alturas de varias avenidas. Ambos sin costo ni clave. |
 | Rate limiting | `express-rate-limit` | Gratuito/OSS, cubre RNF-19. |
 | Testing | Jest (backend) + Vitest (frontend) | Ambos gratuitos/OSS, estándar en el ecosistema Node/React. |
 | Hosting de la demo (opcional) | Render / Railway (backend, capa free) + Vercel o Netlify (frontend, capa free) + Neon/Supabase (Postgres, capa free) | Ninguno tiene costo para el volumen de una demo académica; para producción real, el CIL define el hosting institucional (fuera de este alcance, ver `alcance.md` §3). |
@@ -122,8 +123,9 @@ las credenciales de producción.
      seleccionado más cercano (heurística de vecino más próximo, acumulativa).
    - Se completa el cupo pedido por el ingeniero siguiendo ese orden.
 3. **Cálculo de distancia/tiempo (RNF-14):** cada solicitud ya tiene `latitud`/`longitud`
-   cacheadas (geocodificadas una sola vez al momento de la derivación, vía la API de
-   Geocoding de OpenRouteService — ver `er-modelo.md`, Decisión 9), así que generar una
+   cacheadas (geocodificadas una sola vez al momento de la derivación, con Georef y, si no
+   encuentra la dirección, con Nominatim, siempre limitado a Rosario — ver `er-modelo.md`,
+   Decisión 9), así que generar una
    ruta no geocodifica de nuevo. Se consulta la API de Matrix de OpenRouteService (perfil
    `foot-walking` o `driving-car` según el modo elegido, RF-49) para obtener la matriz de
    distancias entre esas coordenadas y la sede de la Dirección General de Parques y Paseos

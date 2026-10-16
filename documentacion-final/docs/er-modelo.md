@@ -48,8 +48,9 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   `prioridad` es la prioridad de **triage** al momento de crear el reclamo — no confundir
   con `Dictamen.nivel_prioridad`, que es la urgencia de ejecución que define el ingeniero
   después de dictaminar (ver Decisión 6).
-- `direccion` (`string`): domicilio de la solicitud tal como lo reporta el SUA (puede no
-  coincidir con la ubicación exacta del ejemplar; ver `domicilio_ejemplar` en Dictamen).
+- `direccion` (`string`): domicilio de la solicitud tal como lo reporta el SUA. El reclamo
+  se hace sobre el árbol, así que es la dirección del ejemplar; al dictaminar se copia en
+  `domicilio_ejemplar` (ver Dictamen).
 - `latitud` (`decimal`), `longitud` (`decimal`): coordenadas resultantes de geocodificar
   `direccion`, cacheadas para el cálculo de rutas (RF-47, RF-48, RNF-14). Ver Decisión 9.
 - `descripcion_reclamo` (`string`): texto técnico del problema reportado, sin datos
@@ -80,12 +81,12 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   firmarse).
 - `fecha_emision` (`date`): se guarda junto con el hash como parte de la firma digital
   (RF-22).
-- `domicilio_ejemplar` (`string`): dirección real donde está el árbol, determinada por el
-  ingeniero en el lugar eligiendo el punto en el mapa (el geocodificador completa la
-  dirección, sin tipeo libre; ver Decisión 10). **Obligatorio.** Se guarda acá y no solo en Solicitud — ver
-  Decisión 3.
-- `latitud_ejemplar` (`decimal`), `longitud_ejemplar` (`decimal`): coordenadas del punto
-  elegido en el mapa para `domicilio_ejemplar`. **Obligatorios** junto con él.
+- `domicilio_ejemplar` (`string`): dirección del árbol, copiada de `Solicitud.direccion`
+  (la que informa el reclamo), sin tipeo libre. **Obligatorio.** Se guarda acá y no solo en
+  Solicitud — ver Decisión 3.
+- `latitud_ejemplar` (`decimal`), `longitud_ejemplar` (`decimal`): ubicación exacta del
+  ejemplar, que el ingeniero marca en el mapa en el lugar (parte del punto geocodificado de
+  la solicitud y lo puede corregir). **Obligatorios.**
 - `referencia_ubicacion` (`string`): texto
   libre con largo máximo. `distancia_medianera_referencia` (`decimal`): datos de ubicación
   complementarios. **Opcionales**, se completan solo cuando el domicilio no tiene
@@ -250,10 +251,9 @@ Aunque `Solicitud.direccion` ya guarda una dirección, se decidió agregar
 Solicitud. Motivo: `Solicitud` es una copia local de datos que **vienen del SUA** y podrían
 en teoría actualizarse; pero un Dictamen ya firmado es un **documento legal** que debe
 quedar autocontenido y no depender de que un dato externo cacheado no cambie después de la
-firma. Además, el propio formulario en papel distingue "domicilio de solicitud" de
-"domicilio del ejemplar" porque pueden no coincidir (el reclamo se origina en una dirección
-y el árbol a intervenir está en otra cercana). Guardarlo aparte refleja esa realidad del
-dominio y no solo una necesidad técnica.
+firma. La dirección es la que informa el reclamo, que se hace sobre el árbol; la
+ubicación exacta del ejemplar la dan las coordenadas que el ingeniero marca en el mapa
+(`latitud_ejemplar`, `longitud_ejemplar`), que también quedan firmadas.
 
 ### Decisión 4 — Trabajos aéreos y subterráneos como entidades hijas, no columnas booleanas
 
@@ -388,7 +388,7 @@ ruta. Se evaluaron dos opciones:
   siguiente.
 - **Geocodificar una sola vez y cachear el resultado (la elegida).** Se agregan `latitud` y
   `longitud` a `Solicitud`, completados por el sistema la primera vez que la solicitud se
-  deriva (vía la API de Geocoding de OpenRouteService, ver `arquitectura-tecnica.md`,
+  deriva (con Georef y respaldo en Nominatim, ver `arquitectura-tecnica.md`,
   sección 5). Generar una ruta después solo lee estas coordenadas, sin volver a geocodificar.
 
 Si la geocodificación falla (dirección ambigua o servicio caído en el momento de la
@@ -409,8 +409,8 @@ se resuelven así:
 - **Enumeración (`enum`):** `nivel_dano_vereda`, `motivo_extraccion`, `motivo_sin_trabajo`,
   `complejidad`, `plantar`, `nivel_prioridad` y `tipo_trabajo` (aéreo y subterráneo), porque
   son listas cortas y fijas del formulario físico.
-- **Mapa y geocodificador:** `domicilio_ejemplar` se
-  elige en el mapa; el sistema guarda además las coordenadas.
+- **Mapa:** la ubicación exacta del ejemplar (`latitud_ejemplar`, `longitud_ejemplar`) se
+  marca en el mapa; `domicilio_ejemplar` se copia de la dirección del reclamo.
 - **Número entero:** `nota_numero` y `expediente_numero` son números enteros positivos
   (solo se aceptan dígitos).
 - **Texto libre, a propósito:** `referencia_ubicacion` y `observaciones`, con largo máximo y

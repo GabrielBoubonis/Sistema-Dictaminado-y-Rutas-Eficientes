@@ -61,7 +61,7 @@ WebAuthn (la huella al firmar) y la instalación de la PWA **exigen HTTPS** en e
 cd backend && npm run tunel     # muestra la URL https://algo.trycloudflare.com y un código QR para el celular
 ```
 
-`npm run tunel` controla antes que el servidor responda y que el `.env` no fije `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN` (con `localhost` fijo la huella falla desde el túnel). Conviene `TRUST_PROXY=1` en el `.env` para que el límite de intentos de login distinga a cada usuario detrás del túnel. Si `cloudflared` dice `lookup api.trycloudflare.com: no such host`, el DNS del router no resuelve ese dominio: cambiar el DNS de Windows a 1.1.1.1 (Configuración → Red → Propiedades del adaptador → DNS) o probar con otra red (por ejemplo, datos del celular compartidos).
+`npm run tunel` controla antes que el servidor responda y que el `.env` no fije `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN` (con `localhost` fijo la huella falla desde el túnel). Conviene `TRUST_PROXY=1` en el `.env` para que el límite de intentos de login distinga a cada usuario detrás del túnel. Algunos routers y proveedores bloquean el dominio `trycloudflare.com` en su DNS. El script lo detecta y pide el túnel igual, resolviendo ese nombre con el DNS público de Cloudflare (1.1.1.1 por HTTPS). En ese caso **un celular conectado al mismo Wi-Fi tampoco abre la URL**: usar los datos móviles, o en Android activar Ajustes → Redes → DNS privado → `1dot1dot1dot1.cloudflare-dns.com`.
 
 o todo en contenedores (necesita `../datos-prueba` junto a `sistema/`):
 

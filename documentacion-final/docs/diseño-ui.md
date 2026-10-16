@@ -151,7 +151,7 @@ quede claro que el formulario completo no es corto:
 
 1. **Datos del ejemplar y ubicación** — Distrito (precargado desde la Solicitud, solo
    lectura), Nota N.°, Exp N.°, Fecha, SUA N.° (solo lectura), Domicilio de solicitud (solo
-   lectura), Domicilio del ejemplar\* (punto en el mapa, puede diferir del anterior), Referencia de ubicación (texto libre), Especie\* (selector con búsqueda y opción "Agregar especie"), Distancia a
+   lectura), Ubicación del ejemplar\* (punto en el mapa, parte de la dirección del reclamo y el ingeniero lo ajusta a la posición exacta), Referencia de ubicación (texto libre), Especie\* (selector con búsqueda y opción "Agregar especie"), Distancia a
    medianera/referencia, Cantidad de ejemplares al frente.
 2. **Diagnóstico** — Bloque 1: nivel de daño en vereda (Alto/Medio/Bajo); Bloque 2:
    casillero "Extracción" + perímetro del tronco + motivo (12 opciones, aparecen solo si se

@@ -18,7 +18,7 @@ equivalente en `er-modelo.md` (entidad `Dictamen`)._
 | Fecha | Fecha, autogenerada al emitir | `fecha_emision` |
 | SUA N.° | Precargado, solo lectura | (vía `Solicitud.numero_sua`) |
 | Domicilio de solicitud | Precargado, solo lectura | (vía `Solicitud.direccion`) |
-| Domicilio del ejemplar\* | Punto elegido en el mapa; la dirección la completa el geocodificador (puede diferir del anterior — ver Decisiones 3 y 10 en `er-modelo.md`) | `domicilio_ejemplar`, `latitud_ejemplar`, `longitud_ejemplar` |
+| Domicilio del ejemplar\* | La dirección se copia del reclamo (es la del árbol); la ubicación exacta se marca en el mapa — ver Decisiones 3 y 10 en `er-modelo.md` | `domicilio_ejemplar`, `latitud_ejemplar`, `longitud_ejemplar` |
 | Referencia de ubicación | Texto libre con largo máximo | `referencia_ubicacion` |
 | Especie\* | Selección con búsqueda en un catálogo; si la especie no figura, se agrega desde el selector. Obligatorio | `id_especie` |
 | Distancia a medianera/referencia | Numérico, editable | `distancia_medianera_referencia` |
