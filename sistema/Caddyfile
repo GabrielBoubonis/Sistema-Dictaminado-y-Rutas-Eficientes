@@ -1,0 +1,6 @@
+# Proxy HTTPS delante de la app. Con un dominio real, Caddy pide y renueva el certificado de Let's Encrypt solo;
+# con DOMINIO=localhost usa un certificado local (para probar en la PC).
+{$DOMINIO} {
+	encode zstd gzip
+	reverse_proxy app:3000
+}

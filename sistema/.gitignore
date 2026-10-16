@@ -1,0 +1,3 @@
+# Configuración y copias de seguridad del servidor de la demo
+.env.prod
+backups/

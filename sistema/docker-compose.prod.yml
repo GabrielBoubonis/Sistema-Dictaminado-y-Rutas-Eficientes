@@ -1,0 +1,69 @@
+# Servidor de la demo (p. ej. VM Always Free de Oracle Cloud). Ver DESPLIEGUE.md.
+#   cp .env.prod.example .env.prod      # completar
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+# Caddy obtiene y renueva solo el certificado HTTPS (Let's Encrypt) para DOMINIO. La base no se expone a internet.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env.prod}
+      POSTGRES_DB: arbolado
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U postgres"], interval: 5s, retries: 20 }
+
+  app:
+    build: { context: .., dockerfile: sistema/Dockerfile }
+    restart: unless-stopped
+    depends_on: { db: { condition: service_healthy } }
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/arbolado
+      JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET en .env.prod}
+      SEED: ${SEED:-1}
+      # Con dominio fijo, WebAuthn queda atado a él (no se toma del navegador).
+      WEBAUTHN_RP_ID: ${DOMINIO:?Falta DOMINIO en .env.prod}
+      WEBAUTHN_ORIGIN: https://${DOMINIO}
+      ORS_API_KEY: ${ORS_API_KEY:-}
+      NOMINATIM_CONTACTO: ${NOMINATIM_CONTACTO:-arbolado-rosario-tp}
+    volumes: [uploads:/data/uploads]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [app]
+    environment: { DOMINIO: "${DOMINIO}" }
+    ports:
+      - "${PUERTO_HTTP:-80}:80"
+      - "${PUERTO_HTTPS:-443}:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-datos:/data
+      - caddy-config:/config
+
+  # RNF-11: copia diaria de la base y de las fotos en ./backups (se guardan 14 días de base y 7 de fotos).
+  backup:
+    image: postgres:16
+    restart: unless-stopped
+    depends_on: { db: { condition: service_healthy } }
+    environment: { PGPASSWORD: "${POSTGRES_PASSWORD}" }
+    volumes:
+      - ./backups:/backups
+      - uploads:/fotos:ro
+    entrypoint:
+      - sh
+      - -c
+      - |
+        while true; do
+          f=$$(date +%F)
+          pg_dump -h db -U postgres -Fc arbolado > /backups/base-$$f.dump && echo "backup base $$f ok"
+          tar czf /backups/fotos-$$f.tar.gz -C /fotos . && echo "backup fotos $$f ok"
+          find /backups -name 'base-*.dump' -mtime +14 -delete
+          find /backups -name 'fotos-*.tar.gz' -mtime +7 -delete
+          sleep 86400
+        done
+
+volumes:
+  pgdata:
+  uploads:
+  caddy-datos:
+  caddy-config:

@@ -1,0 +1,14 @@
+# Lo usa BuildKit para sistema/Dockerfile (el contexto es la raíz del repo: un .dockerignore en sistema/ se ignoraría).
+**/node_modules
+**/dist
+**/uploads
+**/src/generated
+**/capturas
+**/__pycache__
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.prod.example
+.git
+documentacion-final
+sistema/backups

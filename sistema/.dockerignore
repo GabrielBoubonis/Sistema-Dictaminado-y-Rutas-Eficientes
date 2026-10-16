@@ -1,7 +1,0 @@
-**/node_modules
-**/dist
-**/uploads
-**/src/generated
-**/capturas
-**/__pycache__
-.git
