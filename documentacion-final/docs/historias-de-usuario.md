@@ -95,7 +95,7 @@ _Cada historia debe incluir formato clásico, criterios de aceptación y validac
 |-------|---------|
 | Historia | Como Operador, quiero generar una ruta de trabajo con los criterios que yo elija, para organizar mi jornada de forma eficiente según cómo prefiero trabajar. |
 | Módulo | Generación de rutas de trabajo |
-| Requisitos relacionados | RF-14, RF-15, RF-16, RF-19, RF-47, RF-48, RF-49 |
+| Requisitos relacionados | RF-14, RF-15, RF-16, RF-19, RF-47, RF-48, RF-49, RF-63 |
 
 ### Criterios de aceptación
 
@@ -105,6 +105,7 @@ _Cada historia debe incluir formato clásico, criterios de aceptación y validac
 4. Dado que elijo no filtrar por distrito, el sistema igual arma la ruta considerando el resto de los criterios seleccionados.
 5. Dado que genero una ruta, debo indicar el modo de desplazamiento (a pie o en vehículo), y el sistema calcula el tiempo y la distancia del recorrido en función de ese modo.
 6. Dado que las solicitudes que cumplen mis criterios superan la cantidad que pedí, el sistema selecciona cuáles incluir combinando antigüedad (las más antiguas primero) y eficiencia del recorrido resultante, y ordena su visita minimizando tiempo y distancia desde mi ubicación actual o, si no está disponible, desde la sede de la Dirección General de Parques y Paseos.
+7. Dado que se generó la ruta, el mapa muestra el recorrido siguiendo las calles según el modo elegido (a pie, por veredas; en vehículo, respetando el sentido de circulación), no líneas rectas entre las paradas; si el servicio de mapas no devuelve el recorrido, el mapa avisa que el trazado es aproximado.
 
 ### Validación INVEST
 

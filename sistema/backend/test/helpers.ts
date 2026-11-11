@@ -12,7 +12,7 @@ import { createApp } from '../src/app';
 import { prisma } from '../src/db';
 import { seed } from '../src/seed';
 import { throttle } from '../src/middleware/throttle';
-import { providers, MockAuthProvider, MockMatriz, MockGeocoder } from '../src/providers';
+import { providers, MockAuthProvider, MockMatriz, MockGeocoder, MockRecorrido } from '../src/providers';
 
 // Los tests no dependen del .env local: WebAuthn toma rpId y origen del pedido (el autenticador de prueba usa localhost:5173).
 delete process.env.WEBAUTHN_RP_ID;
@@ -27,6 +27,7 @@ export async function prepararBase() {
   throttle.reset();
   (providers.auth as MockAuthProvider).caido = false;
   (providers.matriz as MockMatriz).caido = false;
+  (providers.recorrido as MockRecorrido).caido = false;
   (providers.geocoder as MockGeocoder).falla = false;
 }
 

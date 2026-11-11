@@ -1,5 +1,5 @@
 import { api, auth, prepararBase, prisma, providers, throttle, token } from './helpers';
-import { MockMatriz, MockGeocoder, haversine } from '../src/providers';
+import { MockMatriz, MockGeocoder, MockRecorrido, OrsRecorrido, haversine } from '../src/providers';
 import { config } from '../src/config';
 import { puntoEnPoligono, ultimoCorte, agruparPorFranja, seleccionar } from '../src/services/rutas';
 import { cerrarRutasVencidas } from '../src/services/rutas';
@@ -135,6 +135,44 @@ describe('Generación de rutas (RF-14 a RF-19, RF-47 a RF-49)', () => {
     expect(r.body.optimizada).toBe(false);
     expect(r.body.distancia_total_m).toBeNull();
     expect(r.body.solicitudes).toHaveLength(3);
+  });
+
+  it('RF-63: guarda el recorrido por calles desde la partida y en el orden de visita', async () => {
+    const ubicacion = { lat: -32.95, lng: -60.65 };
+    const r = await generar(await token('mrossi0'), { modo: 'Vehículo', cantidades: { Alta: 3 }, ubicacion });
+    expect(r.status).toBe(201);
+    expect(r.body.recorrido[0]).toEqual([ubicacion.lat, ubicacion.lng]);
+    const ultima = r.body.solicitudes[r.body.solicitudes.length - 1];
+    expect(r.body.recorrido[r.body.recorrido.length - 1]).toEqual([ultima.latitud, ultima.longitud]);
+    expect((await api().get('/api/rutas/activa').set(auth(await token('mrossi0')))).body.recorrido).toEqual(r.body.recorrido);
+  });
+
+  it('RF-63: si el recorrido no llega, la ruta sale igual (optimizada) y sin trazado', async () => {
+    (providers.recorrido as MockRecorrido).caido = true;
+    const r = await generar(await token('mrossi0'), { modo: 'Caminando', cantidades: { Alta: 3 } });
+    expect(r.status).toBe(201);
+    expect(r.body.optimizada).toBe(true);
+    expect(r.body.recorrido).toBeNull();
+    expect(r.body.distancia_total_m).toBeGreaterThan(0);
+  });
+
+  it('RF-63: OrsRecorrido pide por tramos de hasta 50 puntos, con el perfil del modo, y los une sin repetir', async () => {
+    const pedidos: any[] = [];
+    const orig = global.fetch;
+    global.fetch = (async (url: string, init: any) => {
+      const body = JSON.parse(init.body); pedidos.push({ url, n: body.coordinates.length });
+      return new Response(JSON.stringify({ features: [{ geometry: { coordinates: body.coordinates }, properties: { summary: { distance: 100, duration: 10 } } }] }));
+    }) as any;
+    try {
+      const puntos = Array.from({ length: 59 }, (_, i) => ({ lat: -32.9 - i / 1000, lng: -60.6 }));
+      const r = await new OrsRecorrido().recorrido(puntos, 'Vehículo');
+      expect(pedidos.map((p) => p.n)).toEqual([50, 10]);
+      expect(pedidos.every((p) => p.url.includes('/directions/driving-car/'))).toBe(true);
+      expect(r.linea).toHaveLength(59);
+      expect(r.distancia).toBe(200);
+      await new OrsRecorrido().recorrido(puntos.slice(0, 3), 'Caminando');
+      expect(pedidos[2].url).toContain('/directions/foot-walking/');
+    } finally { global.fetch = orig; }
   });
 
   it('zona dibujada: solo entran solicitudes dentro del polígono', async () => {

@@ -51,6 +51,7 @@ poder trabajar sin conexión en el campo.
 | RF-47 | Cuando la cantidad de solicitudes que cumplen los criterios definidos (RF-15) supere el cupo indicado por el ingeniero, el sistema debe seleccionar cuáles incluir combinando antigüedad de la solicitud (mayor preferencia a las más antiguas) y eficiencia del recorrido resultante (menor tiempo y distancia total según el modo de desplazamiento). _(Nota técnica: criterio de desempate y métrica de eficiencia concretos en `arquitectura-tecnica.md`.)_ |
 | RF-48 | El sistema debe calcular el orden de visita de las solicitudes de una ruta minimizando el tiempo y la distancia total del recorrido, tomando como punto de partida la ubicación actual del ingeniero al generar la ruta o, si no está disponible, la sede de la Dirección General de Parques y Paseos (Mariano Moreno 2350); el recorrido termina en la última solicitud, sin regreso a la sede. |
 | RF-49 | El sistema debe permitir seleccionar el modo de desplazamiento (a pie o en vehículo) como criterio adicional al generar la ruta, y calcular el tiempo y la distancia en función del modo elegido. |
+| RF-63 | El sistema debe mostrar en el mapa el recorrido de la ruta siguiendo las calles según el modo de desplazamiento elegido (a pie, por veredas y sendas peatonales; en vehículo, respetando el sentido de circulación de cada calle), y debe indicar que el trazado es aproximado cuando el servicio de mapas no lo devuelva. |
 
 ### Módulo 4 — Dictaminación
 

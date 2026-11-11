@@ -11,7 +11,7 @@ export function RutaActiva({ ruta, firmadasLocal, alCambiar }: { ruta: Ruta; fir
   const [trabajando, setTrabajando] = useState(false);
 
   const hecha = (s: Ruta['solicitudes'][number]) => s.liberada || firmadasLocal.includes(`${s.numero_sua}-${s.anio}`);
-  const { marcadores, linea } = useMemo(() => {
+  const { marcadores, linea, aproximada } = useMemo(() => {
     const { partida } = ruta;
     const titulo = partida.tipo === 'Sede' ? 'Partida: Parques y Paseos (Mariano Moreno 2350)' : 'Partida: tu ubicación al generar la ruta';
     const m: Marcador[] = [{ lat: partida.lat, lng: partida.lng, etiqueta: 'P', clase: 'sede', titulo }];
@@ -20,7 +20,9 @@ export function RutaActiva({ ruta, firmadasLocal, alCambiar }: { ruta: Ruta; fir
       m.push({ lat: s.latitud!, lng: s.longitud!, etiqueta: String(s.orden), clase: hecha(s) ? 'hecho' : '', titulo: s.direccion });
       l.push([s.latitud!, s.longitud!]);
     }
-    return { marcadores: m, linea: ruta.optimizada ? l : undefined };
+    // RF-63: el recorrido por calles de OpenRouteService; si no llegó, línea recta entre paradas, marcada como aproximada.
+    if (ruta.recorrido && ruta.recorrido.length > 1) return { marcadores: m, linea: ruta.recorrido, aproximada: false };
+    return { marcadores: m, linea: ruta.optimizada ? l : undefined, aproximada: true };
   }, [ruta, firmadasLocal]); // eslint-disable-line
 
   const restablecer = async () => {
@@ -40,7 +42,8 @@ export function RutaActiva({ ruta, firmadasLocal, alCambiar }: { ruta: Ruta; fir
           ? <span className="badge">{(ruta.distancia_total_m / 1000).toFixed(1)} km · {Math.round((ruta.tiempo_total_s ?? 0) / 60)} min desde {ruta.partida.tipo === 'Sede' ? 'Parques y Paseos' : 'tu ubicación'}</span>
           : <span className="badge warn">Orden sin optimizar (el servicio de mapas no respondió)</span>}
       </div>
-      <Mapa marcadores={marcadores} linea={linea} etiquetaAria="Mapa de la ruta" />
+      <Mapa marcadores={marcadores} linea={linea} lineaAproximada={aproximada} etiquetaAria="Mapa de la ruta" />
+      {ruta.optimizada && aproximada && <p className="ayuda">Trazado aproximado en línea recta: el servicio de mapas no devolvió el recorrido por calles. El orden de visita sí es el calculado.</p>}
       {error && <div className="error" role="alert">{error}</div>}
       {ruta.solicitudes.map((s) => (
         <article key={s.numero_sua + s.anio} className={`card prio-${s.prioridad}`} style={{ opacity: hecha(s) ? 0.6 : 1 }}>

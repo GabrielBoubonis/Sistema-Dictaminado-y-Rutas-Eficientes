@@ -23,7 +23,7 @@ uso en el volumen de esta demo (hasta 7 ingenieros, ~70 dictámenes/día)._
 | Frontend | React + Vite | Gratuito, ecosistema grande, Vite da un build rápido y soporte nativo para PWA vía plugin. |
 | PWA / offline | Workbox (Service Worker) + Dexie.js (IndexedDB) | Ambos gratuitos/OSS. Workbox cachea los assets de la app; Dexie maneja la cola de dictámenes/fotos "pendiente de sincronizar" (RF-31 a RF-34) con una API más simple que IndexedDB nativo. |
 | Autenticación | JWT (librería `jsonwebtoken`) + bcrypt (librería `bcryptjs`, la misma función de hash sin compilación nativa) + WebAuthn (`@simplewebauthn/server` y `/browser`) | Las tres son gratuitas/OSS. WebAuthn resuelve RF-51 usando el sensor biométrico que ya tienen los captores Android, sin depender de SMS/email. |
-| Mapas y ruteo | OpenRouteService (API gratuita con clave; cada matriz de distancias admite hasta 3500 pares de puntos, por eso se consulta con hasta 59) + Leaflet (mapa interactivo, OSS) con teselas de OpenStreetMap | Cubre RNF-14: cálculo de distancia/tiempo a pie y en vehículo, y dibujo de zona en el mapa (RF-15) sin costo. |
+| Mapas y ruteo | OpenRouteService (API gratuita con clave; cada matriz de distancias admite hasta 3500 pares de puntos, por eso se consulta con hasta 59; Directions devuelve el recorrido por calles) + Leaflet (mapa interactivo, OSS) con teselas de OpenStreetMap | Cubre RNF-14: cálculo de distancia/tiempo a pie y en vehículo, recorrido por calles (RF-63) y dibujo de zona en el mapa (RF-15) sin costo. |
 | Geocodificación | Georef (API gratuita del Estado nacional, tramos de calle del INDEC con rangos de altura) con respaldo en Nominatim (OpenStreetMap, gratuito, 1 consulta por segundo) | Ubica cada dirección por su altura exacta dentro de Rosario; OpenStreetMap no tiene cargadas las alturas de varias avenidas. Ambos sin costo ni clave. |
 | Rate limiting | `express-rate-limit` | Gratuito/OSS, cubre RNF-19. |
 | Testing | Jest + supertest contra PostgreSQL real (backend) + Vitest (frontend) + Playwright (prueba de punta a punta en Chromium) | Todos gratuitos/OSS, estándar en el ecosistema Node/React. |
@@ -50,7 +50,7 @@ Agrupado por módulo de `requisitos.md`:
 | `/auth` | `POST /auth/login` (paso 1 y 2, RF-01 a RF-03), `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `POST /auth/revalidar` (al volver la conexión tras reanudar sin señal, RF-57), `GET /auth/webauthn/estado`, `GET /auth/webauthn/credenciales`, `POST /auth/webauthn/registro/opciones` y `POST /auth/webauthn/registro/verificar` (alta de la huella del captor, RF-51), `POST /auth/dispositivo/bloqueo` y `GET /auth/dispositivo/:id` (bloqueo local y consulta del desbloqueo, RF-52, RF-60) | RF-01 a RF-05, RF-50 a RF-52, RF-57, RF-60 |
 | `/usuarios` | `GET /usuarios`, `POST /usuarios`, `PATCH /usuarios/:id`, `POST /usuarios/:id/reset-password`, `POST /usuarios/:id/revocar-captor`, `GET /usuarios/captores-bloqueados?codigo=`, `POST /usuarios/captores/:codigo/desbloquear` | RF-06 a RF-08, RF-52, RF-60 |
 | `/solicitudes` | `GET /solicitudes` (filtros de estado/distrito), `GET /solicitudes/:numeroSua/:anio` | RF-09 a RF-13 |
-| `/rutas` | `POST /rutas` (generar; acepta la ubicación actual del captor como partida, RF-14 a RF-19, RF-47 a RF-49), `GET /rutas/activa`, `POST /rutas/:id/restablecer` | RF-14 a RF-19, RF-47 a RF-49 |
+| `/rutas` | `POST /rutas` (generar; acepta la ubicación actual del captor como partida, RF-14 a RF-19, RF-47 a RF-49, RF-63), `GET /rutas/activa`, `POST /rutas/:id/restablecer` | RF-14 a RF-19, RF-47 a RF-49, RF-63 |
 | `/dictamenes` | `POST /dictamenes` (completar y firmar, con la aserción WebAuthn incluida), `GET /dictamenes/:id`, `GET /dictamenes/:id/fotos/:orden`, `GET /dictamenes/:numeroSua/:anio/historial`, `GET /dictamenes/:id/pdf`, `GET /dictamenes/:numeroSua/:anio/conflicto` y `POST /dictamenes/:id/vigente` (solo Jefe, RF-59) | RF-20 a RF-29, RF-45, RF-46, RF-51, RF-59, RF-61 |
 | `/sync` | `POST /sync/dictamenes` (cola offline → servidor, recalcula hash y verifica la aserción WebAuthn, RF-53) | RF-30 a RF-34, RF-51, RF-53 |
 | `/especies` | `GET /especies?q=` (búsqueda para el selector), `POST /especies` (agregar una especie nueva, normalizada y sin duplicados) | RF-56 |
@@ -127,7 +127,7 @@ las credenciales de producción.
 
 ---
 
-## 5. Algoritmo de selección y ruteo (RF-47, RF-48, RF-49)
+## 5. Algoritmo de selección y ruteo (RF-47, RF-48, RF-49, RF-63)
 
 1. **Filtrado:** se filtran las solicitudes pendientes según distrito (si se indicó),
    prioridad y/o zona dibujada en el mapa (polígono, verificado con un chequeo
@@ -154,7 +154,18 @@ las credenciales de producción.
 4. **Orden de visita (RF-48):** una vez seleccionadas las solicitudes, se resuelve el orden
    de recorrido con la misma heurística de vecino más próximo sobre la matriz de
    distancias ya calculada, desde el punto de partida y sin tramo de regreso.
-5. **Si OpenRouteService no responde:** la selección continúa usando solo el criterio de
+5. **Recorrido por calles (RF-63):** con el orden ya reservado, y fuera del bloqueo de
+   reservas, se consulta la API de Directions de OpenRouteService con la partida y las
+   solicitudes en orden de visita (mismo perfil que la matriz). A pie (`foot-walking`) usa
+   veredas, sendas peatonales y plazas y no depende de la mano de las calles; en vehículo
+   (`driving-car`) respeta el sentido de circulación y los giros prohibidos cargados en
+   OpenStreetMap. Cada punto se engancha a la calle más cercana; con más de 50 puntos se
+   pide por tramos. La línea (en `[lat, lng]`, redondeada a 5 decimales) se guarda en
+   `Ruta.recorrido` y viaja con la ruta, así que se dibuja también sin conexión; su
+   distancia y tiempo reemplazan a los de la matriz. Espera hasta 3 s (la matriz usa hasta
+   6 s de los 10 s del cliente, RNF-04). Si no responde, la ruta se genera igual y el mapa
+   une las paradas con una línea recta punteada, avisando que el trazado es aproximado.
+6. **Si OpenRouteService no responde:** la selección continúa usando solo el criterio de
    antigüedad (sin el desempate por distancia), y el orden de visita queda sin optimizar
    hasta que el servicio vuelva a responder — ver `slicing.md`, Parte B, segunda fila de la
    tabla de excepciones.
@@ -197,7 +208,7 @@ escenario de falla._
 | Falla el guardado local de un dictamen firmado sin conexión. | Ya resuelto: estado de error visual con reintento manual (ver wireframe `04c-error-guardado-offline.svg`, caso de borde de HU-09). |
 | Se pierde la conexión justo después de que el servidor recibe un dictamen de la cola offline, antes de que la confirmación (ACK) llegue al dispositivo. | Cada dictamen firmado localmente lleva un UUID generado en el dispositivo al momento de la firma. `/sync/dictamenes` usa ese UUID como clave de idempotencia: si el mismo UUID llega dos veces (por un reintento automático), el servidor no crea un segundo registro. |
 | El mismo ingeniero sincroniza desde dos dispositivos distintos (perdió el celular, usa uno de respaldo). | El UUID por dictamen evita duplicados aunque las dos colas se sincronicen por separado. La organización de un solo captor activo por ingeniero es una política operativa, no una restricción técnica del sistema. |
-| OpenRouteService no responde al generar una ruta. | Ya resuelto: selección solo por antigüedad, sin desempate por distancia, hasta que el servicio vuelva a responder (ver sección 5, punto 5). |
+| OpenRouteService no responde al generar una ruta. | Ya resuelto: selección solo por antigüedad, sin desempate por distancia, hasta que el servicio vuelva a responder (ver sección 5, puntos 5 y 6). |
 | Falla la geocodificación de una Solicitud al derivarse. | Ya resuelto: la Solicitud queda disponible para consulta y dictamen manual, pero sin coordenadas, excluida del cálculo de rutas hasta que un reintento automático (cada hora, RF-62) la geocodifique; nadie la corrige a mano (ver `er-modelo.md`, Decisión 9). |
 | El mock de SUA / Autenticación Institucional no responde (en producción: el servicio real cae) durante el login. | El sistema muestra un mensaje propio —distinto del error genérico de credenciales (RF-50)— que informa que el servicio de autenticación no está disponible y que se intente nuevamente en un rato; la caída no cuenta como intento fallido (RF-52, RNF-19); no existe una copia cacheada de credenciales institucionales con la que loguear "igual" en ese momento. |
 

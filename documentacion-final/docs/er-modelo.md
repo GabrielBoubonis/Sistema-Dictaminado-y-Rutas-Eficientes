@@ -204,6 +204,9 @@ Catálogo inicial propuesto (a validar con los ingenieros agrónomos): Fresno am
 - `partida_latitud` (`decimal`), `partida_longitud` (`decimal`): coordenadas de la partida
   (la ubicación del captor al generar la ruta, o la sede de la Dirección General de
   Parques y Paseos).
+- `recorrido` (`json`): línea que sigue las calles desde la partida hasta la última
+  solicitud, según el modo de desplazamiento (RF-63). Nulo si el servicio de mapas no la
+  devolvió: el mapa une las paradas en línea recta y avisa que es aproximado.
 
 ### RutaSolicitud
 
@@ -365,6 +368,9 @@ visita entre las seleccionadas. Se resolvió de la siguiente manera:
   (Mariano Moreno 2350). El recorrido termina en la última solicitud, sin regreso: los
   ingenieros agrónomos no están obligados a volver a la sede al final de la jornada (a
   diferencia de otros roles que sí lo hacen). La partida usada queda guardada en `Ruta`.
+- **Recorrido por calles (RF-63):** el mapa no une las paradas en línea recta: dibuja el
+  camino real según el modo (a pie, por veredas; en vehículo, respetando la mano de cada
+  calle). Se guarda en `Ruta.recorrido` para verlo también sin conexión.
 - **Modo de desplazamiento (RF-49, atributo `Ruta.modo_desplazamiento`):** el ingeniero no
   siempre se desplaza de la misma forma — la mayoría de las veces camina, pero en ciertos
   casos usa un vehículo de la Dirección. Como el tiempo y la distancia de un mismo

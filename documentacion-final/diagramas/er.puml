@@ -192,6 +192,7 @@ entity "Ruta" as ruta {
   partida_tipo : string
   partida_latitud : decimal
   partida_longitud : decimal
+  recorrido : json
 }
 
 entity "RutaSolicitud" as ruta_solicitud {

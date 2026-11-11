@@ -207,13 +207,67 @@ export class OrsMatriz implements IMatriz {
   }
 }
 
+// ---------- Recorrido por calles (RF-63): el trazado real que se dibuja en el mapa ----------
+/** Línea en [lat, lng] que sigue las calles, con su distancia (m) y duración (s). */
+export interface RecorridoResultado { linea: Array<[number, number]>; distancia: number; duracion: number }
+export interface IRecorrido { recorrido(puntos: Coord[], modo: Modo): Promise<RecorridoResultado> }
+
+/** Simulador: une los puntos en línea recta (sin clave de ORS no hay calles). `caido` simula la falla. */
+export class MockRecorrido implements IRecorrido {
+  caido = false;
+  async recorrido(puntos: Coord[], modo: Modo): Promise<RecorridoResultado> {
+    if (this.caido) throw new ProveedorNoDisponible('OpenRouteService no responde');
+    const v = modo === 'Caminando' ? 1.3 : 6.9;
+    let distancia = 0;
+    for (let i = 1; i < puntos.length; i++) distancia += haversine(puntos[i - 1], puntos[i]) * 1.3;
+    return { linea: puntos.map((p) => [p.lat, p.lng]), distancia, duracion: distancia / v };
+  }
+}
+
+/** Máximo de puntos por pedido a Directions: con más, se pide por tramos que comparten el punto de unión. */
+const MAX_PUNTOS_DIRECTIONS = 50;
+const redondear = (x: number) => Math.round(x * 1e5) / 1e5; // ~1 m: alcanza para dibujar y achica lo que se guarda
+
+/**
+ * OpenRouteService Directions. A pie (foot-walking) usa veredas, sendas peatonales y plazas y no depende de la mano
+ * de las calles; en vehículo (driving-car) respeta los sentidos de circulación y los giros prohibidos de OpenStreetMap.
+ */
+export class OrsRecorrido implements IRecorrido {
+  async recorrido(puntos: Coord[], modo: Modo): Promise<RecorridoResultado> {
+    const perfil = modo === 'Caminando' ? 'foot-walking' : 'driving-car';
+    const tramos: Coord[][] = [];
+    for (let i = 0; i < puntos.length - 1; i += MAX_PUNTOS_DIRECTIONS - 1) tramos.push(puntos.slice(i, i + MAX_PUNTOS_DIRECTIONS));
+    const partes = await Promise.all(tramos.map(async (t) => {
+      const r = await fetch(`https://api.openrouteservice.org/v2/directions/${perfil}/geojson`, {
+        method: 'POST',
+        headers: { Authorization: config.orsKey, 'Content-Type': 'application/json' },
+        // radiuses -1: engancha cada punto a la calle más cercana aunque la coordenada caiga dentro de una manzana.
+        body: JSON.stringify({ coordinates: t.map((p) => [p.lng, p.lat]), radiuses: t.map(() => -1), instructions: false }),
+        signal: AbortSignal.timeout(3000), // la matriz ya usó hasta 6 s de los 10 s del cliente (RNF-04)
+      }).catch((e) => { throw new ProveedorNoDisponible(`ORS directions sin respuesta (${(e as Error).name})`); });
+      if (!r.ok) throw new ProveedorNoDisponible(`ORS directions ${r.status}`);
+      const f = ((await r.json()) as any).features?.[0];
+      if (!f) throw new ProveedorNoDisponible('ORS directions sin recorrido');
+      return {
+        linea: (f.geometry.coordinates as number[][]).map(([lng, lat]) => [redondear(lat), redondear(lng)] as [number, number]),
+        distancia: Number(f.properties.summary?.distance ?? 0), duracion: Number(f.properties.summary?.duration ?? 0),
+      };
+    }));
+    return {
+      linea: partes.flatMap((p, i) => (i === 0 ? p.linea : p.linea.slice(1))),
+      distancia: partes.reduce((s, p) => s + p.distancia, 0), duracion: partes.reduce((s, p) => s + p.duracion, 0),
+    };
+  }
+}
+
 // ---------- Registro de proveedores (reemplazables, p. ej. en los tests) ----------
 export const providers: {
-  auth: IAuthProvider; reclamo: IReclamoProvider; geocoder: IGeocoder; matriz: IMatriz;
+  auth: IAuthProvider; reclamo: IReclamoProvider; geocoder: IGeocoder; matriz: IMatriz; recorrido: IRecorrido;
 } = {
   auth: new MockAuthProvider(),
   reclamo: new MockReclamoProvider(),
   geocoder: config.geocoder === 'ors' && config.orsKey ? new OrsGeocoder() : config.geocoder === 'mock' ? new MockGeocoder()
     : config.geocoder === 'nominatim' ? new NominatimGeocoder() : new GeorefGeocoder(),
   matriz: config.orsKey ? new OrsMatriz() : new MockMatriz(),
+  recorrido: config.orsKey ? new OrsRecorrido() : new MockRecorrido(),
 };

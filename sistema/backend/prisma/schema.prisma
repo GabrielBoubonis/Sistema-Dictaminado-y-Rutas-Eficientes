@@ -233,6 +233,7 @@ model Ruta {
   partida_tipo        String   @default("Sede")
   partida_latitud     Float?
   partida_longitud    Float?
+  recorrido           Json?
   usuario             Usuario  @relation(fields: [nombre_usuario], references: [nombre_usuario])
   solicitudes         RutaSolicitud[]
 

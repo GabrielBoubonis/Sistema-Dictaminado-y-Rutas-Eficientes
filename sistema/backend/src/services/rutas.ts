@@ -199,8 +199,9 @@ export async function generarRuta(p: ParametrosRuta) {
     // Elegir y reservar de a un ingeniero por vez (RNF-02). Lo lento (leer candidatas y consultar la matriz) ya se hizo
     // afuera; adentro del bloqueo solo se releen las reservas, se elige sobre la matriz ya calculada y se inserta: son
     // milisegundos, así que siete ingenieros generando a la vez no se pisan ni esperan de forma perceptible.
+    let ruta;
     try {
-      return await prisma.$transaction(async (tx) => {
+      ruta = await prisma.$transaction(async (tx) => {
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(${BLOQUEO_RESERVAS})`;
         if (await tx.ruta.findFirst({ where: { nombre_usuario: p.usuario, estado: 'Activa' } })) {
           throw new AppError(409, 'ruta_activa_existente', 'Ya tenés una ruta activa. Restablecela antes de generar otra.');
@@ -242,8 +243,30 @@ export async function generarRuta(p: ParametrosRuta) {
       if (e?.code === 'P2002' || /uq_reserva_activa|duplicate key/i.test(String(e?.message))) continue;
       throw e;
     }
+    return trazarRecorrido(ruta, partida);
   }
   throw new AppError(409, 'conflicto_reserva', 'Otra ruta tomó esas solicitudes al mismo tiempo. Probá de nuevo.');
+}
+
+/**
+ * RF-63: pide a OpenRouteService el recorrido por calles en el orden ya decidido (a pie o respetando los sentidos de
+ * circulación en vehículo) y lo guarda para dibujarlo, también sin conexión. Se hace después de reservar, fuera del
+ * bloqueo; si falla, la ruta queda igual y el mapa une los puntos en línea recta, marcada como aproximada.
+ */
+async function trazarRecorrido<R extends { id_ruta: number; optimizada: boolean; modo_desplazamiento: string }>(ruta: R, partida: Coord): Promise<R> {
+  if (!ruta.optimizada) return ruta; // ORS no respondió a la matriz: no se insiste (RNF-04)
+  const paradas = await prisma.rutaSolicitud.findMany({ where: { id_ruta: ruta.id_ruta }, orderBy: { orden: 'asc' }, include: { solicitud: true } });
+  const puntos = [partida, ...paradas.map((p) => ({ lat: p.solicitud.latitud!, lng: p.solicitud.longitud! }))];
+  try {
+    const r = await providers.recorrido.recorrido(puntos, ruta.modo_desplazamiento as Modo);
+    return await prisma.ruta.update({
+      where: { id_ruta: ruta.id_ruta },
+      data: { recorrido: r.linea, distancia_total_m: r.distancia, tiempo_total_s: r.duracion },
+    }) as unknown as R;
+  } catch (e) {
+    if (!(e instanceof ProveedorNoDisponible)) console.error('Error de recorrido:', e);
+    return ruta;
+  }
 }
 
 export async function detalleRuta(idRuta: number) {

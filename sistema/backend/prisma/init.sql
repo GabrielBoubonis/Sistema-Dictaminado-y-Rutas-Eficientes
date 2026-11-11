@@ -237,6 +237,8 @@ ALTER TABLE dictamen ADD COLUMN IF NOT EXISTS sua_proximo_intento TIMESTAMP(3);
 ALTER TABLE ruta ADD COLUMN IF NOT EXISTS partida_tipo TEXT NOT NULL DEFAULT 'Sede';
 ALTER TABLE ruta ADD COLUMN IF NOT EXISTS partida_latitud DOUBLE PRECISION;
 ALTER TABLE ruta ADD COLUMN IF NOT EXISTS partida_longitud DOUBLE PRECISION;
+-- Recorrido por calles devuelto por OpenRouteService Directions, en [lat, lng] (RF-63). Null: el mapa une en línea recta.
+ALTER TABLE ruta ADD COLUMN IF NOT EXISTS recorrido JSONB;
 
 -- Se quitó "calle de esquina" del dictamen (decisión de la Dirección).
 ALTER TABLE dictamen DROP COLUMN IF EXISTS calle_esquina;
