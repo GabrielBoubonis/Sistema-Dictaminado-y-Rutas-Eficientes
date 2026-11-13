@@ -28,6 +28,7 @@ export async function prepararBase() {
   (providers.auth as MockAuthProvider).caido = false;
   (providers.matriz as MockMatriz).caido = false;
   (providers.recorrido as MockRecorrido).caido = false;
+  (providers.recorrido as MockRecorrido).simular = true;
   (providers.geocoder as MockGeocoder).falla = false;
 }
 

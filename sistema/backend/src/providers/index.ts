@@ -212,11 +212,15 @@ export class OrsMatriz implements IMatriz {
 export interface RecorridoResultado { linea: Array<[number, number]>; distancia: number; duracion: number }
 export interface IRecorrido { recorrido(puntos: Coord[], modo: Modo): Promise<RecorridoResultado> }
 
-/** Simulador: une los puntos en línea recta (sin clave de ORS no hay calles). `caido` simula la falla. */
+/**
+ * Sin clave de ORS no hay recorrido por calles: responde "no disponible" y el mapa muestra la recta punteada con aviso,
+ * para no hacer pasar una recta por un camino real. Solo los tests activan `simular` (une en recta) o `caido`.
+ */
 export class MockRecorrido implements IRecorrido {
+  simular = false;
   caido = false;
   async recorrido(puntos: Coord[], modo: Modo): Promise<RecorridoResultado> {
-    if (this.caido) throw new ProveedorNoDisponible('OpenRouteService no responde');
+    if (this.caido || !this.simular) throw new ProveedorNoDisponible('Sin clave de OpenRouteService: no hay recorrido por calles');
     const v = modo === 'Caminando' ? 1.3 : 6.9;
     let distancia = 0;
     for (let i = 1; i < puntos.length; i++) distancia += haversine(puntos[i - 1], puntos[i]) * 1.3;

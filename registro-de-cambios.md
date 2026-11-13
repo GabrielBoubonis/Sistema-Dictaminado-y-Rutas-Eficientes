@@ -4,6 +4,27 @@ Cambios hechos al sistema y a la documentación, del más nuevo al más viejo.
 
 ---
 
+## 13/11/2026 — Sin clave de ORS, el aviso de trazado aproximado no aparecía
+
+### Problema
+
+Después de subir RF-63 al servidor, la ruta se seguía viendo con líneas rectas y sin el
+aviso. Si el servidor no tiene `ORS_API_KEY`, el simulador del recorrido unía las paradas
+en línea recta y la guardaba como si fuera el recorrido por calles, así que el mapa la
+dibujaba continua y sin aviso.
+
+### Solución
+
+- `MockRecorrido` ahora responde "no disponible" salvo en los tests (`simular = true`).
+  Sin clave, la ruta guarda `recorrido = null` y el mapa muestra la recta punteada con
+  el aviso "Trazado aproximado en línea recta".
+- Archivos: `sistema/backend/src/providers/index.ts`, `sistema/backend/test/helpers.ts`.
+- Verificado: los 24 tests de rutas pasan.
+- **No verificado**: si al servidor de Oracle le falta la clave o si el celular mostraba
+  la versión vieja. Ver los comandos de diagnóstico de la conversación del 13/11/2026.
+
+---
+
 ## 10/11/2026 — La ruta se dibuja por las calles (RF-63)
 
 ### Problema
@@ -27,7 +48,8 @@ usa distancias reales por calle (perfil a pie o en vehículo). Lo que fallaba er
 - Si ORS no devuelve el recorrido (caído o lento, espera hasta 3 s), la ruta se genera
   igual y el mapa une las paradas con una **línea punteada**, con el aviso "Trazado
   aproximado en línea recta".
-- Sin clave de ORS (desarrollo con el simulador) el trazado sigue siendo recto.
+- Sin clave de ORS también se ve la línea punteada con el aviso (corregido el 13/11/2026,
+  ver la entrada de arriba).
 
 ### Archivos de código
 
@@ -58,7 +80,8 @@ usa distancias reales por calle (perfil a pie o en vehículo). Lo que fallaba er
   Acepta 51 puntos en un solo pedido.
 - Verificado: 79 tests de backend y 13 de frontend pasan, y la PWA compila. (Una primera
   corrida, justo después de arrancar Docker, tuvo 9 fallas en una suite que no se
-  repitieron ni sola ni en la corrida completa siguiente; no llegué a ver el motivo.)
+  repitieron ni sola ni en la corrida completa siguiente. El 13/11/2026 volvió a pasar igual
+  justo después de arrancar Docker: son vencimientos de 30 s con la base recién levantada.)
 - **No verificado**: ver el trazado en el celular ni en el servidor de Oracle. Para
   subirlo: `git pull` y `docker compose -f docker-compose.prod.yml --env-file .env.prod up
   -d --build` (el `init.sql` agrega la columna solo). Las rutas ya generadas no tienen
