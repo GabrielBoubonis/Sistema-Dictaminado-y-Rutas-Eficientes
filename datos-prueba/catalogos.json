@@ -13,36 +13,37 @@
     "Bajo"
   ],
   "motivo_extraccion": [
-    "Árbol muerto",
-    "Con riesgo de caída por ahuecamiento",
-    "Con riesgo de caída por inclinación",
-    "Afectado por enfermedad incurable",
-    "Con pronunciado desequilibrio estructural",
-    "En precario estado vegetativo",
-    "No es posible implementar solución técnica",
-    "Por daño intencional irreversible",
-    "Obra pública",
-    "Especie no apta para el lugar implantado",
-    "Cepa verde",
-    "Cepa muerta"
+    "2.1 Árbol muerto",
+    "2.2 Con riesgo de caída por ahuecamiento",
+    "2.3 Con riesgo de caída por inclinación",
+    "2.4 Afectado por una enfermedad incurable",
+    "2.5 Con pronunciado desequilibrio estructural",
+    "2.6 En precario estado vegetativo",
+    "2.7 No es posible implementar una solución técnica",
+    "2.8 Por daño intencional irreversible",
+    "2.9 Obra pública",
+    "2.10 Especie no apta para el lugar implantado",
+    "2.11 Cepa verde",
+    "2.12 Cepa muerta"
   ],
   "trabajos_subterraneos": [
     "Corte vertical de raíces",
-    "Corte horizontal de raíces"
+    "Corte horizontal de raíces",
+    "Agrandamiento de cazuela"
   ],
   "trabajos_aereos": [
-    "Poda de formación",
-    "Liberación de conductores eléctricos",
-    "Liberación de tránsito peatonal",
-    "Liberación de tránsito vehicular",
-    "Despeje de espacio aéreo privado",
-    "Despeje de luminarias",
-    "Equilibrio del ejemplar",
-    "Raleo y limpieza",
-    "Elevación de copa",
-    "Reducción de altura de copa",
-    "Reducción volumétrica",
-    "Eliminación de ramas peligro"
+    "4.1 Poda de formación",
+    "4.2 Liberación de conductores aéreos",
+    "4.3 Liberación de tránsito peatonal",
+    "4.4 Liberación de tránsito vehicular",
+    "4.5 Despeje de espacio aéreo privado",
+    "4.6 Despeje de luminarias",
+    "4.7 Equilibrio del ejemplar",
+    "4.8 Raleo y limpieza",
+    "4.9 Elevación de copas",
+    "4.10 Reducción de altura de copa",
+    "4.11 Reducción volumétrica de copa",
+    "4.12 Eliminación de ramas peligrosas"
   ],
   "motivo_sin_trabajo": [
     "Ejemplar extraído",
@@ -59,10 +60,9 @@
     "Máxima"
   ],
   "plantar": [
-    "Cazuela",
-    "Construir cazuela",
     "Vereda jardín",
-    "Agrandar cazuela"
+    "Cazuela libre",
+    "Construir cazuela"
   ],
   "nivel_prioridad": [
     "Alta",

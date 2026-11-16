@@ -7,7 +7,7 @@ import { cifrar, descifrar } from '../lib/cifrado';
 import { calcularHashFirma } from '../lib/canonical';
 import { firmarConHuella, registrarHuella, credencialesDe } from '../lib/biometria';
 import { comprimirFoto } from '../lib/imagen';
-import { aNumero, CORTE_VERTICAL, vacioFormulario, validarPaso, type FormDictamen } from '../lib/reglas';
+import { aNumero, CORTE_HORIZONTAL, CORTE_VERTICAL, fechaArgentina, vacioFormulario, validarPaso, type FormDictamen } from '../lib/reglas';
 import { conCache, marcarFirmadaLocal, type Ruta, type Solicitud } from '../lib/datos';
 import { encolar } from '../lib/sync';
 import { Mapa } from '../components/Mapa';
@@ -16,7 +16,7 @@ import catalogos from '../catalogos.json';
 
 interface Especie { id_especie: number; nombre_comun: string; nombre_cientifico: string | null }
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
-const hoy = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const fechaLegible = (iso: string) => iso.split('-').reverse().join('/');
 const PASOS = ['Ejemplar y ubicación', 'Diagnóstico', 'Intervención', 'Información adicional y fotos', 'Observaciones y firma'];
 
 export function DictamenForm() {
@@ -26,7 +26,7 @@ export function DictamenForm() {
   const [sol, setSol] = useState<Solicitud | null>(null);
   const [especies, setEspecies] = useState<Especie[]>([]);
   const [paso, setPaso] = useState(1);
-  const [f, setF] = useState<FormDictamen>(vacioFormulario(hoy()));
+  const [f, setF] = useState<FormDictamen>(vacioFormulario());
   const [errores, setErrores] = useState<string[]>([]);
   const [errorGlobal, setErrorGlobal] = useState<string | null>(null);
   const [cargado, setCargado] = useState(false);
@@ -54,7 +54,7 @@ export function DictamenForm() {
       const esp = await conCache<Especie[]>('especies', () => api('/especies'));
       setEspecies(esp.datos ?? []);
       const b = await db.borradores.get(claveBorrador);
-      if (b) { try { setF({ ...vacioFormulario(hoy()), ...(await descifrar<FormDictamen>(b.datos as any)) }); } catch { /* borrador ilegible: se descarta */ } }
+      if (b) { try { setF({ ...vacioFormulario(), ...(await descifrar<FormDictamen>(b.datos as any)) }); } catch { /* borrador ilegible: se descarta */ } }
       else if (s.latitud !== null) setF((p) => ({ ...p, latitud_ejemplar: s!.latitud, longitud_ejemplar: s!.longitud }));
       setCargado(true);
     })();
@@ -91,18 +91,19 @@ export function DictamenForm() {
     if (!(await credencialesDe(usuario!.nombre_usuario)).length) { setPedirRegistro(true); return; }
     const uuid = f.uuid_dictamen || crypto.randomUUID();
     if (!f.uuid_dictamen) set('uuid_dictamen', uuid);
+    const ahora = new Date(); // la fecha del dictamen es la del día de la firma (no se elige)
     const payload: Record<string, any> = {
-      uuid_dictamen: uuid, fecha_firma: new Date().toISOString(), numero_sua: sol!.numero_sua, anio: sol!.anio,
-      nota_numero: aNumero(f.nota_numero), expediente_numero: aNumero(f.expediente_numero), fecha_emision: f.fecha_emision,
+      uuid_dictamen: uuid, fecha_firma: ahora.toISOString(), numero_sua: sol!.numero_sua, anio: sol!.anio,
+      nota_numero: aNumero(f.nota_numero), expediente_numero: aNumero(f.expediente_numero), fecha_emision: fechaArgentina(ahora),
       domicilio_ejemplar: sol!.direccion, latitud_ejemplar: f.latitud_ejemplar, longitud_ejemplar: f.longitud_ejemplar,
       referencia_ubicacion: f.referencia_ubicacion.trim() || null,
       id_especie: f.id_especie, distancia_medianera_referencia: aNumero(f.distancia_medianera_referencia),
       cantidad_frente: f.cantidad_frente ? Number(f.cantidad_frente) : null, nivel_dano_vereda: f.nivel_dano_vereda || null,
       es_extraccion: f.es_extraccion, perimetro_tronco: f.es_extraccion ? aNumero(f.perimetro_tronco) : null, motivo_extraccion: f.es_extraccion ? f.motivo_extraccion : null,
       es_sin_trabajo: f.es_sin_trabajo, motivo_sin_trabajo: f.es_sin_trabajo ? f.motivo_sin_trabajo : null,
-      trabajos_aereos: f.trabajos_aereos, trabajos_subterraneos: f.trabajos_subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.tipo_trabajo === CORTE_VERTICAL ? aNumero(t.distancia_borde) : null })),
-      complejidad: f.complejidad, urgente: f.urgente, arbol_frente_garage: f.arbol_frente_garage, media_tension: f.media_tension, de_oficio: f.de_oficio,
-      plantar: f.plantar && f.plantar !== 'ninguna' ? f.plantar : null, nivel_prioridad: f.nivel_prioridad, observaciones: f.observaciones.trim() || null,
+      trabajos_aereos: f.trabajos_aereos, trabajos_subterraneos: f.trabajos_subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.tipo_trabajo === CORTE_VERTICAL ? aNumero(t.distancia_borde) : null, profundidad_cm: t.tipo_trabajo === CORTE_HORIZONTAL ? aNumero(t.profundidad_cm ?? '') : null })),
+      complejidad: f.complejidad, urgente: f.urgente, arbol_frente_garage: f.arbol_frente_garage, media_tension: f.media_tension, de_oficio: f.de_oficio, descopado: f.descopado,
+      plantar: catalogos.plantar.includes(f.plantar) ? f.plantar : null, nivel_prioridad: f.nivel_prioridad, observaciones: f.observaciones.trim() || null,
       firmado_sin_conexion: !navigator.onLine,
     };
     setFirmando('biometria');
@@ -155,7 +156,7 @@ export function DictamenForm() {
           <div><label>SUA N.°</label><input type="text" value={`${sol.numero_sua}-${sol.anio}`} disabled /></div>
           <div><label htmlFor="nota">Nota N.°</label><input id="nota" type="text" inputMode="numeric" value={f.nota_numero} onChange={(e) => set('nota_numero', e.target.value)} /></div>
           <div><label htmlFor="exp">Expediente N.°</label><input id="exp" type="text" inputMode="numeric" value={f.expediente_numero} onChange={(e) => set('expediente_numero', e.target.value)} /></div>
-          <div><label htmlFor="fecha">Fecha</label><input id="fecha" type="date" value={f.fecha_emision} onChange={(e) => set('fecha_emision', e.target.value)} /></div>
+          <div><label htmlFor="fecha">Fecha <span className="ayuda">(la del día de la firma)</span></label><input id="fecha" type="text" value={fechaLegible(fechaArgentina())} disabled /></div>
         </div>
         <label>Domicilio de la solicitud</label><input type="text" value={sol.direccion} disabled />
         <label>Domicilio del ejemplar * <span className="ayuda">tocá el mapa en el punto exacto</span></label>
@@ -198,6 +199,8 @@ export function DictamenForm() {
             <label className={`check ${bloqueaAereos ? 'off' : ''}`}><input type="checkbox" disabled={bloqueaAereos} checked={!!sel} onChange={() => toggleSub(t)} />{t}</label>
             {sel && t === CORTE_VERTICAL && (<div style={{ marginLeft: '2rem' }}><label htmlFor="dist">Distancia al borde del árbol (m) *</label>
               <input id="dist" type="text" inputMode="decimal" value={sel.distancia_borde} onChange={(e) => set('trabajos_subterraneos', f.trabajos_subterraneos.map((x) => x === sel ? { ...x, distancia_borde: e.target.value } : x))} /></div>)}
+            {sel && t === CORTE_HORIZONTAL && (<div style={{ marginLeft: '2rem' }}><label htmlFor="prof">Profundidad del corte (cm) <span className="ayuda">opcional</span></label>
+              <input id="prof" type="text" inputMode="decimal" value={sel.profundidad_cm ?? ''} onChange={(e) => set('trabajos_subterraneos', f.trabajos_subterraneos.map((x) => x === sel ? { ...x, profundidad_cm: e.target.value } : x))} /></div>)}
           </div>);
         })}
         <h3>Trabajos aéreos</h3>
@@ -210,11 +213,11 @@ export function DictamenForm() {
         <label htmlFor="cx">Complejidad de la intervención *</label>
         <select id="cx" value={f.complejidad} onChange={(e) => set('complejidad', e.target.value)}><option value="">Elegí una opción</option>{catalogos.complejidad.map((c) => <option key={c}>{c}</option>)}</select>
         <div className="grid2" style={{ marginTop: '.5rem' }}>
-          {([['urgente', 'Urgente'], ['arbol_frente_garage', 'Árbol frente a garage'], ['media_tension', 'Media tensión'], ['de_oficio', 'De oficio']] as const).map(([k, t]) => (
+          {([['urgente', 'Urgente'], ['arbol_frente_garage', 'Árbol frente a garage'], ['media_tension', 'Media tensión'], ['de_oficio', 'De oficio'], ['descopado', 'Descopado']] as const).map(([k, t]) => (
             <label key={k} className="check"><input type="checkbox" checked={f[k]} onChange={(e) => set(k, e.target.checked)} />{t}</label>))}
         </div>
         <label htmlFor="pl">Plantar (árbol nuevo)</label>
-        <select id="pl" value={f.plantar} onChange={(e) => set('plantar', e.target.value)}><option value="">Ninguna</option>{catalogos.plantar.filter((p) => p !== 'ninguna').map((p) => <option key={p}>{p}</option>)}</select>
+        <select id="pl" value={f.plantar} onChange={(e) => set('plantar', e.target.value)}><option value="">Ninguna</option>{catalogos.plantar.map((p) => <option key={p}>{p}</option>)}</select>
         <label>Fotografías del ejemplar * <span className="ayuda">(mínimo 1, máximo 10)</span></label>
         <input type="file" accept="image/*" capture="environment" multiple aria-label="Agregar fotografías" onChange={(e) => { void agregarFotos(e.target.files); e.target.value = ''; }} />
         <div className="fotos" style={{ marginTop: '.6rem' }}>{f.fotos.map((b, i) => (

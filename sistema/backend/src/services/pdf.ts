@@ -47,10 +47,10 @@ export async function generarPdf(idDictamen: number): Promise<PDFKit.PDFDocument
   else if (d.es_sin_trabajo) fila('Sin trabajo', d.motivo_sin_trabajo);
   else {
     fila('Trabajos aéreos', d.aereos.map((t) => t.tipo_trabajo).join('; ') || 'Ninguno');
-    fila('Trabajos subterráneos', d.subterraneos.map((t) => t.tipo_trabajo + (t.distancia_borde ? ` (${t.distancia_borde} m)` : '')).join('; ') || 'Ninguno');
+    fila('Trabajos subterráneos', d.subterraneos.map((t) => t.tipo_trabajo + (t.distancia_borde ? ` (${t.distancia_borde} m)` : '') + (t.profundidad_cm ? ` (${t.profundidad_cm} cm)` : '')).join('; ') || 'Ninguno');
   }
   fila('Complejidad', d.complejidad); fila('Nivel de prioridad', d.nivel_prioridad);
-  fila('Urgente', si(d.urgente)); fila('Árbol frente a garage', si(d.arbol_frente_garage)); fila('Media tensión', si(d.media_tension)); fila('De oficio', si(d.de_oficio));
+  fila('Urgente', si(d.urgente)); fila('Árbol frente a garage', si(d.arbol_frente_garage)); fila('Media tensión', si(d.media_tension)); fila('De oficio', si(d.de_oficio)); fila('Descopado', si(d.descopado));
   fila('Plantar', d.plantar);
   titulo('Observaciones'); doc.font('Helvetica').fontSize(10).text(v(d.observaciones));
 

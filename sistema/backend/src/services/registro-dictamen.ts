@@ -118,11 +118,11 @@ export async function registrarDictamen(usuario: string, raw: unknown, segundoFa
           nivel_dano_vereda: p.nivel_dano_vereda ?? null, es_extraccion: p.es_extraccion, perimetro_tronco: p.perimetro_tronco ?? null,
           motivo_extraccion: p.motivo_extraccion ?? null, es_sin_trabajo: p.es_sin_trabajo, motivo_sin_trabajo: p.motivo_sin_trabajo ?? null,
           complejidad: p.complejidad, urgente: p.urgente, arbol_frente_garage: p.arbol_frente_garage, media_tension: p.media_tension,
-          de_oficio: p.de_oficio, plantar: p.plantar ?? null, nivel_prioridad: p.nivel_prioridad, observaciones: p.observaciones ?? null,
+          de_oficio: p.de_oficio, descopado: p.descopado, plantar: p.plantar ?? null, nivel_prioridad: p.nivel_prioridad, observaciones: p.observaciones ?? null,
           vigente, hash_firma: p.hash_firma!, firmado_sin_conexion: origen === 'sync' || p.firmado_sin_conexion,
           estado_sincronizacion: falla ? 'integridad_no_verificada' : 'pendiente_sua', sua_proximo_intento: new Date(),
           aereos: { create: p.trabajos_aereos.map((t) => ({ tipo_trabajo: t })) },
-          subterraneos: { create: p.trabajos_subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.distancia_borde ?? null })) },
+          subterraneos: { create: p.trabajos_subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.distancia_borde ?? null, profundidad_cm: t.profundidad_cm ?? null })) },
           fotos: { create: archivos.map((a, i) => ({ archivo_referencia: a, orden: i + 1 })) },
         },
       });
@@ -168,9 +168,9 @@ export async function armarPayloadSua(idDictamen: number) {
     extraccion: d.es_extraccion ? { perimetro_tronco: d.perimetro_tronco, motivo: d.motivo_extraccion } : null,
     sin_trabajo: d.es_sin_trabajo ? { motivo: d.motivo_sin_trabajo } : null,
     trabajos_aereos: d.aereos.map((t) => t.tipo_trabajo),
-    trabajos_subterraneos: d.subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.distancia_borde })),
+    trabajos_subterraneos: d.subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.distancia_borde, profundidad_cm: t.profundidad_cm })),
     complejidad: d.complejidad, urgente: d.urgente, arbol_frente_garage: d.arbol_frente_garage, media_tension: d.media_tension,
-    de_oficio: d.de_oficio, plantar: d.plantar, nivel_prioridad: d.nivel_prioridad, observaciones: d.observaciones,
+    de_oficio: d.de_oficio, descopado: d.descopado, plantar: d.plantar, nivel_prioridad: d.nivel_prioridad, observaciones: d.observaciones,
     fotografias: d.fotos.map((f) => {
       const ruta = dir(f.archivo_referencia);
       return { orden: f.orden, contenido_base64: fs.existsSync(ruta) ? fs.readFileSync(ruta).toString('base64') : null };

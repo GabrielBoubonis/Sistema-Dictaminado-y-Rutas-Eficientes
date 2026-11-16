@@ -84,7 +84,7 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   municipal. **Opcionales** (no todo dictamen tiene expediente asociado al momento de
   firmarse).
 - `fecha_emision` (`date`): se guarda junto con el hash como parte de la firma digital
-  (RF-22).
+  (RF-22). Es siempre el día de `fecha_firma` en hora de Argentina: no se elige.
 - `uuid_dictamen` (`string`, único): generado en el captor al firmar; clave de
   idempotencia para que un reenvío no duplique el dictamen (RF-21, RF-33).
 - `fecha_firma` (`datetime`): momento exacto de la firma (timestamp de RF-22).
@@ -120,7 +120,8 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   reclamo desde la calle" que se descartó del alcance: acá el dictamen ya parte de una
   Solicitud existente derivada por el SUA, este campo solo documenta el origen para el
   registro legal.
-- `plantar` (`enum`): plantar árboles; Cazuela / Construir cazuela / Vereda jardín / Agrandar cazuela / ninguna. **Opcional.**
+- `descopado` (`boolean`): el ejemplar está descopado. **Opcional**, como los anteriores.
+- `plantar` (`enum`): plantar árboles; Vereda jardín / Cazuela libre / Construir cazuela / ninguna. **Opcional.**
 - `nivel_prioridad` (`enum`): Alta/Media/Baja. **Obligatorio.** Es la urgencia con la que
   hay que **ejecutar** la intervención ya dictaminada (por ejemplo, una poda de riesgo
   eléctrico puede necesitar resolverse antes que una de mantenimiento estético), definida
@@ -153,7 +154,7 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   que ya la usaron.
 - `creada_por` (FK, `string`): usuario que agregó la especie desde el selector; nulo si viene del catálogo inicial.
 
-Catálogo inicial propuesto (a validar con los ingenieros agrónomos): Fresno americano, Fresno europeo, Plátano, Tipa blanca, Paraíso, Ligustro, Arce negundo, Jacarandá, Álamo, Sauce llorón, Crespón, Ceibo, Lapacho rosado, Acacia negra (Gleditsia), Aguaribay, Eucalipto, Morera, Palo borracho, Pindó, Tilo, Olmo, Casuarina, Cina-cina. En el formulario, el selector filtra mientras se escribe; si la especie no figura, la opción "Agregar especie" la incorpora al catálogo con nombre normalizado y sin duplicados (mayúsculas y tildes no distinguen).
+Catálogo inicial: los 76 nombres comunes que usa el reporte real de la Dirección (Fresno, Plátano, Ficus, Ligustro, Jacarandá, Álamo, Liquidámbar, Tilo, Paraíso, Lapacho y otros, más "Sin determinar"), en `datos-prueba/especies.json`. Al iniciar, el sistema agrega las que falten y desactiva las del catálogo anterior, sin borrar ninguna. En el formulario, el selector filtra mientras se escribe; si la especie no figura, la opción "Agregar especie" la incorpora al catálogo con nombre normalizado y sin duplicados (mayúsculas y tildes no distinguen).
 
 ### Fotografia
 
@@ -167,7 +168,7 @@ Catálogo inicial propuesto (a validar con los ingenieros agrónomos): Fresno am
 - `id_trabajo_aereo` (PK, `int`).
 - `id_dictamen` (FK, `int`).
 - `tipo_trabajo` (`enum`): uno de los 12 ítems del catálogo del Bloque 4 (poda de
-  formación, liberación de conductores eléctricos, etc.). Cada fila representa **un** ítem
+  formación, liberación de conductores aéreos, etc.). Cada fila representa **un** ítem
   marcado; un Dictamen puede tener varias filas (selección múltiple confirmada). **No puede
   tener filas si el Dictamen tiene `es_extraccion = true`** (ver Decisión 5).
 
@@ -175,10 +176,12 @@ Catálogo inicial propuesto (a validar con los ingenieros agrónomos): Fresno am
 
 - `id_trabajo_subterraneo` (PK, `int`).
 - `id_dictamen` (FK, `int`).
-- `tipo_trabajo` (`enum`): Corte vertical de raíces / Corte horizontal de raíces.
+- `tipo_trabajo` (`enum`): Corte vertical de raíces / Corte horizontal de raíces /
+  Agrandamiento de cazuela.
 - `distancia_borde` (`decimal`): **obligatorio solo si** `tipo_trabajo` es "Corte vertical
-  de raíces" (es el único de los dos que registra una distancia en el formulario
-  original). **No puede tener filas si el Dictamen tiene `es_extraccion = true`** (ver
+  de raíces" (en metros); en los otros dos no se carga.
+- `profundidad_cm` (`decimal`): profundidad del corte, en cm. **Opcional** y solo para
+  "Corte horizontal de raíces" (en el reporte real suele ser 15 cm). **No puede tener filas si el Dictamen tiene `es_extraccion = true`** (ver
   Decisión 5).
 
 ### Ruta
@@ -293,7 +296,7 @@ confirmó que son de selección múltiple, un Dictamen puede tener entre 0 y 12 
 aéreos marcados, y tener 15 columnas booleanas mayormente en `false` es un esquema poco
 prolijo y difícil de mantener si el catálogo cambia. Segundo, modelarlos como una entidad
 hija con una fila por ítem seleccionado permite consultas más simples (por ejemplo,
-"¿cuántos dictámenes incluyeron liberación de conductores eléctricos este mes?") sin tener
+"¿cuántos dictámenes incluyeron liberación de conductores aéreos este mes?") sin tener
 que revisar columna por columna.
 
 ### Decisión 5 — Exclusión entre extracción y trabajos aéreos/subterráneos como regla de validación, no como restricción de base de datos
@@ -337,7 +340,7 @@ así que vale la pena dejar explícita la diferencia entre ambos:
   ingeniero recién al cerrar el dictamen, **después** de haber inspeccionado el ejemplar en
   persona, y responde a una pregunta distinta: "ya que se determinó qué intervención
   corresponde, ¿con qué urgencia hay que efectivamente hacerla?" (por ejemplo, una
-  liberación de conductores eléctricos puede requerir resolverse antes que una poda de
+  liberación de conductores aéreos puede requerir resolverse antes que una poda de
   formación, aunque ambas solicitudes hayan entrado con la misma prioridad de triage).
 
 Se decidió no unificarlos en un solo campo porque representan decisiones tomadas por

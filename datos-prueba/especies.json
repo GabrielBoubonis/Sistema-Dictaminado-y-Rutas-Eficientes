@@ -1,162 +1,533 @@
 [
   {
     "id_especie": 1,
-    "nombre_comun": "Fresno americano",
-    "nombre_cientifico": "Fraxinus pennsylvanica",
+    "nombre_comun": "Abedul",
+    "nombre_cientifico": "Betula pendula",
     "activa": true,
     "creada_por": null
   },
   {
     "id_especie": 2,
-    "nombre_comun": "Fresno europeo",
-    "nombre_cientifico": "Fraxinus excelsior",
+    "nombre_comun": "Acacia",
+    "nombre_cientifico": null,
     "activa": true,
     "creada_por": null
   },
   {
     "id_especie": 3,
-    "nombre_comun": "Plátano",
-    "nombre_cientifico": "Platanus x acerifolia",
+    "nombre_comun": "Acacia bola",
+    "nombre_cientifico": "Robinia pseudoacacia 'Umbraculifera'",
     "activa": true,
     "creada_por": null
   },
   {
     "id_especie": 4,
-    "nombre_comun": "Tipa blanca",
-    "nombre_cientifico": "Tipuana tipu",
+    "nombre_comun": "Acer",
+    "nombre_cientifico": null,
     "activa": true,
     "creada_por": null
   },
   {
     "id_especie": 5,
-    "nombre_comun": "Paraíso",
-    "nombre_cientifico": "Melia azedarach",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 6,
-    "nombre_comun": "Ligustro",
-    "nombre_cientifico": "Ligustrum lucidum",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 7,
-    "nombre_comun": "Arce negundo",
+    "nombre_comun": "Acer negundo",
     "nombre_cientifico": "Acer negundo",
     "activa": true,
     "creada_por": null
   },
   {
-    "id_especie": 8,
-    "nombre_comun": "Jacarandá",
-    "nombre_cientifico": "Jacaranda mimosifolia",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 9,
-    "nombre_comun": "Álamo",
-    "nombre_cientifico": "Populus sp.",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 10,
-    "nombre_comun": "Sauce llorón",
-    "nombre_cientifico": "Salix babylonica",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 11,
-    "nombre_comun": "Crespón",
-    "nombre_cientifico": "Lagerstroemia indica",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 12,
-    "nombre_comun": "Ceibo",
-    "nombre_cientifico": "Erythrina crista-galli",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 13,
-    "nombre_comun": "Lapacho rosado",
-    "nombre_cientifico": "Handroanthus impetiginosus",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 14,
-    "nombre_comun": "Acacia negra (Gleditsia)",
-    "nombre_cientifico": "Gleditsia triacanthos",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 15,
+    "id_especie": 6,
     "nombre_comun": "Aguaribay",
     "nombre_cientifico": "Schinus areira",
     "activa": true,
     "creada_por": null
   },
   {
+    "id_especie": 7,
+    "nombre_comun": "Ailanto",
+    "nombre_cientifico": "Ailanthus altissima",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 8,
+    "nombre_comun": "Álamo",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 9,
+    "nombre_comun": "Álamo piramidal",
+    "nombre_cientifico": "Populus nigra 'Italica'",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 10,
+    "nombre_comun": "Álamo plateado",
+    "nombre_cientifico": "Populus alba",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 11,
+    "nombre_comun": "Alcanforero",
+    "nombre_cientifico": "Cinnamomum camphora",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 12,
+    "nombre_comun": "Araucaria",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 13,
+    "nombre_comun": "Arce blanco",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 14,
+    "nombre_comun": "Aromito",
+    "nombre_cientifico": "Vachellia caven",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 15,
+    "nombre_comun": "Aromo",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
     "id_especie": 16,
-    "nombre_comun": "Eucalipto",
-    "nombre_cientifico": "Eucalyptus sp.",
+    "nombre_comun": "Brachichito",
+    "nombre_cientifico": "Brachychiton populneus",
     "activa": true,
     "creada_por": null
   },
   {
     "id_especie": 17,
-    "nombre_comun": "Morera",
-    "nombre_cientifico": "Morus alba",
+    "nombre_comun": "Calistemo",
+    "nombre_cientifico": null,
     "activa": true,
     "creada_por": null
   },
   {
     "id_especie": 18,
-    "nombre_comun": "Palo borracho",
-    "nombre_cientifico": "Ceiba speciosa",
+    "nombre_comun": "Castaño",
+    "nombre_cientifico": null,
     "activa": true,
     "creada_por": null
   },
   {
     "id_especie": 19,
-    "nombre_comun": "Pindó",
-    "nombre_cientifico": "Syagrus romanzoffiana",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 20,
-    "nombre_comun": "Tilo",
-    "nombre_cientifico": "Tilia x moltkei",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 21,
-    "nombre_comun": "Olmo",
-    "nombre_cientifico": "Ulmus sp.",
-    "activa": true,
-    "creada_por": null
-  },
-  {
-    "id_especie": 22,
     "nombre_comun": "Casuarina",
     "nombre_cientifico": "Casuarina cunninghamiana",
     "activa": true,
     "creada_por": null
   },
   {
+    "id_especie": 20,
+    "nombre_comun": "Catalpa",
+    "nombre_cientifico": "Catalpa bignonioides",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 21,
+    "nombre_comun": "Cedro",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 22,
+    "nombre_comun": "Ceibo",
+    "nombre_cientifico": "Erythrina crista-galli",
+    "activa": true,
+    "creada_por": null
+  },
+  {
     "id_especie": 23,
+    "nombre_comun": "Celtis",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 24,
     "nombre_comun": "Cina-cina",
     "nombre_cientifico": "Parkinsonia aculeata",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 25,
+    "nombre_comun": "Ciprés",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 26,
+    "nombre_comun": "Ciruelo",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 27,
+    "nombre_comun": "Citrus",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 28,
+    "nombre_comun": "Crespón",
+    "nombre_cientifico": "Lagerstroemia indica",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 29,
+    "nombre_comun": "Duraznero",
+    "nombre_cientifico": "Prunus persica",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 30,
+    "nombre_comun": "Eucalipto",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 31,
+    "nombre_comun": "Falso café",
+    "nombre_cientifico": "Manihot grahamii",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 32,
+    "nombre_comun": "Ficus",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 33,
+    "nombre_comun": "Fresno",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 34,
+    "nombre_comun": "Fresno dorado",
+    "nombre_cientifico": "Fraxinus excelsior 'Aurea'",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 35,
+    "nombre_comun": "Ginkgo",
+    "nombre_cientifico": "Ginkgo biloba",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 36,
+    "nombre_comun": "Gomero",
+    "nombre_cientifico": "Ficus elastica",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 37,
+    "nombre_comun": "Grevillea",
+    "nombre_cientifico": "Grevillea robusta",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 38,
+    "nombre_comun": "Guarán",
+    "nombre_cientifico": "Tecoma stans",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 39,
+    "nombre_comun": "Higuera",
+    "nombre_cientifico": "Ficus carica",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 40,
+    "nombre_comun": "Ibirá pitá",
+    "nombre_cientifico": "Peltophorum dubium",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 41,
+    "nombre_comun": "Jacarandá",
+    "nombre_cientifico": "Jacaranda mimosifolia",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 42,
+    "nombre_comun": "Kiri",
+    "nombre_cientifico": "Paulownia tomentosa",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 43,
+    "nombre_comun": "Lapacho",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 44,
+    "nombre_comun": "Laurel",
+    "nombre_cientifico": "Laurus nobilis",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 45,
+    "nombre_comun": "Lecherón",
+    "nombre_cientifico": "Sapium haematospermum",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 46,
+    "nombre_comun": "Ligustro",
+    "nombre_cientifico": "Ligustrum lucidum",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 47,
+    "nombre_comun": "Limpiatubos",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 48,
+    "nombre_comun": "Liquidámbar",
+    "nombre_cientifico": "Liquidambar styraciflua",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 49,
+    "nombre_comun": "Magnolia",
+    "nombre_cientifico": "Magnolia grandiflora",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 50,
+    "nombre_comun": "Mora",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 51,
+    "nombre_comun": "Morera salvaje",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 52,
+    "nombre_comun": "Níspero",
+    "nombre_cientifico": "Eriobotrya japonica",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 53,
+    "nombre_comun": "Nogal",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 54,
+    "nombre_comun": "Olivo",
+    "nombre_cientifico": "Olea europaea",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 55,
+    "nombre_comun": "Olmo",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 56,
+    "nombre_comun": "Ombú",
+    "nombre_cientifico": "Phytolacca dioica",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 57,
+    "nombre_comun": "Pacará",
+    "nombre_cientifico": "Enterolobium contortisiliquum",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 58,
+    "nombre_comun": "Palmera",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 59,
+    "nombre_comun": "Palo borracho",
+    "nombre_cientifico": "Ceiba speciosa",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 60,
+    "nombre_comun": "Palta",
+    "nombre_cientifico": "Persea americana",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 61,
+    "nombre_comun": "Paraíso",
+    "nombre_cientifico": "Melia azedarach",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 62,
+    "nombre_comun": "Pecán",
+    "nombre_cientifico": "Carya illinoinensis",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 63,
+    "nombre_comun": "Pezuña de vaca",
+    "nombre_cientifico": "Bauhinia forficata",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 64,
+    "nombre_comun": "Pino",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 65,
+    "nombre_comun": "Plátano",
+    "nombre_cientifico": "Platanus × acerifolia",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 66,
+    "nombre_comun": "Roble",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 67,
+    "nombre_comun": "Rus",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 68,
+    "nombre_comun": "Sauce",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 69,
+    "nombre_comun": "Sauce eléctrico",
+    "nombre_cientifico": "Salix matsudana 'Tortuosa'",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 70,
+    "nombre_comun": "Sin determinar",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 71,
+    "nombre_comun": "Sófora",
+    "nombre_cientifico": "Styphnolobium japonicum",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 72,
+    "nombre_comun": "Tilo",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 73,
+    "nombre_comun": "Timbó",
+    "nombre_cientifico": null,
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 74,
+    "nombre_comun": "Tipa",
+    "nombre_cientifico": "Tipuana tipu",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 75,
+    "nombre_comun": "Tulipanero",
+    "nombre_cientifico": "Liriodendron tulipifera",
+    "activa": true,
+    "creada_por": null
+  },
+  {
+    "id_especie": 76,
+    "nombre_comun": "Yuca",
+    "nombre_cientifico": null,
     "activa": true,
     "creada_por": null
   }

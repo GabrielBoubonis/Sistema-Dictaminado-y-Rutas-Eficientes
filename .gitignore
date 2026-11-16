@@ -1,0 +1,5 @@
+# Datos reales de la Dirección (reclamos de vecinos, cotizaciones): solo en la PC, nunca en el repo público.
+datos-prueba/Documento para contexto/
+*.xlsx
+# Restos de un npx corrido en la raíz
+/package-lock.json

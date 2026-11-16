@@ -17,12 +17,17 @@
   "es_extraccion": false,
   "es_sin_trabajo": false,
   "trabajos_aereos": [
-   "Liberación de conductores eléctricos"
+   "4.2 Liberación de conductores aéreos",
+   "4.10 Reducción de altura de copa"
   ],
   "trabajos_subterraneos": [
    {
     "tipo_trabajo": "Corte vertical de raíces",
     "distancia_borde": 0.8
+   },
+   {
+    "tipo_trabajo": "Corte horizontal de raíces",
+    "profundidad_cm": 15
    }
   ],
   "complejidad": "Baja",
@@ -30,7 +35,8 @@
   "arbol_frente_garage": false,
   "media_tension": false,
   "de_oficio": false,
-  "plantar": "Cazuela",
+  "descopado": true,
+  "plantar": "Cazuela libre",
   "nivel_prioridad": "Media",
   "observaciones": "Ñandú: acentos y \"comillas\"",
   "fotos": [
@@ -40,5 +46,5 @@
   "firmado_sin_conexion": false
  },
  "usuario": "mrossi0",
- "hash": "7b315ba65b471f46b3e73c2411831fa73415ea4015dd8eff95fe9f31fec98090"
+ "hash": "ce56bbd88a9b984a77651cc582be518b7444751705b2956618eb4f3c71d6386f"
 }

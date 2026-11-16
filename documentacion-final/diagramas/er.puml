@@ -87,6 +87,7 @@ entity "Dictamen" as dictamen {
   arbol_frente_garage : boolean
   media_tension : boolean
   de_oficio : boolean
+  descopado : boolean
   plantar : enum
   --
   nivel_prioridad : enum
@@ -174,6 +175,7 @@ entity "TrabajoSubterraneo" as trabajo_subterraneo {
   id_dictamen : int <<FK>>
   tipo_trabajo : enum
   distancia_borde : decimal
+  profundidad_cm : decimal
 }
 
 entity "Ruta" as ruta {

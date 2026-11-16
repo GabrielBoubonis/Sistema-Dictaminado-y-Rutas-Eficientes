@@ -20,7 +20,7 @@ export const dictamenSchema = z.object({
   anio: entero.min(2000).max(2100),
   nota_numero: opt(entero.positive()), // RF-56: enteros positivos
   expediente_numero: opt(entero.positive()),
-  fecha_emision: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  fecha_emision: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), // la fija el sistema: día de la firma en Argentina (no se edita)
   domicilio_ejemplar: opt(z.string().max(200)),
   latitud_ejemplar: opt(z.number().min(-90).max(90)),
   longitud_ejemplar: opt(z.number().min(-180).max(180)),
@@ -37,13 +37,15 @@ export const dictamenSchema = z.object({
   trabajos_aereos: z.array(enumDe(catalogos.trabajos_aereos)).max(12),
   trabajos_subterraneos: z.array(z.object({
     tipo_trabajo: enumDe(catalogos.trabajos_subterraneos),
-    distancia_borde: opt(z.number().positive().max(20)),
+    distancia_borde: opt(z.number().positive().max(20)), // corte vertical: metros al borde del árbol
+    profundidad_cm: opt(z.number().positive().max(200)), // corte horizontal: profundidad en cm (opcional)
   })).max(3),
   complejidad: enumDe(catalogos.complejidad),
   urgente: z.boolean().default(false),
   arbol_frente_garage: z.boolean().default(false),
   media_tension: z.boolean().default(false),
   de_oficio: z.boolean().default(false),
+  descopado: z.boolean().default(false),
   plantar: opt(enumDe(catalogos.plantar)),
   nivel_prioridad: enumDe(catalogos.nivel_prioridad),
   observaciones: opt(z.string().max(1000)), // texto libre permitido (RF-56)
@@ -73,19 +75,33 @@ export function contenidoFirmado(p: {
     es_extraccion: !!p.es_extraccion, perimetro_tronco: n(p.perimetro_tronco), motivo_extraccion: n(p.motivo_extraccion),
     es_sin_trabajo: !!p.es_sin_trabajo, motivo_sin_trabajo: n(p.motivo_sin_trabajo),
     complejidad: p.complejidad, urgente: !!p.urgente, arbol_frente_garage: !!p.arbol_frente_garage,
-    media_tension: !!p.media_tension, de_oficio: !!p.de_oficio, plantar: n(p.plantar),
+    media_tension: !!p.media_tension, de_oficio: !!p.de_oficio, descopado: !!p.descopado, plantar: n(p.plantar),
     nivel_prioridad: p.nivel_prioridad, observaciones: n(p.observaciones),
     trabajos_aereos: [...(p.trabajos_aereos ?? [])].sort(),
     trabajos_subterraneos: [...(p.trabajos_subterraneos ?? [])]
-      .map((t: any) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: n(t.distancia_borde) }))
+      .map((t: any) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: n(t.distancia_borde), profundidad_cm: n(t.profundidad_cm) }))
       .sort((a, b) => a.tipo_trabajo.localeCompare(b.tipo_trabajo)),
     fotos_sha256: [...(p.fotos_sha256 ?? [])].sort(),
   };
 }
 
+/** Día calendario de Argentina (UTC-3 fijo) de un instante, como AAAA-MM-DD. */
+export function fechaArgentina(instante: string | Date): string {
+  return new Date(new Date(instante).getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10);
+}
+/** Tolerancia para relojes de captor adelantados al validar la fecha de firma. */
+const TOLERANCIA_RELOJ_MS = 10 * 60 * 1000;
+
 /** Reglas de negocio del formulario (RF-45, RF-46, RF-61, RF-56). Lanza AppError 422. */
-export function validarReglas(p: DictamenPayload) {
+export function validarReglas(p: DictamenPayload, ahora = new Date()) {
   const errores: { campo: string; mensaje: string }[] = [];
+  // La fecha del dictamen es la del día en que se firma; no se puede elegir otra.
+  if (p.fecha_emision !== fechaArgentina(p.fecha_firma)) {
+    errores.push({ campo: 'fecha_emision', mensaje: 'La fecha del dictamen debe ser la del día de la firma' });
+  }
+  if (new Date(p.fecha_firma).getTime() > ahora.getTime() + TOLERANCIA_RELOJ_MS) {
+    errores.push({ campo: 'fecha_firma', mensaje: 'La fecha de firma no puede ser futura' });
+  }
   const hayTrabajos = p.trabajos_aereos.length > 0 || p.trabajos_subterraneos.length > 0;
   if (p.es_extraccion) {
     if (!p.motivo_extraccion) errores.push({ campo: 'motivo_extraccion', mensaje: 'Indicá el motivo de la extracción' });
@@ -107,6 +123,15 @@ export function validarReglas(p: DictamenPayload) {
     if (t.tipo_trabajo === 'Corte vertical de raíces' && !t.distancia_borde) {
       errores.push({ campo: 'trabajos_subterraneos', mensaje: 'El corte vertical de raíces requiere la distancia al borde del árbol' });
     }
+    if (t.tipo_trabajo !== 'Corte vertical de raíces' && t.distancia_borde) {
+      errores.push({ campo: 'trabajos_subterraneos', mensaje: 'La distancia al borde solo aplica al corte vertical de raíces' });
+    }
+    if (t.tipo_trabajo !== 'Corte horizontal de raíces' && t.profundidad_cm) {
+      errores.push({ campo: 'trabajos_subterraneos', mensaje: 'La profundidad solo aplica al corte horizontal de raíces' });
+    }
+  }
+  if (new Set(p.trabajos_subterraneos.map((t) => t.tipo_trabajo)).size !== p.trabajos_subterraneos.length) {
+    errores.push({ campo: 'trabajos_subterraneos', mensaje: 'Hay trabajos repetidos' });
   }
   if (new Set(p.trabajos_aereos).size !== p.trabajos_aereos.length) errores.push({ campo: 'trabajos_aereos', mensaje: 'Hay trabajos repetidos' });
   if (errores.length) throw new AppError(422, 'dictamen_invalido', 'El dictamen no cumple las reglas del formulario', { detalles: errores });

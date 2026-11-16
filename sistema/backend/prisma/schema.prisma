@@ -169,6 +169,7 @@ model Dictamen {
   arbol_frente_garage            Boolean   @default(false)
   media_tension                  Boolean   @default(false)
   de_oficio                      Boolean   @default(false)
+  descopado                      Boolean   @default(false)
   plantar                        String?
   nivel_prioridad                String
   observaciones                  String?
@@ -213,6 +214,7 @@ model TrabajoSubterraneo {
   id_dictamen            Int
   tipo_trabajo           String
   distancia_borde        Float?
+  profundidad_cm         Float?
   dictamen               Dictamen @relation(fields: [id_dictamen], references: [id_dictamen], onDelete: Cascade)
 
   @@map("trabajo_subterraneo")

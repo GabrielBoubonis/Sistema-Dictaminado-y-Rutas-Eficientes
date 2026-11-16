@@ -68,19 +68,19 @@
   <rect x="24" y="426" width="327" height="190" rx="8" fill="#f4f4f4" stroke="#ddd"/>
 
   <rect x="36" y="438" width="16" height="16" rx="3" fill="#e8e8e8" stroke="#ccc"/>
-  <text x="60" y="451" font-size="10" fill="#aaa">Poda de formación</text>
+  <text x="60" y="451" font-size="10" fill="#aaa">4.1 Poda de formación</text>
 
   <rect x="36" y="464" width="16" height="16" rx="3" fill="#e8e8e8" stroke="#ccc"/>
-  <text x="60" y="477" font-size="10" fill="#aaa">Liberación de conductores eléctricos</text>
+  <text x="60" y="477" font-size="10" fill="#aaa">4.2 Liberación de conductores aéreos</text>
 
   <rect x="36" y="490" width="16" height="16" rx="3" fill="#e8e8e8" stroke="#ccc"/>
-  <text x="60" y="503" font-size="10" fill="#aaa">Liberación de tránsito peatonal</text>
+  <text x="60" y="503" font-size="10" fill="#aaa">4.3 Liberación de tránsito peatonal</text>
 
   <rect x="36" y="516" width="16" height="16" rx="3" fill="#e8e8e8" stroke="#ccc"/>
-  <text x="60" y="529" font-size="10" fill="#aaa">Liberación de tránsito vehicular</text>
+  <text x="60" y="529" font-size="10" fill="#aaa">4.4 Liberación de tránsito vehicular</text>
 
   <rect x="36" y="542" width="16" height="16" rx="3" fill="#e8e8e8" stroke="#ccc"/>
-  <text x="60" y="555" font-size="10" fill="#aaa">Despeje de espacio aéreo privado</text>
+  <text x="60" y="555" font-size="10" fill="#aaa">4.5 Despeje de espacio aéreo privado</text>
 
   <text x="36" y="580" font-size="9" fill="#999" font-style="italic">+ 7 opciones más del catálogo (despeje de</text>
   <text x="36" y="592" font-size="9" fill="#999" font-style="italic">luminarias, equilibrio, raleo y limpieza, elevación</text>

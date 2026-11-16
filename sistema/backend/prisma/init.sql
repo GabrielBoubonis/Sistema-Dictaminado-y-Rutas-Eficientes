@@ -243,3 +243,7 @@ ALTER TABLE ruta ADD COLUMN IF NOT EXISTS recorrido JSONB;
 -- Se quitó "calle de esquina" del dictamen (decisión de la Dirección).
 ALTER TABLE dictamen DROP COLUMN IF EXISTS calle_esquina;
 ALTER TABLE dictamen DROP COLUMN IF EXISTS numero_esquina;
+
+-- Datos reales de la Dirección (13/11/2026): descopado del ejemplar y profundidad del corte horizontal de raíces (cm).
+ALTER TABLE dictamen ADD COLUMN IF NOT EXISTS descopado BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE trabajo_subterraneo ADD COLUMN IF NOT EXISTS profundidad_cm DOUBLE PRECISION;

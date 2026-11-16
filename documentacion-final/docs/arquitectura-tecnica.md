@@ -53,7 +53,7 @@ Agrupado por módulo de `requisitos.md`:
 | `/rutas` | `POST /rutas` (generar; acepta la ubicación actual del captor como partida, RF-14 a RF-19, RF-47 a RF-49, RF-63), `GET /rutas/activa`, `POST /rutas/:id/restablecer` | RF-14 a RF-19, RF-47 a RF-49, RF-63 |
 | `/dictamenes` | `POST /dictamenes` (completar y firmar, con la aserción WebAuthn incluida), `GET /dictamenes/:id`, `GET /dictamenes/:id/fotos/:orden`, `GET /dictamenes/:numeroSua/:anio/historial`, `GET /dictamenes/:id/pdf`, `GET /dictamenes/:numeroSua/:anio/conflicto` y `POST /dictamenes/:id/vigente` (solo Jefe, RF-59) | RF-20 a RF-29, RF-45, RF-46, RF-51, RF-59, RF-61 |
 | `/sync` | `POST /sync/dictamenes` (cola offline → servidor, recalcula hash y verifica la aserción WebAuthn, RF-53) | RF-30 a RF-34, RF-51, RF-53 |
-| `/especies` | `GET /especies?q=` (búsqueda para el selector), `POST /especies` (agregar una especie nueva, normalizada y sin duplicados) | RF-56 |
+| `/especies` | `GET /especies?q=` (búsqueda para el selector), `POST /especies` (agregar una especie nueva, normalizada y sin duplicados). Al iniciar, el servidor alinea la tabla con `datos-prueba/especies.json` (agrega las que faltan, desactiva las viejas, no borra) | RF-56 |
 | `/dashboard` | `GET /dashboard?mes=&anio=` | RF-35 a RF-37, RF-44 |
 | `/tormenta` | `GET /tormenta`, `POST /tormenta/rutas` (acepta la ubicación actual como partida) | RF-38 a RF-43 |
 | `/auditoria` | `GET /auditoria?usuario=&accion=&desde=&hasta=` | RF-54, RF-55 |
@@ -122,6 +122,7 @@ las credenciales de producción.
 | Borrado post-sincronización | al confirmarse la sincronización (RF-33), se eliminan de IndexedDB la fotografía y el dictamen ya enviados | RNF-16 |
 | Rate limiting server-side | 10 intentos fallidos / 15 min por combinación IP + usuario (también para usuarios inexistentes), backoff exponencial; capa distinta del bloqueo local a los 5 intentos del captor | RNF-19, RF-52 |
 | Validación de campos cerrados | el servidor valida cada campo de lista cerrada contra su enumeración o tabla de catálogo y responde 422 ante cualquier valor fuera de ella | RF-56 |
+| Fecha del dictamen | la fija el sistema: `fecha_emision` debe ser el día de `fecha_firma` en hora de Argentina y la firma no puede ser futura (10 min de tolerancia para el reloj del captor); si no, 422 | RF-22 |
 | Sesión | JWT corto (30 min) + refresh token con tope absoluto de 7 días | RF-04, RF-05, RNF-20 |
 | Cabeceras HTTP | CSP `default-src 'self'` (con excepciones solo para las teselas de OpenStreetMap y OpenRouteService), HSTS, `X-Frame-Options: DENY` y `Referrer-Policy: strict-origin-when-cross-origin` (OpenStreetMap exige el Referer) en todas las respuestas | RNF-21 |
 

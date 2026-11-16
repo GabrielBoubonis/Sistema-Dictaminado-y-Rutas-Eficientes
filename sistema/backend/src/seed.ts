@@ -63,7 +63,7 @@ export async function seed(opciones: { bcryptCost?: number } = {}) {
   for (const d of [...dicts, ...conflicto]) {
     const sol = await prisma.solicitud.findUniqueOrThrow({ where: { numero_sua_anio: { numero_sua: d.numero_sua, anio: d.anio } } });
     const aereos = (d.trabajos_aereos ?? []).map((t: any) => t.tipo_trabajo);
-    const subs = (d.trabajos_subterraneos ?? []).map((t: any) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.distancia_borde ?? null }));
+    const subs = (d.trabajos_subterraneos ?? []).map((t: any) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.distancia_borde ?? null, profundidad_cm: t.profundidad_cm ?? null }));
     const fotos = (d.fotografias ?? []).map((f: any) => {
       // las fotos de prueba se copian al almacenamiento de fotos del sistema (UPLOADS_DIR/seed/)
       const destino = path.join(config.uploadsDir, 'seed', path.basename(f.archivo_referencia));
@@ -80,7 +80,7 @@ export async function seed(opciones: { bcryptCost?: number } = {}) {
       nivel_dano_vereda: d.nivel_dano_vereda, es_extraccion: d.es_extraccion, perimetro_tronco: d.perimetro_tronco,
       motivo_extraccion: d.motivo_extraccion, es_sin_trabajo: d.es_sin_trabajo, motivo_sin_trabajo: d.motivo_sin_trabajo,
       complejidad: d.complejidad, urgente: d.urgente, arbol_frente_garage: d.arbol_frente_garage, media_tension: d.media_tension,
-      de_oficio: d.de_oficio, plantar: d.plantar === 'ninguna' ? null : d.plantar, nivel_prioridad: d.nivel_prioridad, observaciones: d.observaciones,
+      de_oficio: d.de_oficio, descopado: !!d.descopado, plantar: d.plantar === 'ninguna' ? null : d.plantar, nivel_prioridad: d.nivel_prioridad, observaciones: d.observaciones,
       trabajos_aereos: aereos, trabajos_subterraneos: subs,
       fotos_sha256: fotos.map((f: string) => sha256(fs.readFileSync(path.join(config.uploadsDir, f)).toString('base64'))),
     };
@@ -97,7 +97,7 @@ export async function seed(opciones: { bcryptCost?: number } = {}) {
         nivel_dano_vereda: d.nivel_dano_vereda, es_extraccion: d.es_extraccion, perimetro_tronco: d.perimetro_tronco,
         motivo_extraccion: d.motivo_extraccion, es_sin_trabajo: d.es_sin_trabajo, motivo_sin_trabajo: d.motivo_sin_trabajo,
         complejidad: d.complejidad, urgente: d.urgente, arbol_frente_garage: d.arbol_frente_garage, media_tension: d.media_tension,
-        de_oficio: d.de_oficio, plantar: base.plantar, nivel_prioridad: d.nivel_prioridad, observaciones: d.observaciones,
+        de_oficio: d.de_oficio, descopado: base.descopado, plantar: base.plantar, nivel_prioridad: d.nivel_prioridad, observaciones: d.observaciones,
         vigente: d.vigente === undefined ? true : d.vigente, hash_firma: hash,
         firmado_sin_conexion: d.id_dictamen === 102,
         aereos: { create: aereos.map((t: string) => ({ tipo_trabajo: t })) },

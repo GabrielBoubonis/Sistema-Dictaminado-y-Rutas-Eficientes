@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import { api, auth, PASS, prepararBase, prisma, randomUUID, token } from './helpers';
 import { SoftAuthenticator } from './soft-authenticator';
 import { calcularHash } from '../src/services/registro-dictamen';
-import { dictamenSchema } from '../src/services/dictamenes';
+import { dictamenSchema, fechaArgentina } from '../src/services/dictamenes';
 import { config } from '../src/config';
 
 /**
@@ -45,8 +45,8 @@ const p95 = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length
 function dictamen(usuario: string, s: { numero_sua: string; anio: number }) {
   const d: any = {
     uuid_dictamen: randomUUID(), fecha_firma: new Date().toISOString(), numero_sua: s.numero_sua, anio: s.anio,
-    fecha_emision: new Date().toISOString().slice(0, 10), domicilio_ejemplar: 'Calle de carga', latitud_ejemplar: -32.96, longitud_ejemplar: -60.65,
-    id_especie: 1, nivel_dano_vereda: 'Bajo', es_extraccion: false, es_sin_trabajo: false, trabajos_aereos: ['Liberación de conductores eléctricos'],
+    fecha_emision: fechaArgentina(new Date()), domicilio_ejemplar: 'Calle de carga', latitud_ejemplar: -32.96, longitud_ejemplar: -60.65,
+    id_especie: 1, nivel_dano_vereda: 'Bajo', es_extraccion: false, es_sin_trabajo: false, trabajos_aereos: ['4.2 Liberación de conductores aéreos'],
     trabajos_subterraneos: [], complejidad: 'Baja', urgente: false, arbol_frente_garage: false, media_tension: false, de_oficio: false,
     nivel_prioridad: 'Baja', fotos: [{ contenido_base64: FOTO }],
   };

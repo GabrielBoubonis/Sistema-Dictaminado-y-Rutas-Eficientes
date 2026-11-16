@@ -1,27 +1,35 @@
 import catalogos from '../catalogos.json';
 
 export interface FormDictamen {
-  nota_numero: string; expediente_numero: string; fecha_emision: string;
+  nota_numero: string; expediente_numero: string;
   latitud_ejemplar: number | null; longitud_ejemplar: number | null; referencia_ubicacion: string;
   id_especie: number | null; distancia_medianera_referencia: string; cantidad_frente: string; nivel_dano_vereda: string;
   es_extraccion: boolean; perimetro_tronco: string; motivo_extraccion: string; es_sin_trabajo: boolean; motivo_sin_trabajo: string;
-  trabajos_aereos: string[]; trabajos_subterraneos: { tipo_trabajo: string; distancia_borde: string }[];
-  complejidad: string; urgente: boolean; arbol_frente_garage: boolean; media_tension: boolean; de_oficio: boolean; plantar: string;
+  trabajos_aereos: string[]; trabajos_subterraneos: { tipo_trabajo: string; distancia_borde: string; profundidad_cm?: string }[];
+  complejidad: string; urgente: boolean; arbol_frente_garage: boolean; media_tension: boolean; de_oficio: boolean; descopado: boolean; plantar: string;
   nivel_prioridad: string; observaciones: string; fotos: string[]; uuid_dictamen: string;
 }
 
 export const CORTE_VERTICAL = 'Corte vertical de raíces';
-export const vacioFormulario = (hoy: string): FormDictamen => ({
-  nota_numero: '', expediente_numero: '', fecha_emision: hoy, latitud_ejemplar: null, longitud_ejemplar: null,
+export const CORTE_HORIZONTAL = 'Corte horizontal de raíces';
+
+/** Día calendario de Argentina (UTC-3 fijo) de un instante, AAAA-MM-DD. Igual que en el servidor (dictamenes.ts). */
+export const fechaArgentina = (instante: Date | string = new Date()) =>
+  new Date(new Date(instante).getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10);
+
+/** El formulario no tiene fecha editable: la fecha del dictamen es la del día de la firma. */
+export const vacioFormulario = (): FormDictamen => ({
+  nota_numero: '', expediente_numero: '', latitud_ejemplar: null, longitud_ejemplar: null,
   referencia_ubicacion: '', id_especie: null, distancia_medianera_referencia: '', cantidad_frente: '', nivel_dano_vereda: '',
   es_extraccion: false, perimetro_tronco: '', motivo_extraccion: '', es_sin_trabajo: false, motivo_sin_trabajo: '', trabajos_aereos: [],
-  trabajos_subterraneos: [], complejidad: '', urgente: false, arbol_frente_garage: false, media_tension: false, de_oficio: false, plantar: '',
+  trabajos_subterraneos: [], complejidad: '', urgente: false, arbol_frente_garage: false, media_tension: false, de_oficio: false, descopado: false, plantar: '',
   nivel_prioridad: '', observaciones: '', fotos: [], uuid_dictamen: '',
 });
 
 const entPos = (s: string) => /^[1-9]\d*$/.test(s.trim());
 const num = (s: string) => s.trim() !== '' && Number.isFinite(Number(s.replace(',', '.')));
 export const aNumero = (s: string) => (s.trim() === '' ? null : Number(s.replace(',', '.')));
+const enRango = (s: string, min: number, max: number) => num(s) && Number(s.replace(',', '.')) >= min && Number(s.replace(',', '.')) <= max;
 
 /** Validación por paso. Refleja las reglas del servidor (RF-45, RF-46, RF-56, RF-61). Devuelve los mensajes de error. */
 export function validarPaso(paso: number, f: FormDictamen): string[] {
@@ -33,16 +41,19 @@ export function validarPaso(paso: number, f: FormDictamen): string[] {
     if (f.nota_numero && !entPos(f.nota_numero)) e.push('La nota debe ser un número entero positivo.');
     if (f.expediente_numero && !entPos(f.expediente_numero)) e.push('El expediente debe ser un número entero positivo.');
     if (f.cantidad_frente && !/^\d+$/.test(f.cantidad_frente)) e.push('La cantidad al frente debe ser un número entero.');
-    if (f.distancia_medianera_referencia && (!num(f.distancia_medianera_referencia) || Number(f.distancia_medianera_referencia.replace(',', '.')) < 0)) e.push('La distancia a la medianera debe ser un número.');
+    if (f.distancia_medianera_referencia && !enRango(f.distancia_medianera_referencia, 0, 100)) e.push('La distancia a la medianera debe ser un número en metros, entre 0 y 100.');
     if (f.referencia_ubicacion.length > 300) e.push('La referencia de ubicación es demasiado larga (máximo 300).');
   }
   if (paso === 2) {
     if (f.es_extraccion && !f.motivo_extraccion) e.push('Indicá el motivo de la extracción.');
-    if (f.es_extraccion && f.perimetro_tronco && !num(f.perimetro_tronco)) e.push('El perímetro del tronco debe ser un número.');
+    if (f.es_extraccion && f.perimetro_tronco && !enRango(f.perimetro_tronco, 0.01, 20)) e.push('El perímetro del tronco debe ser un número en metros, mayor que 0 y hasta 20.');
     if (f.es_sin_trabajo && !f.motivo_sin_trabajo) e.push('Indicá el motivo de “Sin trabajo”.');
   }
   if (paso === 3) {
-    for (const t of f.trabajos_subterraneos) if (t.tipo_trabajo === CORTE_VERTICAL && !num(t.distancia_borde)) e.push('El corte vertical de raíces requiere la distancia al borde del árbol.');
+    for (const t of f.trabajos_subterraneos) {
+      if (t.tipo_trabajo === CORTE_VERTICAL && !enRango(t.distancia_borde, 0.01, 20)) e.push('El corte vertical de raíces requiere la distancia al borde del árbol, en metros (hasta 20).');
+      if (t.tipo_trabajo === CORTE_HORIZONTAL && t.profundidad_cm && !enRango(t.profundidad_cm, 0.01, 200)) e.push('La profundidad del corte horizontal debe ser un número en centímetros (hasta 200).');
+    }
     if (!f.es_extraccion && !f.es_sin_trabajo && !hayTrabajos) e.push('Marcá al menos una intervención (en este paso) o “Sin trabajo” / “Extracción” en el paso 2.');
   }
   if (paso === 4) {

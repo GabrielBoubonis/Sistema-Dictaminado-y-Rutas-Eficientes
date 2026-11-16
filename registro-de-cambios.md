@@ -4,6 +4,67 @@ Cambios hechos al sistema y a la documentación, del más nuevo al más viejo.
 
 ---
 
+## 13/11/2026 — Formulario del dictamen alineado con el reporte real de la Dirección
+
+### Por qué
+
+Se sumó el reporte real de solicitudes de la Dirección (33.887 solicitudes, hoja "Base"
+con todos los campos del dictamen). Comparándolo con el sistema aparecieron diferencias de
+nombres, campos que faltaban y un error: la fecha del dictamen se podía cambiar.
+
+### Qué cambió
+
+| Tema | Antes | Ahora |
+|---|---|---|
+| Fecha del dictamen | Editable | Solo lectura: el día de la firma (hora de Argentina). El servidor rechaza otra fecha o una firma futura |
+| Motivos de extracción | Sin código y con otra redacción | Códigos y redacción del reporte: "2.1 Árbol muerto" … "2.12 Cepa muerta" |
+| Trabajos aéreos | Sin código; 4 nombres distintos | "4.1 Poda de formación" … "4.12 Eliminación de ramas peligrosas" (p. ej. "conductores aéreos", no "eléctricos") |
+| Agrandamiento de cazuela | Opción de Plantar | Trabajo subterráneo, como en el reporte (decisión tuya) |
+| Plantar | Cazuela, Construir cazuela, Vereda jardín, Agrandar cazuela | Vereda jardín, Cazuela libre, Construir cazuela |
+| Corte horizontal de raíces | Sin medida | Profundidad en cm, opcional (en el reporte suele ser 15) |
+| Descopado | No existía | Casilla en el paso 4, junto a Urgente |
+| Especies | 23 propuestas ("Fresno americano"…) | Las 76 del reporte ("Fresno", "Plátano", "Ficus"…, más "Sin determinar") |
+| Distancias y perímetro | Cualquier número | Con rango: medianera 0 a 100 m, perímetro hasta 20 m, distancia al borde hasta 20 m, profundidad hasta 200 cm |
+
+- Las especies de la base de producción se actualizan solas al reiniciar el servidor:
+  agrega las que faltan y desactiva las viejas sin borrarlas (los dictámenes que ya las
+  usan siguen bien). Las que agregó un ingeniero no se tocan.
+- El reporte real tiene datos personales de vecinos y cotizaciones: quedó en `.gitignore`
+  (nuevo, en la raíz) y **no se sube** al repo, que es público.
+
+### Archivos
+
+- Catálogos: `sistema/backend/src/catalogos.json` y sus copias en `sistema/frontend/src/` y
+  `datos-prueba/`; `datos-prueba/especies.json`, `dictamenes-ejemplo.json` y
+  `dictamenes-conflicto.json` pasados a los valores nuevos.
+- Backend: `prisma/schema.prisma` e `init.sql` (`dictamen.descopado`,
+  `trabajo_subterraneo.profundidad_cm`), `services/dictamenes.ts` (validación y firma),
+  `services/registro-dictamen.ts` (guardado y envío al SUA), `services/pdf.ts`, `seed.ts`,
+  `especies-catalogo.ts` (nuevo) y `server.ts`.
+- Frontend: `pages/DictamenForm.tsx`, `lib/reglas.ts`, `lib/canonical.ts` y el vector de
+  firma regenerado (`lib/vector-canonico.json`).
+- Tests: 5 nuevos de backend y 2 de frontend.
+- Documentación: `dictamen-tecnico-campos.md`, `er-modelo.md`, `er.puml`, `diseño-ui.md`,
+  `arquitectura-tecnica.md`, el wireframe del formulario y `README-datos-prueba.md`.
+
+### Verificado y pendiente
+
+- Verificado: 84 tests de backend y 15 de frontend pasan (incluye el vector de firma
+  compartido, que confirma que el hash del celular y el del servidor siguen coincidiendo),
+  y la PWA compila.
+- **No verificado**: la prueba de punta a punta (en tu PC no están Playwright para Python
+  ni `psql`), verlo en el celular y en el servidor.
+- **Antes de subirlo al servidor**: sincronizá los dictámenes que haya firmados sin conexión
+  en algún celular. Si alguno queda en la cola con la versión vieja, el servidor lo rechaza
+  por los valores viejos de las listas.
+- La base de desarrollo de tu PC tiene dictámenes con los valores viejos; `npm run seed` la
+  recarga con los nuevos (borra lo que haya).
+- Para revisar más adelante: en el reporte el expediente tiene letra y año ("Expte.
+  21366-C-2021") y el sistema hoy pide un número entero; y el SUA ya trae coordenadas de
+  cada reclamo (Gauss-Krüger), que podrían reemplazar la geocodificación.
+
+---
+
 ## 13/11/2026 — Sin clave de ORS, el aviso de trazado aproximado no aparecía
 
 ### Problema

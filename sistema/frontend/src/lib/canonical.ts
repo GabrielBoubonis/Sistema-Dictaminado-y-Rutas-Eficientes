@@ -33,11 +33,11 @@ export function contenidoFirmado(p: Record<string, any>) {
     es_extraccion: !!p.es_extraccion, perimetro_tronco: n(p.perimetro_tronco), motivo_extraccion: n(p.motivo_extraccion),
     es_sin_trabajo: !!p.es_sin_trabajo, motivo_sin_trabajo: n(p.motivo_sin_trabajo),
     complejidad: p.complejidad, urgente: !!p.urgente, arbol_frente_garage: !!p.arbol_frente_garage,
-    media_tension: !!p.media_tension, de_oficio: !!p.de_oficio, plantar: n(p.plantar),
+    media_tension: !!p.media_tension, de_oficio: !!p.de_oficio, descopado: !!p.descopado, plantar: n(p.plantar),
     nivel_prioridad: p.nivel_prioridad, observaciones: n(p.observaciones),
     trabajos_aereos: [...(p.trabajos_aereos ?? [])].sort(),
     trabajos_subterraneos: [...(p.trabajos_subterraneos ?? [])]
-      .map((t: any) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: n(t.distancia_borde) }))
+      .map((t: any) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: n(t.distancia_borde), profundidad_cm: n(t.profundidad_cm) }))
       .sort((a, b) => a.tipo_trabajo.localeCompare(b.tipo_trabajo)),
     fotos_sha256: [...(p.fotos_sha256 ?? [])].sort(),
   };

@@ -4,7 +4,8 @@ import { api, auth, prepararBase, prisma, providers, randomUUID, token } from '.
 import { MockReclamoProvider } from '../src/providers';
 import { SoftAuthenticator } from './soft-authenticator';
 import { calcularHash, reintentarEnviosSua } from '../src/services/registro-dictamen';
-import { dictamenSchema } from '../src/services/dictamenes';
+import { dictamenSchema, fechaArgentina } from '../src/services/dictamenes';
+import { sincronizarCatalogoEspecies } from '../src/especies-catalogo';
 
 import { catalogos } from '../src/catalogos';
 const MOTIVO = catalogos.motivo_extraccion[0];
@@ -33,15 +34,16 @@ async function pendiente(skip = 0) {
 
 /** Arma un dictamen válido tal como lo haría el cliente (incluye hash de firma). */
 function armar(usuario: string, s: { numero_sua: string; anio: number }, cambios: Record<string, any> = {}) {
+  const ahora = new Date();
   const base: any = {
-    uuid_dictamen: randomUUID(), fecha_firma: new Date().toISOString(), numero_sua: s.numero_sua, anio: s.anio,
-    nota_numero: 1500, expediente_numero: 30777, fecha_emision: new Date().toISOString().slice(0, 10),
+    uuid_dictamen: randomUUID(), fecha_firma: ahora.toISOString(), numero_sua: s.numero_sua, anio: s.anio,
+    nota_numero: 1500, expediente_numero: 30777, fecha_emision: fechaArgentina(ahora),
     domicilio_ejemplar: 'Pellegrini 1500', latitud_ejemplar: -32.95, longitud_ejemplar: -60.65, id_especie: 1,
     distancia_medianera_referencia: 1.2, cantidad_frente: 2, nivel_dano_vereda: 'Medio',
-    es_extraccion: false, es_sin_trabajo: false, trabajos_aereos: ['Liberación de conductores eléctricos'],
+    es_extraccion: false, es_sin_trabajo: false, trabajos_aereos: ['4.2 Liberación de conductores aéreos'],
     trabajos_subterraneos: [{ tipo_trabajo: 'Corte vertical de raíces', distancia_borde: 0.8 }],
     complejidad: 'Media', urgente: false, arbol_frente_garage: false, media_tension: false, de_oficio: false,
-    plantar: 'Cazuela', nivel_prioridad: 'Media', observaciones: 'Prueba', fotos: [{ contenido_base64: FOTO }], ...cambios,
+    plantar: 'Cazuela libre', nivel_prioridad: 'Media', observaciones: 'Prueba', fotos: [{ contenido_base64: FOTO }], ...cambios,
   };
   const parsed = dictamenSchema.parse({ ...base, hash_firma: undefined });
   base.hash_firma = calcularHash(parsed, usuario).hash;
@@ -109,10 +111,56 @@ describe('Firma de dictámenes (RF-20 a RF-26, RF-45, RF-46, RF-51, RF-61)', () 
     }
   });
 
+  it('la fecha del dictamen es la del día de la firma: otra fecha o una firma futura se rechazan', async () => {
+    const t = await token('mrossi0'); await registrarHuella('mrossi0', t);
+    const s = await pendiente();
+    const ayer = armar('mrossi0', s, { fecha_emision: fechaArgentina(new Date(Date.now() - 24 * 3600 * 1000)) });
+    const r1 = await enviar(t, firmar('mrossi0', ayer));
+    expect(r1.status).toBe(422);
+    expect(JSON.stringify(r1.body)).toContain('día de la firma');
+    const futuro = new Date(Date.now() + 2 * 24 * 3600 * 1000);
+    const r2 = await enviar(t, firmar('mrossi0', armar('mrossi0', s, { fecha_firma: futuro.toISOString(), fecha_emision: fechaArgentina(futuro) })));
+    expect(r2.status).toBe(422);
+    expect(JSON.stringify(r2.body)).toContain('no puede ser futura');
+  });
+
+  it('fecha de Argentina: a las 23:30 del día 13 (02:30 UTC del 14) el dictamen es del 13', () => {
+    expect(fechaArgentina('2026-11-14T02:30:00Z')).toBe('2026-11-13');
+    expect(fechaArgentina('2026-11-14T03:00:00Z')).toBe('2026-11-14');
+  });
+
+  it('datos reales: descopado, corte horizontal con profundidad (cm) y agrandamiento de cazuela se guardan y van al SUA', async () => {
+    const t = await token('mrossi0'); await registrarHuella('mrossi0', t);
+    const s = await pendiente();
+    const d = armar('mrossi0', s, {
+      descopado: true, plantar: 'Construir cazuela',
+      trabajos_subterraneos: [{ tipo_trabajo: 'Corte horizontal de raíces', profundidad_cm: 15 }, { tipo_trabajo: 'Agrandamiento de cazuela' }],
+    });
+    const r = await enviar(t, firmar('mrossi0', d));
+    expect(r.status).toBe(201);
+    const g = await prisma.dictamen.findUniqueOrThrow({ where: { uuid_dictamen: d.uuid_dictamen }, include: { subterraneos: true } });
+    expect(g.descopado).toBe(true);
+    expect(g.subterraneos.find((x) => x.tipo_trabajo === 'Corte horizontal de raíces')?.profundidad_cm).toBe(15);
+    const sua = await prisma.suaDatosComplementarios.findUnique({ where: { numero_sua_anio: { numero_sua: s.numero_sua, anio: s.anio } } });
+    if (sua) expect(JSON.stringify(sua.payload)).toContain('"descopado":true');
+  });
+
+  it('medidas en el trabajo equivocado o trabajos subterráneos repetidos se rechazan', async () => {
+    const t = await token('mrossi0'); await registrarHuella('mrossi0', t);
+    const s = await pendiente();
+    for (const subs of [
+      [{ tipo_trabajo: 'Corte vertical de raíces', distancia_borde: 0.8, profundidad_cm: 15 }],
+      [{ tipo_trabajo: 'Agrandamiento de cazuela', distancia_borde: 1 }],
+      [{ tipo_trabajo: 'Corte horizontal de raíces' }, { tipo_trabajo: 'Corte horizontal de raíces' }],
+    ]) {
+      expect((await enviar(t, firmar('mrossi0', armar('mrossi0', s, { trabajos_subterraneos: subs })))).status).toBe(422);
+    }
+  });
+
   it('RF-56: valores fuera de las listas cerradas o números no enteros se rechazan', async () => {
     const t = await token('mrossi0'); await registrarHuella('mrossi0', t);
     const s = await pendiente();
-    for (const cambios of [{ nivel_dano_vereda: 'Gigante' }, { complejidad: 'Extrema' }, { nota_numero: 12.5 }, { nota_numero: -3 }, { plantar: 'Palmera' }, { trabajos_aereos: ['Pintar el tronco'] }]) {
+    for (const cambios of [{ nivel_dano_vereda: 'Gigante' }, { complejidad: 'Extrema' }, { nota_numero: 12.5 }, { nota_numero: -3 }, { plantar: 'Palmera' }, { plantar: 'Agrandar cazuela' }, { trabajos_aereos: ['Pintar el tronco'] }, { trabajos_aereos: ['Liberación de conductores eléctricos'] }, { motivo_extraccion: 'Árbol muerto', es_extraccion: true, trabajos_aereos: [], trabajos_subterraneos: [] }]) {
       const d = armar('mrossi0', s, {});
       Object.assign(d, cambios);
       expect((await enviar(t, { ...d, segundo_factor: autenticadores.get('mrossi0')!.firmar(d.hash_firma) })).status).toBe(422);
@@ -185,7 +233,7 @@ describe('Firma de dictámenes (RF-20 a RF-26, RF-45, RF-46, RF-51, RF-61)', () 
   it('RF-12 / RF-27: una solicitud re-derivada se vuelve a dictaminar; el anterior queda en el historial como no vigente', async () => {
     const t = await token('cbenite0'); await registrarHuella('cbenite0', t);
     const rev = await prisma.solicitud.findFirstOrThrow({ where: { estado: 'Pendiente-revisión', latitud: { not: null }, dictamenes: { none: { vigente: null } } }, include: { dictamenes: true } });
-    const r = await enviar(t, firmar('cbenite0', armar('cbenite0', rev, { fecha_emision: new Date().toISOString().slice(0, 10) })));
+    const r = await enviar(t, firmar('cbenite0', armar('cbenite0', rev)));
     expect(r.status).toBe(201);
     expect(r.body.estado_solicitud).toBe('Dictaminada');
     const h = await api().get(`/api/dictamenes/${rev.numero_sua}/${rev.anio}/historial`).set(auth(t));
@@ -282,6 +330,18 @@ describe('Sincronización offline (RF-31 a RF-33, RF-53, RF-59)', () => {
 });
 
 describe('Especies (RF-56)', () => {
+  it('catálogo real: al iniciar se agregan las que faltan y se desactivan las viejas sin borrar ni tocar las agregadas a mano', async () => {
+    const vieja = await prisma.especie.create({ data: { nombre_comun: 'Fresno americano', nombre_normalizado: 'fresno americano' } });
+    const aMano = await prisma.especie.create({ data: { nombre_comun: 'Pata de buey', nombre_normalizado: 'pata de buey', creada_por: 'mrossi0' } });
+    await prisma.especie.delete({ where: { nombre_normalizado: 'ombu' } });
+    const r = await sincronizarCatalogoEspecies();
+    expect(r).toEqual({ agregadas: 1, desactivadas: 1 });
+    expect((await prisma.especie.findUniqueOrThrow({ where: { id_especie: vieja.id_especie } })).activa).toBe(false);
+    expect((await prisma.especie.findUniqueOrThrow({ where: { id_especie: aMano.id_especie } })).activa).toBe(true);
+    expect((await prisma.especie.findUniqueOrThrow({ where: { nombre_normalizado: 'ombu' } })).nombre_comun).toBe('Ombú');
+    expect(await sincronizarCatalogoEspecies()).toEqual({ agregadas: 0, desactivadas: 0 });
+  });
+
   it('busca sin tildes ni mayúsculas, agrega sin duplicar y registra quién la agregó', async () => {
     const t = await token('mrossi0');
     const todas = await api().get('/api/especies').set(auth(t));

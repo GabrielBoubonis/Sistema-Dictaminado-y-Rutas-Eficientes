@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cifrar, descifrar } from './cifrado';
 import { db } from './db';
 import { guardarSesionLocal, reanudarSinConexion, codigoDispositivo, mismoDia } from './local-auth';
-import { validarPaso, vacioFormulario, CORTE_VERTICAL } from './reglas';
+import { validarPaso, vacioFormulario, CORTE_VERTICAL, CORTE_HORIZONTAL, fechaArgentina } from './reglas';
 import { puntoEnPoligono } from './geo';
 
 afterEach(() => vi.useRealTimers());
@@ -46,9 +46,9 @@ describe('reanudar sin señal (RF-57)', () => {
 });
 
 describe('reglas del formulario (RF-45, RF-46, RF-56, RF-61)', () => {
-  const base = () => ({ ...vacioFormulario('2026-10-13'), latitud_ejemplar: -32.9, longitud_ejemplar: -60.6, id_especie: 1 });
+  const base = () => ({ ...vacioFormulario(), latitud_ejemplar: -32.9, longitud_ejemplar: -60.6, id_especie: 1 });
   it('paso 1 exige ubicación y especie; números enteros', () => {
-    expect(validarPaso(1, vacioFormulario('2026-10-13')).length).toBe(2);
+    expect(validarPaso(1, vacioFormulario()).length).toBe(2);
     expect(validarPaso(1, { ...base(), nota_numero: '12.5' })).toHaveLength(1);
     expect(validarPaso(1, { ...base(), nota_numero: '1200' })).toHaveLength(0);
   });
@@ -58,6 +58,19 @@ describe('reglas del formulario (RF-45, RF-46, RF-56, RF-61)', () => {
     expect(validarPaso(3, { ...base(), es_extraccion: true })).toHaveLength(0);
     expect(validarPaso(3, { ...base(), trabajos_subterraneos: [{ tipo_trabajo: CORTE_VERTICAL, distancia_borde: '' }] })).toHaveLength(1);
     expect(validarPaso(3, { ...base(), trabajos_subterraneos: [{ tipo_trabajo: CORTE_VERTICAL, distancia_borde: '0,8' }] })).toHaveLength(0);
+  });
+  it('medidas con rango: distancia a medianera, perímetro y profundidad del corte horizontal (opcional)', () => {
+    expect(validarPaso(1, { ...base(), distancia_medianera_referencia: '4 mts' })).toHaveLength(1);
+    expect(validarPaso(1, { ...base(), distancia_medianera_referencia: '150' })).toHaveLength(1);
+    expect(validarPaso(1, { ...base(), distancia_medianera_referencia: '3,5' })).toHaveLength(0);
+    expect(validarPaso(2, { ...base(), es_extraccion: true, motivo_extraccion: 'x', perimetro_tronco: '0' })).toHaveLength(1);
+    expect(validarPaso(3, { ...base(), trabajos_subterraneos: [{ tipo_trabajo: CORTE_HORIZONTAL, distancia_borde: '' }] })).toHaveLength(0);
+    expect(validarPaso(3, { ...base(), trabajos_subterraneos: [{ tipo_trabajo: CORTE_HORIZONTAL, distancia_borde: '', profundidad_cm: '15 cm' }] })).toHaveLength(1);
+    expect(validarPaso(3, { ...base(), trabajos_subterraneos: [{ tipo_trabajo: CORTE_HORIZONTAL, distancia_borde: '', profundidad_cm: '15' }] })).toHaveLength(0);
+  });
+  it('la fecha del dictamen es el día de Argentina, no el de UTC', () => {
+    expect(fechaArgentina('2026-11-14T02:30:00Z')).toBe('2026-11-13');
+    expect(fechaArgentina('2026-11-14T03:00:00Z')).toBe('2026-11-14');
   });
   it('paso 4 exige complejidad y al menos una foto (RF-45)', () => {
     expect(validarPaso(4, base())).toHaveLength(2);

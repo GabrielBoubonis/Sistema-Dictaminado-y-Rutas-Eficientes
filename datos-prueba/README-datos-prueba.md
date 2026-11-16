@@ -9,7 +9,7 @@ Datos **ficticios** para cargar las dos bases simuladas (SUA y Autenticación In
 | `solicitudes-sua.json` / `.csv` | 42 solicitudes con el esquema del mock SUA (`arquitectura-tecnica.md` §3). El CSV agrega la columna `estado_esperado_en_sistema`. | Mock SUA (`solicitudes_sua`) |
 | `usuarios-institucionales.json` | 8 usuarios del mock de Autenticación Institucional (uno no vigente). | Mock Autenticación |
 | `usuarios-sistema.json` | 7 usuarios con rol, para la tabla `Usuario`. | Base propia |
-| `especies.json` | Catálogo inicial de 23 especies. | Tabla `Especie` |
+| `especies.json` | Catálogo de 76 especies con los nombres comunes del reporte real de la Dirección. | Tabla `Especie` |
 | `historial-derivaciones.json` | Un evento por solicitud, más la derivación original de las 2 re-derivadas. | Tabla `HistorialDerivacion` |
 | `dictamenes-ejemplo.json` | 8 dictámenes ya firmados y sincronizados (6 solicitudes dictaminadas + el dictamen anterior de las 2 re-derivadas). | Tabla `Dictamen` y tablas hijas |
 | `catalogos.json` | Todas las listas cerradas del formulario en papel (distritos, motivos de extracción, trabajos, motivos de "sin trabajo", etc.). | Constantes o tablas de catálogo |
@@ -55,6 +55,8 @@ Todos usan la misma contraseña de demostración: `Demo2026!` (solo para la demo
 
 ## Catálogos del formulario
 
-Los catálogos de motivos de extracción (12), trabajos aéreos (12), trabajos subterráneos (3) y motivos de "sin trabajo" (6) se transcribieron del formulario en papel y están en `catalogos.json`. Los dictámenes de `dictamenes-ejemplo.json` no usan extracción ni "sin trabajo" a propósito; `dictamenes-conflicto.json` incluye un caso con extracción. Todos los dictámenes de ejemplo tienen `vigente = true`, salvo los dos del conflicto, que quedan en `null` hasta que un Jefe elige.
+Los catálogos de motivos de extracción (12), trabajos aéreos (12), trabajos subterráneos (3) y motivos de "sin trabajo" (6) se transcribieron del formulario en papel, se ajustaron a los códigos y la redacción del reporte real de la Dirección (13/11/2026) y están en `catalogos.json`. Los dictámenes de `dictamenes-ejemplo.json` no usan extracción ni "sin trabajo" a propósito; `dictamenes-conflicto.json` incluye un caso con extracción. Todos los dictámenes de ejemplo tienen `vigente = true`, salvo los dos del conflicto, que quedan en `null` hasta que un Jefe elige.
 
 Para probar la regla RF-61: marcar "Sin trabajo" debe deshabilitar Extracción y los trabajos, y firmar sin ninguna intervención ni "Sin trabajo" debe fallar.
+
+La carpeta `Documento para contexto/` tiene el reporte real de solicitudes de la Dirección (Excel). Tiene datos personales de vecinos y cotizaciones: está en `.gitignore`, queda solo en la PC y no se sube al repositorio.

@@ -157,12 +157,13 @@ quede claro que el formulario completo no es corto:
    casillero "Extracción" + perímetro del tronco + motivo (12 opciones, aparecen solo si se
    marca Extracción); Bloque 5: casillero "Sin trabajo" + motivo (6 opciones); "Sin trabajo" es excluyente: al marcarlo se deshabilitan Extracción y los trabajos, y no se puede firmar sin ninguna intervención ni "Sin trabajo" (RF-61).
 3. **Intervención** (pantalla dibujada en el wireframe) — Bloque 3: trabajos subterráneos
-   (2 opciones, selección múltiple, una con campo de distancia); Bloque 4: trabajos aéreos
+   (3 opciones, selección múltiple; el corte vertical pide distancia y el horizontal,
+   profundidad opcional); Bloque 4: trabajos aéreos
    (12 opciones, selección múltiple). **Si en el Paso 2 se marcó "Extracción", ambos
    bloques aparecen deshabilitados** (ver justificación de la regla debajo).
 4. **Información adicional y fotografías** — Complejidad de la intervención\*
    (Baja/Media/Alta/Máxima), casilleros Urgente / Árbol frente a garage / Media tensión /
-   De oficio, Plantar árboles (Cazuela / Construir cazuela / Vereda jardín / Agrandar cazuela / ninguna), y el
+   De oficio / Descopado, Plantar árboles (Vereda jardín / Cazuela libre / Construir cazuela / ninguna), y el
    selector de **fotografías del ejemplar\* (mínimo 1, obligatorio)**.
 5. **Observaciones y firma** — **Nivel de prioridad de la intervención\*** (Alta/Media/Baja:
    la urgencia con la que hay que *ejecutar* lo dictaminado, no confundir con la prioridad
