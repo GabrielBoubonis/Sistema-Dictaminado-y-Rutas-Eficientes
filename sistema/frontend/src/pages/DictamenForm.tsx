@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, PenLine, Plus, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ApiError, ErrorRed, api } from '../lib/api';
 import { useAuth } from '../auth';
@@ -72,8 +73,8 @@ export function DictamenForm() {
   const bloqueaAereos = f.es_extraccion || f.es_sin_trabajo;
   const toggleAereo = (t: string) => set('trabajos_aereos', f.trabajos_aereos.includes(t) ? f.trabajos_aereos.filter((x) => x !== t) : [...f.trabajos_aereos, t]);
   const toggleSub = (t: string) => set('trabajos_subterraneos', f.trabajos_subterraneos.some((x) => x.tipo_trabajo === t) ? f.trabajos_subterraneos.filter((x) => x.tipo_trabajo !== t) : [...f.trabajos_subterraneos, { tipo_trabajo: t, distancia_borde: '' }]);
-  const marcarExtraccion = (v: boolean) => setF((p) => ({ ...p, es_extraccion: v, ...(v ? { es_sin_trabajo: false, motivo_sin_trabajo: '', trabajos_aereos: [], trabajos_subterraneos: [] } : { perimetro_tronco: '', motivo_extraccion: '' }) }));
-  const marcarSinTrabajo = (v: boolean) => setF((p) => ({ ...p, es_sin_trabajo: v, ...(v ? { es_extraccion: false, perimetro_tronco: '', motivo_extraccion: '', trabajos_aereos: [], trabajos_subterraneos: [] } : { motivo_sin_trabajo: '' }) }));
+  const marcarExtraccion = (v: boolean) => setF((p) => ({ ...p, es_extraccion: v, ...(v ? { es_sin_trabajo: false, motivo_sin_trabajo: '', trabajos_aereos: [], trabajos_subterraneos: [] } : { perimetro_tronco: '', motivo_extraccion: '', plantar: '' }) }));
+  const marcarSinTrabajo = (v: boolean) => setF((p) => ({ ...p, es_sin_trabajo: v, ...(v ? { es_extraccion: false, perimetro_tronco: '', motivo_extraccion: '', plantar: '', trabajos_aereos: [], trabajos_subterraneos: [] } : { motivo_sin_trabajo: '' }) }));
 
   const siguiente = () => { const e = validarPaso(paso, f); setErrores(e); if (!e.length) { setPaso(paso + 1); window.scrollTo(0, 0); } };
   const anterior = () => { setErrores([]); setPaso(paso - 1); window.scrollTo(0, 0); };
@@ -103,7 +104,7 @@ export function DictamenForm() {
       es_sin_trabajo: f.es_sin_trabajo, motivo_sin_trabajo: f.es_sin_trabajo ? f.motivo_sin_trabajo : null,
       trabajos_aereos: f.trabajos_aereos, trabajos_subterraneos: f.trabajos_subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.tipo_trabajo === CORTE_VERTICAL ? aNumero(t.distancia_borde) : null, profundidad_cm: t.tipo_trabajo === CORTE_HORIZONTAL ? aNumero(t.profundidad_cm ?? '') : null })),
       complejidad: f.complejidad, urgente: f.urgente, arbol_frente_garage: f.arbol_frente_garage, media_tension: f.media_tension, de_oficio: f.de_oficio, descopado: f.descopado,
-      plantar: catalogos.plantar.includes(f.plantar) ? f.plantar : null, nivel_prioridad: f.nivel_prioridad, observaciones: f.observaciones.trim() || null,
+      plantar: f.es_extraccion && catalogos.plantar.includes(f.plantar) ? f.plantar : null, nivel_prioridad: f.nivel_prioridad, observaciones: f.observaciones.trim() || null,
       firmado_sin_conexion: !navigator.onLine,
     };
     setFirmando('biometria');
@@ -137,12 +138,12 @@ export function DictamenForm() {
   };
 
   if (!cargado) return <p role="status">Cargando…</p>;
-  if (bloqueo || !sol) return <div><div className="aviso" role="alert">{bloqueo}</div><Link to="/solicitudes">‹ Volver</Link></div>;
+  if (bloqueo || !sol) return <div><div className="aviso" role="alert">{bloqueo}</div><Link to="/solicitudes"><ChevronLeft className="ico" aria-hidden /> Volver</Link></div>;
 
   const especie = especies.find((e) => e.id_especie === f.id_especie);
   return (
     <section>
-      <p><Link to={`/solicitudes/${sol.numero_sua}/${sol.anio}`}>‹ Cancelar</Link></p>
+      <p><Link to={`/solicitudes/${sol.numero_sua}/${sol.anio}`}><ChevronLeft className="ico" aria-hidden /> Cancelar</Link></p>
       <h1>Dictamen · {sol.numero_sua}-{sol.anio}</h1>
       <div className="pasos" aria-hidden>{PASOS.map((_, i) => <span key={i} className={i + 1 < paso ? 'hecho' : i + 1 === paso ? 'actual' : ''} />)}</div>
       <h2 style={{ marginTop: 0 }} role="status">Paso {paso} de 5 · {PASOS[paso - 1]}</h2>
@@ -179,6 +180,8 @@ export function DictamenForm() {
           <label htmlFor="per">Perímetro del tronco (m)</label><input id="per" type="text" inputMode="decimal" value={f.perimetro_tronco} onChange={(e) => set('perimetro_tronco', e.target.value)} />
           <label htmlFor="mot">Motivo de la extracción *</label>
           <select id="mot" value={f.motivo_extraccion} onChange={(e) => set('motivo_extraccion', e.target.value)}><option value="">Elegí un motivo</option>{catalogos.motivo_extraccion.map((m) => <option key={m}>{m}</option>)}</select>
+          <label htmlFor="pl">Plantar otro árbol en su lugar <span className="ayuda">opcional</span></label>
+          <select id="pl" value={f.plantar} onChange={(e) => set('plantar', e.target.value)}><option value="">No se planta</option>{catalogos.plantar.map((p) => <option key={p}>{p}</option>)}</select>
         </>)}
         <h3>Sin trabajo</h3>
         <label className={`check ${f.es_extraccion ? 'off' : ''}`}><input type="checkbox" checked={f.es_sin_trabajo} disabled={f.es_extraccion} onChange={(e) => marcarSinTrabajo(e.target.checked)} />Sin trabajo</label>
@@ -216,12 +219,10 @@ export function DictamenForm() {
           {([['urgente', 'Urgente'], ['arbol_frente_garage', 'Árbol frente a garage'], ['media_tension', 'Media tensión'], ['de_oficio', 'De oficio'], ['descopado', 'Descopado']] as const).map(([k, t]) => (
             <label key={k} className="check"><input type="checkbox" checked={f[k]} onChange={(e) => set(k, e.target.checked)} />{t}</label>))}
         </div>
-        <label htmlFor="pl">Plantar (árbol nuevo)</label>
-        <select id="pl" value={f.plantar} onChange={(e) => set('plantar', e.target.value)}><option value="">Ninguna</option>{catalogos.plantar.map((p) => <option key={p}>{p}</option>)}</select>
         <label>Fotografías del ejemplar * <span className="ayuda">(mínimo 1, máximo 10)</span></label>
         <input type="file" accept="image/*" capture="environment" multiple aria-label="Agregar fotografías" onChange={(e) => { void agregarFotos(e.target.files); e.target.value = ''; }} />
         <div className="fotos" style={{ marginTop: '.6rem' }}>{f.fotos.map((b, i) => (
-          <div className="foto" key={i}><img alt={`Fotografía ${i + 1}`} src={`data:image/jpeg;base64,${b}`} /><button type="button" aria-label={`Quitar fotografía ${i + 1}`} onClick={() => set('fotos', f.fotos.filter((_, j) => j !== i))}>×</button></div>))}</div>
+          <div className="foto" key={i}><img alt={`Fotografía ${i + 1}`} src={`data:image/jpeg;base64,${b}`} /><button type="button" aria-label={`Quitar fotografía ${i + 1}`} onClick={() => set('fotos', f.fotos.filter((_, j) => j !== i))}><X className="ico" aria-hidden /></button></div>))}</div>
       </>)}
 
       {paso === 5 && (<>
@@ -232,16 +233,16 @@ export function DictamenForm() {
         <h3>Resumen</h3>
         <div className="card">
           <div>Especie: <strong>{especie?.nombre_comun ?? '—'}</strong> · Daño en vereda: {f.nivel_dano_vereda || '—'} · Complejidad: {f.complejidad || '—'}</div>
-          <div>Intervención: {f.es_extraccion ? `Extracción (${f.motivo_extraccion})` : f.es_sin_trabajo ? `Sin trabajo (${f.motivo_sin_trabajo})` : [...f.trabajos_aereos, ...f.trabajos_subterraneos.map((t) => t.tipo_trabajo)].join('; ') || '—'}</div>
+          <div>Intervención: {f.es_extraccion ? `Extracción (${f.motivo_extraccion})${f.plantar ? ` · plantar: ${f.plantar}` : ''}` : f.es_sin_trabajo ? `Sin trabajo (${f.motivo_sin_trabajo})` : [...f.trabajos_aereos, ...f.trabajos_subterraneos.map((t) => t.tipo_trabajo)].join('; ') || '—'}</div>
           <div>Fotografías: {f.fotos.length}</div>
         </div>
         <p className="ayuda">Al firmar se te va a pedir tu huella o reconocimiento facial. Una vez firmado, el dictamen no se puede modificar.</p>
-        <button className="btn block" onClick={firmar} disabled={!!firmando}>✍ Firmar dictamen</button>
+        <button className="btn block" onClick={firmar} disabled={!!firmando}><PenLine className="ico" aria-hidden /> Firmar dictamen</button>
       </>)}
 
       <div className="fila sb" style={{ marginTop: '1rem' }}>
-        <button className="btn sec" onClick={anterior} disabled={paso === 1 || !!firmando}>‹ Anterior</button>
-        {paso < 5 && <button className="btn" onClick={siguiente}>Siguiente ›</button>}
+        <button className="btn sec" onClick={anterior} disabled={paso === 1 || !!firmando}><ChevronLeft className="ico" aria-hidden /> Anterior</button>
+        {paso < 5 && <button className="btn" onClick={siguiente}>Siguiente <ChevronRight className="ico" aria-hidden /></button>}
       </div>
 
       {firmando === 'biometria' && <Modal titulo="Verificación biométrica"><p role="status">Confirmá con tu huella o reconocimiento facial para firmar el dictamen.</p></Modal>}
@@ -278,7 +279,7 @@ function SelectorEspecie({ especies, valor, onElegir, onNueva, online }: { espec
           <div className="sugerencias" role="listbox" aria-label="Especies">
             {coincidencias.map((e) => <button type="button" role="option" aria-selected={false} key={e.id_especie} onClick={() => { onElegir(e); setQ(''); setAbierto(false); }}>{e.nombre_comun} {e.nombre_cientifico && <em className="ayuda">({e.nombre_cientifico})</em>}</button>)}
             {!coincidencias.some((e) => norm(e.nombre_comun) === norm(q)) && (online
-              ? <button type="button" onClick={agregar}>➕ Agregar especie “{q}”</button>
+              ? <button type="button" onClick={agregar}><Plus className="ico" aria-hidden /> Agregar especie “{q}”</button>
               : <div className="ayuda" style={{ padding: '.6rem' }}>Para agregar una especie nueva necesitás conexión.</div>)}
           </div>
         )}

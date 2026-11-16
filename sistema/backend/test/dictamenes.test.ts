@@ -43,7 +43,7 @@ function armar(usuario: string, s: { numero_sua: string; anio: number }, cambios
     es_extraccion: false, es_sin_trabajo: false, trabajos_aereos: ['4.2 Liberación de conductores aéreos'],
     trabajos_subterraneos: [{ tipo_trabajo: 'Corte vertical de raíces', distancia_borde: 0.8 }],
     complejidad: 'Media', urgente: false, arbol_frente_garage: false, media_tension: false, de_oficio: false,
-    plantar: 'Cazuela libre', nivel_prioridad: 'Media', observaciones: 'Prueba', fotos: [{ contenido_base64: FOTO }], ...cambios,
+    nivel_prioridad: 'Media', observaciones: 'Prueba', fotos: [{ contenido_base64: FOTO }], ...cambios,
   };
   const parsed = dictamenSchema.parse({ ...base, hash_firma: undefined });
   base.hash_firma = calcularHash(parsed, usuario).hash;
@@ -133,7 +133,7 @@ describe('Firma de dictámenes (RF-20 a RF-26, RF-45, RF-46, RF-51, RF-61)', () 
     const t = await token('mrossi0'); await registrarHuella('mrossi0', t);
     const s = await pendiente();
     const d = armar('mrossi0', s, {
-      descopado: true, plantar: 'Construir cazuela',
+      descopado: true,
       trabajos_subterraneos: [{ tipo_trabajo: 'Corte horizontal de raíces', profundidad_cm: 15 }, { tipo_trabajo: 'Agrandamiento de cazuela' }],
     });
     const r = await enviar(t, firmar('mrossi0', d));
@@ -143,6 +143,17 @@ describe('Firma de dictámenes (RF-20 a RF-26, RF-45, RF-46, RF-51, RF-61)', () 
     expect(g.subterraneos.find((x) => x.tipo_trabajo === 'Corte horizontal de raíces')?.profundidad_cm).toBe(15);
     const sua = await prisma.suaDatosComplementarios.findUnique({ where: { numero_sua_anio: { numero_sua: s.numero_sua, anio: s.anio } } });
     if (sua) expect(JSON.stringify(sua.payload)).toContain('"descopado":true');
+  });
+
+  it('plantar otro árbol solo con extracción: se acepta con extracción y se rechaza sin ella', async () => {
+    const t = await token('mrossi0'); await registrarHuella('mrossi0', t);
+    const s = await pendiente();
+    const sinExtraccion = await enviar(t, firmar('mrossi0', armar('mrossi0', s, { plantar: 'Vereda jardín' })));
+    expect(sinExtraccion.status).toBe(422);
+    expect(JSON.stringify(sinExtraccion.body)).toContain('cuando se extrae');
+    const d = armar('mrossi0', s, { es_extraccion: true, motivo_extraccion: MOTIVO, perimetro_tronco: 1.2, trabajos_aereos: [], trabajos_subterraneos: [], plantar: 'Cazuela libre' });
+    expect((await enviar(t, firmar('mrossi0', d))).status).toBe(201);
+    expect((await prisma.dictamen.findUniqueOrThrow({ where: { uuid_dictamen: d.uuid_dictamen } })).plantar).toBe('Cazuela libre');
   });
 
   it('medidas en el trabajo equivocado o trabajos subterráneos repetidos se rechazan', async () => {

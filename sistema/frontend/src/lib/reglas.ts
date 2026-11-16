@@ -48,6 +48,7 @@ export function validarPaso(paso: number, f: FormDictamen): string[] {
     if (f.es_extraccion && !f.motivo_extraccion) e.push('Indicá el motivo de la extracción.');
     if (f.es_extraccion && f.perimetro_tronco && !enRango(f.perimetro_tronco, 0.01, 20)) e.push('El perímetro del tronco debe ser un número en metros, mayor que 0 y hasta 20.');
     if (f.es_sin_trabajo && !f.motivo_sin_trabajo) e.push('Indicá el motivo de “Sin trabajo”.');
+    if (!f.es_extraccion && f.plantar) e.push('Solo se planta otro árbol cuando se extrae el existente.');
   }
   if (paso === 3) {
     for (const t of f.trabajos_subterraneos) {

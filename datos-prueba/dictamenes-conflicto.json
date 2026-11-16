@@ -27,7 +27,7 @@
       "arbol_frente_garage": true,
       "media_tension": false,
       "de_oficio": false,
-      "plantar": null,
+      "plantar": "Vereda jardín",
       "nivel_prioridad": "Alta",
       "observaciones": "Dictamen A: extracción.",
       "hash_firma": "<CALCULAR_EN_SEED>",

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Lock, MapPinOff, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cargarSolicitudes, type Solicitud } from '../lib/datos';
 import { Estado, Paginacion, Prioridad, fechaCorta, textoError } from '../components/ui';
@@ -56,9 +57,9 @@ export function Solicitudes() {
             <div className="fila sb"><strong>{s.numero_sua}-{s.anio}</strong><span className="fila"><Prioridad p={s.prioridad} /><Estado estado={s.estado} /></span></div>
             <div>{s.direccion}</div>
             <div className="ayuda">{s.distrito} · derivada el {fechaCorta(s.fecha_ultima_derivacion)}
-              {s.reservada_por && <> · 🔒 en la ruta de {s.reservada_por}</>}
-              {s.sin_ubicar && <> · 📍 sin ubicar en el mapa</>}
-              {s.en_conflicto && <> · ⚖ esperando decisión del Jefe</>}</div>
+              {s.reservada_por && <> · <Lock className="ico" aria-hidden /> en la ruta de {s.reservada_por}</>}
+              {s.sin_ubicar && <> · <MapPinOff className="ico" aria-hidden /> sin ubicar en el mapa</>}
+              {s.en_conflicto && <> · <Scale className="ico" aria-hidden /> esperando decisión del Jefe</>}</div>
           </article>
         </Link>
       ))}

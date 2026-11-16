@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ApiError, ErrorRed } from '../lib/api';
 
 export const textoError = (e: unknown) =>
@@ -19,7 +20,7 @@ export function Estado({ estado }: { estado: string }) {
   const clase = estado === 'Dictaminada' ? '' : estado === 'Pendiente-revisión' ? 'warn' : 'info';
   return <span className={`badge ${clase}`}>{estado}</span>;
 }
-export function Prioridad({ p }: { p: string }) { return <span className="badge">{p}</span>; }
+export function Prioridad({ p }: { p: string }) { return <span className={`badge prio-badge-${p}`}>Prioridad {p.toLowerCase()}</span>; }
 
 export function Paginacion({ total, pagina, porPagina, onPagina }: { total: number; pagina: number; porPagina: number; onPagina: (n: number) => void }) {
   const desde = total ? (pagina - 1) * porPagina + 1 : 0, hasta = Math.min(total, pagina * porPagina);
@@ -27,8 +28,8 @@ export function Paginacion({ total, pagina, porPagina, onPagina }: { total: numb
     <div className="fila sb" style={{ margin: '.8rem 0' }}>
       <span className="ayuda">Mostrando {desde}–{hasta} de {total}</span>
       <span className="fila">
-        <button className="btn sec chico" disabled={pagina <= 1} onClick={() => onPagina(pagina - 1)}>‹ Anterior</button>
-        <button className="btn sec chico" disabled={hasta >= total} onClick={() => onPagina(pagina + 1)}>Siguiente ›</button>
+        <button className="btn sec chico" disabled={pagina <= 1} onClick={() => onPagina(pagina - 1)}><ChevronLeft className="ico" aria-hidden /> Anterior</button>
+        <button className="btn sec chico" disabled={hasta >= total} onClick={() => onPagina(pagina + 1)}>Siguiente <ChevronRight className="ico" aria-hidden /></button>
       </span>
     </div>
   );

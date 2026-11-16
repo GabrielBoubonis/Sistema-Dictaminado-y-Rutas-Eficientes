@@ -154,8 +154,8 @@ quede claro que el formulario completo no es corto:
    lectura), Ubicación del ejemplar\* (punto en el mapa, parte de la dirección del reclamo y el ingeniero lo ajusta a la posición exacta), Referencia de ubicación (texto libre), Especie\* (selector con búsqueda y opción "Agregar especie"), Distancia a
    medianera/referencia, Cantidad de ejemplares al frente.
 2. **Diagnóstico** — Bloque 1: nivel de daño en vereda (Alto/Medio/Bajo); Bloque 2:
-   casillero "Extracción" + perímetro del tronco + motivo (12 opciones, aparecen solo si se
-   marca Extracción); Bloque 5: casillero "Sin trabajo" + motivo (6 opciones); "Sin trabajo" es excluyente: al marcarlo se deshabilitan Extracción y los trabajos, y no se puede firmar sin ninguna intervención ni "Sin trabajo" (RF-61).
+   casillero "Extracción" + perímetro del tronco + motivo (12 opciones) + plantar otro árbol en
+   su lugar (opcional), que aparecen solo si se marca Extracción; Bloque 5: casillero "Sin trabajo" + motivo (6 opciones); "Sin trabajo" es excluyente: al marcarlo se deshabilitan Extracción y los trabajos, y no se puede firmar sin ninguna intervención ni "Sin trabajo" (RF-61).
 3. **Intervención** (pantalla dibujada en el wireframe) — Bloque 3: trabajos subterráneos
    (3 opciones, selección múltiple; el corte vertical pide distancia y el horizontal,
    profundidad opcional); Bloque 4: trabajos aéreos
@@ -163,7 +163,7 @@ quede claro que el formulario completo no es corto:
    bloques aparecen deshabilitados** (ver justificación de la regla debajo).
 4. **Información adicional y fotografías** — Complejidad de la intervención\*
    (Baja/Media/Alta/Máxima), casilleros Urgente / Árbol frente a garage / Media tensión /
-   De oficio / Descopado, Plantar árboles (Vereda jardín / Cazuela libre / Construir cazuela / ninguna), y el
+   De oficio / Descopado, y el
    selector de **fotografías del ejemplar\* (mínimo 1, obligatorio)**.
 5. **Observaciones y firma** — **Nivel de prioridad de la intervención\*** (Alta/Media/Baja:
    la urgencia con la que hay que *ejecutar* lo dictaminado, no confundir con la prioridad
@@ -387,3 +387,9 @@ sin explicación.
   texto (que puede pasarse por alto en una pantalla chica), sino con un badge de color fijo
   en el encabezado, visible en todo momento sin necesidad de scrollear, y ampliado en la
   pantalla de Perfil para quien quiera el detalle exacto.
+- **Estilo visual (16/11/2026):** "accesible y sobrio", definido con el skill
+  ui-ux-pro-max. Verde institucional (#14532D en la barra, #15803D en los botones) sobre
+  fondo blanco, texto casi negro (contraste ≥ 7:1), letra Atkinson Hyperlegible incluida en
+  la app (anda sin conexión), íconos de línea Lucide en lugar de emojis (se ven igual en
+  todos los celulares) y foco visible de 3 px. En pantallas angostas el encabezado muestra
+  solo íconos; el texto queda para los lectores de pantalla.

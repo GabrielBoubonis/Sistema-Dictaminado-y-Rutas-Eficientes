@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Eye, EyeOff, TreeDeciduous } from 'lucide-react';
 import { useAuth } from '../auth';
 import { useSync } from '../lib/sync';
 
@@ -39,9 +40,11 @@ export function Login() {
   return (
     <div className="centro">
       <form className="card" onSubmit={enviar} aria-labelledby="titulo-login">
-        <div style={{ textAlign: 'center', fontSize: '2.5rem' }} aria-hidden>🌳</div>
-        <h1 id="titulo-login" style={{ textAlign: 'center' }}>Dictaminado y Rutas Eficientes</h1>
-        <p className="ayuda" style={{ textAlign: 'center' }}>Dirección General de Parques y Paseos · Municipalidad de Rosario</p>
+        <div className="marca-login">
+          <span className="sello"><TreeDeciduous className="ico" aria-hidden /></span>
+          <h1 id="titulo-login" style={{ margin: 0 }}>Dictaminado y Rutas Eficientes</h1>
+          <p className="ayuda" style={{ margin: 0 }}>Dirección General de Parques y Paseos · Municipalidad de Rosario</p>
+        </div>
         {aviso && <div className="aviso" role="status">{aviso}</div>}
         {!online && <div className="aviso" role="status">Sin señal: podés reanudar tu sesión si ingresaste con conexión hoy.</div>}
         <label htmlFor="usuario">Usuario</label>
@@ -49,7 +52,7 @@ export function Login() {
         <label htmlFor="password">Contraseña</label>
         <div className="fila" style={{ flexWrap: 'nowrap' }}>
           <input id="password" type={ver ? 'text' : 'password'} autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <button type="button" className="btn sec" onClick={() => setVer(!ver)} aria-label={ver ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed={ver}>{ver ? '🙈' : '👁'}</button>
+          <button type="button" className="btn sec" onClick={() => setVer(!ver)} aria-label={ver ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed={ver}>{ver ? <EyeOff className="ico" aria-hidden /> : <Eye className="ico" aria-hidden />}</button>
         </div>
         {error && <div className="error" role="alert">{error}</div>}
         <button className="btn block" style={{ marginTop: '1rem' }} disabled={!usuario || !password || enviando}>{enviando ? 'Ingresando…' : online ? 'Ingresar' : 'Reanudar sin señal'}</button>

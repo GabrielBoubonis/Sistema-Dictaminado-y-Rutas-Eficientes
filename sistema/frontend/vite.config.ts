@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: {
         name: 'Dictaminado y Rutas Eficientes', short_name: 'Dictaminado', lang: 'es-AR',
         description: 'Dictámenes técnicos de arbolado público — Municipalidad de Rosario',
-        start_url: '/', display: 'standalone', orientation: 'portrait', background_color: '#f4f7f4', theme_color: '#1a4d2e',
+        start_url: '/', display: 'standalone', orientation: 'portrait', background_color: '#ffffff', theme_color: '#14532d',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -21,6 +21,8 @@ export default defineConfig({
       },
       workbox: {
         // La app carga sin conexión (precache de assets). Nunca se cachea la API: los datos viven en IndexedDB.
+        // woff2: la tipografía (Atkinson Hyperlegible) también queda disponible sin conexión.
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [

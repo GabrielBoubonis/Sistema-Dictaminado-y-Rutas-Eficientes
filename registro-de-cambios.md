@@ -4,6 +4,46 @@ Cambios hechos al sistema y a la documentación, del más nuevo al más viejo.
 
 ---
 
+## 16/11/2026 — Plantar solo con extracción y rediseño visual
+
+### Plantar otro árbol solo si se extrae el existente
+
+- "Plantar" pasó al paso 2, dentro del bloque Extracción, como "Plantar otro árbol en su
+  lugar" (opcional). Solo aparece si se marca Extracción; al desmarcarla se borra.
+- El servidor rechaza un dictamen con Plantar y sin Extracción.
+- El reporte real lo respalda: 610 de los 655 casos con Plantar tienen extracción. Los
+  otros 45 (6 %) no; podrían ser errores de carga o árboles que ya no estaban.
+- Archivos: `DictamenForm.tsx`, `lib/reglas.ts`, `services/dictamenes.ts`, tests y los
+  dictámenes de prueba (solo el del conflicto con extracción conserva Plantar).
+- Documentación: `dictamen-tecnico-campos.md`, `er-modelo.md`, `er.puml`, `diseño-ui.md`.
+
+### Rediseño con el skill ui-ux-pro-max
+
+- Skill instalado en `.claude/skills/ui-ux-pro-max` (licencia MIT). Lo revisé antes de
+  instalarlo: no usa internet ni ejecuta comandos; solo busca en sus propias tablas. Copié
+  solo ese skill, sin sus tests (el repositorio original trae otros seis que no hacían falta).
+- Estilo "accesible y sobrio": verde institucional sobre **fondo blanco** (como pediste, para
+  la calle), texto casi negro, letra **Atkinson Hyperlegible** (incluida en la app, anda sin
+  conexión), íconos **Lucide** en lugar de emojis, botones y casillas de al menos 44 px,
+  foco visible, prioridad con color y texto ("Prioridad alta"), menú inferior con íconos.
+- En el celular el encabezado muestra solo íconos (estado de sincronización y salir) para
+  que no se corte; el texto sigue disponible para lectores de pantalla.
+- Archivos: `styles.css` (reescrito con tokens de color), `App.tsx`, `main.tsx`,
+  `vite.config.ts` (colores de la PWA y la letra en la caché sin conexión), `index.html` y
+  las pantallas con emojis. Dependencias nuevas: `lucide-react` y
+  `@fontsource/atkinson-hyperlegible` (gratis, de código abierto).
+
+### Verificado y pendiente
+
+- Verificado: 85 tests de backend y 15 de frontend, la PWA compila, y capturas en tamaño
+  celular con Chrome sin ventana (ingreso, solicitudes, detalle, dictamen y tormenta).
+- **No verificado**: en un celular real ni al sol.
+- En tu PC, después de bajar el código, corré `npm run db:init` en `sistema/backend`: si
+  no, la base de desarrollo no tiene las columnas nuevas y el detalle da error 500 (me pasó
+  al probar). En el servidor no hace falta: se aplica solo al arrancar.
+
+---
+
 ## 13/11/2026 — Formulario del dictamen alineado con el reporte real de la Dirección
 
 ### Por qué

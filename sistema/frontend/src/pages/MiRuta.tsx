@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Car, Footprints } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { api, ErrorRed } from '../lib/api';
@@ -81,8 +82,8 @@ function GenerarRuta({ alGenerar }: { alGenerar: () => void }) {
       {error && <div className="error" role="alert">{error}</div>}
       <h2>Modo de desplazamiento <span className="ayuda">(obligatorio)</span></h2>
       <div className="toggle" role="group" aria-label="Modo de desplazamiento">
-        <button type="button" className={modo === 'Caminando' ? 'activo' : ''} aria-pressed={modo === 'Caminando'} onClick={() => setModo('Caminando')}>🚶 A pie</button>
-        <button type="button" className={modo === 'Vehículo' ? 'activo' : ''} aria-pressed={modo === 'Vehículo'} onClick={() => setModo('Vehículo')}>🚗 En vehículo</button>
+        <button type="button" className={modo === 'Caminando' ? 'activo' : ''} aria-pressed={modo === 'Caminando'} onClick={() => setModo('Caminando')}><Footprints className="ico" aria-hidden /> A pie</button>
+        <button type="button" className={modo === 'Vehículo' ? 'activo' : ''} aria-pressed={modo === 'Vehículo'} onClick={() => setModo('Vehículo')}><Car className="ico" aria-hidden /> En vehículo</button>
       </div>
       <h2>Distrito <span className="ayuda">(opcional)</span></h2>
       <select aria-label="Distrito" value={distrito} onChange={(e) => setDistrito(e.target.value)}><option value="">Todos los distritos</option>{catalogos.distritos.map((d) => <option key={d}>{d}</option>)}</select>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Car, Check, CloudLightning, Footprints } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Mapa, type Marcador } from './Mapa';
 import { Modal, Prioridad, textoError } from './ui';
@@ -34,9 +35,9 @@ export function RutaActiva({ ruta, firmadasLocal, alCambiar }: { ruta: Ruta; fir
   const hechas = ruta.solicitudes.filter(hecha).length;
   return (
     <section>
-      <h1>{ruta.tipo === 'Tormenta' ? '⛈ Ruta de tormenta' : 'Mi ruta de hoy'}</h1>
+      <h1>{ruta.tipo === 'Tormenta' ? <><CloudLightning className="ico" aria-hidden /> Ruta de tormenta</> : 'Mi ruta de hoy'}</h1>
       <div className="fila">
-        <span className="badge">{ruta.modo_desplazamiento === 'Caminando' ? '🚶 A pie' : '🚗 En vehículo'}</span>
+        <span className="badge">{ruta.modo_desplazamiento === 'Caminando' ? <><Footprints className="ico" aria-hidden /> A pie</> : <><Car className="ico" aria-hidden /> En vehículo</>}</span>
         <span className="badge info">{hechas} de {ruta.solicitudes.length} dictaminadas</span>
         {ruta.optimizada && ruta.distancia_total_m !== null
           ? <span className="badge">{(ruta.distancia_total_m / 1000).toFixed(1)} km · {Math.round((ruta.tiempo_total_s ?? 0) / 60)} min desde {ruta.partida.tipo === 'Sede' ? 'Parques y Paseos' : 'tu ubicación'}</span>
@@ -52,7 +53,7 @@ export function RutaActiva({ ruta, firmadasLocal, alCambiar }: { ruta: Ruta; fir
           <div>{s.descripcion_reclamo}</div>
           <div style={{ marginTop: '.5rem' }}>
             {hecha(s)
-              ? <span className="badge">✓ {s.liberada ? (s.motivo_liberacion ?? 'Liberada') : 'Firmado (pendiente de enviar)'}</span>
+              ? <span className="badge"><Check className="ico" aria-hidden /> {s.liberada ? (s.motivo_liberacion ?? 'Liberada') : 'Firmado (pendiente de enviar)'}</span>
               : <Link className="btn chico" to={`/dictamen/${s.numero_sua}/${s.anio}`}>Dictaminar</Link>}
           </div>
         </article>

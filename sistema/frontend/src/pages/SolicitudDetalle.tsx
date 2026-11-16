@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ChevronLeft, Lock, MapPinOff, Scale } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { api, descargarBlob } from '../lib/api';
 import { useAuth } from '../auth';
@@ -60,15 +61,15 @@ export function SolicitudDetalle() {
   const hayConflicto = s.dictamenes?.some((d: any) => d.vigente === null);
   return (
     <section>
-      <p><Link to="/solicitudes">‹ Volver al listado</Link></p>
+      <p><Link to="/solicitudes" className="fila" style={{ display: 'inline-flex', gap: 4 }}><ChevronLeft className="ico" aria-hidden />Volver al listado</Link></p>
       <h1>Solicitud {s.numero_sua}-{s.anio}</h1>
       <div className="fila"><Estado estado={s.estado} /><Prioridad p={s.prioridad} />{s.es_tormenta && <span className="badge off">Tormenta</span>}</div>
       {error && <div className="error" role="alert">{error}</div>}{ok && <div className="ok" role="status">{ok}</div>}
       <div className="card" style={{ marginTop: '.8rem' }}>
         <div><strong>{s.direccion}</strong> · {s.distrito}</div>
         <p>{s.descripcion_reclamo}</p>
-        {s.sin_ubicar && <div className="aviso">📍 Esta solicitud no pudo ubicarse en el mapa: el sistema reintenta cada hora. Mientras tanto se puede dictaminar desde el listado, pero no entra en rutas.</div>}
-        {s.reservada_por && <div className="aviso">🔒 Reservada en la ruta de {s.reservada_por}.</div>}
+        {s.sin_ubicar && <div className="aviso"><MapPinOff className="ico" aria-hidden /><span>Esta solicitud no pudo ubicarse en el mapa: el sistema reintenta cada hora. Mientras tanto se puede dictaminar desde el listado, pero no entra en rutas.</span></div>}
+        {s.reservada_por && <div className="aviso"><Lock className="ico" aria-hidden /><span>Reservada en la ruta de {s.reservada_por}.</span></div>}
         {s.latitud !== null && <Mapa marcadores={[{ lat: s.latitud, lng: s.longitud, etiqueta: '●' }]} alto={200} etiquetaAria="Ubicación de la solicitud" />}
         <h3>Historial de derivaciones</h3>
         <ul>{s.historial.map((h: any) => <li key={h.id_derivacion}>{fechaCorta(h.fecha_derivacion)} — {h.motivo}</li>)}</ul>
@@ -77,7 +78,7 @@ export function SolicitudDetalle() {
       {puedeDictaminar && s.estado !== 'Dictaminada' && !hayConflicto && (
         <Link className="btn block" to={`/dictamen/${s.numero_sua}/${s.anio}`}>Dictaminar</Link>
       )}
-      {hayConflicto && <div className="aviso">⚖ Hay dos dictámenes firmados para este caso. Un Jefe debe elegir cuál queda vigente.</div>}
+      {hayConflicto && <div className="aviso"><Scale className="ico" aria-hidden /><span>Hay dos dictámenes firmados para este caso. Un Jefe debe elegir cuál queda vigente.</span></div>}
 
       {conflicto.length > 0 && (<>
         <h2>Elegir dictamen vigente</h2>

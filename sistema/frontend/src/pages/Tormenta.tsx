@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Car, CloudLightning, Footprints, Lock, MapPinOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../auth';
@@ -26,7 +27,7 @@ export function Tormenta() {
   };
   return (
     <section>
-      <h1>⛈ Protocolo por tormenta {d?.hay_pendientes && <span className="tormenta-pulso" aria-label="Hay pendientes" />}</h1>
+      <h1><CloudLightning className="ico" aria-hidden /> Protocolo por tormenta {d?.hay_pendientes && <span className="tormenta-pulso" aria-label="Hay pendientes" />}</h1>
       <p className="ayuda">Solicitudes derivadas con la etiqueta “emergencia por tormenta”. No aparecen en el listado general.</p>
       {error && <div className="error" role="alert">{error}</div>}
       {ok && <div className="ok" role="status">Ruta de tormenta generada. <Link to="/ruta">Ver mi ruta</Link></div>}
@@ -35,8 +36,8 @@ export function Tormenta() {
           <h2 style={{ marginTop: 0 }}>Generar ruta de tormenta</h2>
           <p className="ayuda">Indicá solo la cantidad: se toman siempre las más antiguas primero.</p>
           <div className="toggle" role="group" aria-label="Modo de desplazamiento">
-            <button type="button" className={modo === 'Caminando' ? 'activo' : ''} aria-pressed={modo === 'Caminando'} onClick={() => setModo('Caminando')}>🚶 A pie</button>
-            <button type="button" className={modo === 'Vehículo' ? 'activo' : ''} aria-pressed={modo === 'Vehículo'} onClick={() => setModo('Vehículo')}>🚗 En vehículo</button>
+            <button type="button" className={modo === 'Caminando' ? 'activo' : ''} aria-pressed={modo === 'Caminando'} onClick={() => setModo('Caminando')}><Footprints className="ico" aria-hidden /> A pie</button>
+            <button type="button" className={modo === 'Vehículo' ? 'activo' : ''} aria-pressed={modo === 'Vehículo'} onClick={() => setModo('Vehículo')}><Car className="ico" aria-hidden /> En vehículo</button>
           </div>
           <label htmlFor="tot">Cantidad de solicitudes</label>
           <input id="tot" type="number" min={1} max={100} value={total} onChange={(e) => setTotal(Math.max(1, Math.min(100, Math.floor(Number(e.target.value) || 1))))} />
@@ -49,7 +50,7 @@ export function Tormenta() {
           <article className={`card click prio-${s.prioridad}`}>
             <div className="fila sb"><strong>{s.numero_sua}-{s.anio}</strong><span className="fila"><Prioridad p={s.prioridad} /><Estado estado={s.estado} /></span></div>
             <div>{s.direccion}</div>
-            <div className="ayuda">{s.distrito} · derivada el {fechaCorta(s.fecha_ultima_derivacion)}{s.reservada_por ? ` · 🔒 ruta de ${s.reservada_por}` : ''}{s.sin_ubicar ? ' · 📍 sin ubicar' : ''}</div>
+            <div className="ayuda">{s.distrito} · derivada el {fechaCorta(s.fecha_ultima_derivacion)}{s.reservada_por && <> · <Lock className="ico" aria-hidden /> ruta de {s.reservada_por}</>}{s.sin_ubicar && <> · <MapPinOff className="ico" aria-hidden /> sin ubicar</>}</div>
           </article>
         </Link>
       ))}

@@ -121,7 +121,7 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   Solicitud existente derivada por el SUA, este campo solo documenta el origen para el
   registro legal.
 - `descopado` (`boolean`): el ejemplar está descopado. **Opcional**, como los anteriores.
-- `plantar` (`enum`): plantar árboles; Vereda jardín / Cazuela libre / Construir cazuela / ninguna. **Opcional.**
+- `plantar` (`enum`): plantar otro árbol en reemplazo del extraído; Vereda jardín / Cazuela libre / Construir cazuela / ninguna. **Opcional y solo si** `es_extraccion` es verdadero.
 - `nivel_prioridad` (`enum`): Alta/Media/Baja. **Obligatorio.** Es la urgencia con la que
   hay que **ejecutar** la intervención ya dictaminada (por ejemplo, una poda de riesgo
   eléctrico puede necesitar resolverse antes que una de mantenimiento estético), definida

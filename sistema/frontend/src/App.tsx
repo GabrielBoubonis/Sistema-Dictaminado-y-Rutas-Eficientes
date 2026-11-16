@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { CircleCheck, ClipboardList, CloudLightning, CloudUpload, LayoutDashboard, LogOut, RefreshCw, Route as IconoRuta, ScrollText, ShieldAlert, TreeDeciduous, Users, WifiOff, type LucideIcon } from 'lucide-react';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth, type Rol } from './auth';
 import { useSync } from './lib/sync';
@@ -17,20 +18,20 @@ import { Pendientes } from './pages/Pendientes';
 
 function Sincronizacion() {
   const s = useSync();
-  if (!s.online) return <span className="badge off" role="status">SIN SEÑAL{s.pendientes ? ` · ${s.pendientes} pendiente${s.pendientes > 1 ? 's' : ''}` : ''}</span>;
-  if (s.sincronizando) return <span className="badge info" role="status">Sincronizando…</span>;
-  if (s.pendientes) return <span className="badge warn" role="status">{s.pendientes} por sincronizar</span>;
-  return <span className="badge" role="status">✓ Todo sincronizado</span>;
+  if (!s.online) return <span className="badge off" role="status"><WifiOff className="ico" aria-hidden /> SIN SEÑAL{s.pendientes ? ` · ${s.pendientes} pendiente${s.pendientes > 1 ? 's' : ''}` : ''}</span>;
+  if (s.sincronizando) return <span className="badge info" role="status"><RefreshCw className="ico" aria-hidden /><span className="ocultar-celu">Sincronizando…</span></span>;
+  if (s.pendientes) return <span className="badge warn" role="status"><CloudUpload className="ico" aria-hidden /> {s.pendientes} por sincronizar</span>;
+  return <span className="badge" role="status"><CircleCheck className="ico" aria-hidden /><span className="ocultar-celu">Todo sincronizado</span></span>;
 }
 
-const NAV: Array<{ a: string; t: string; roles: Rol[] }> = [
-  { a: '/solicitudes', t: 'Solicitudes', roles: ['Operador', 'Jefe'] },
-  { a: '/ruta', t: 'Mi ruta', roles: ['Operador', 'Jefe'] },
-  { a: '/tormenta', t: 'Tormenta', roles: ['Operador', 'Jefe', 'Administrador', 'Lector'] },
-  { a: '/dashboard', t: 'Dashboard', roles: ['Jefe', 'Administrador', 'Lector'] },
-  { a: '/usuarios', t: 'Usuarios', roles: ['Administrador'] },
-  { a: '/auditoria', t: 'Auditoría', roles: ['Administrador'] },
-  { a: '/revision', t: 'Para revisar', roles: ['Administrador'] },
+const NAV: Array<{ a: string; t: string; i: LucideIcon; roles: Rol[] }> = [
+  { a: '/solicitudes', t: 'Solicitudes', i: ClipboardList, roles: ['Operador', 'Jefe'] },
+  { a: '/ruta', t: 'Mi ruta', i: IconoRuta, roles: ['Operador', 'Jefe'] },
+  { a: '/tormenta', t: 'Tormenta', i: CloudLightning, roles: ['Operador', 'Jefe', 'Administrador', 'Lector'] },
+  { a: '/dashboard', t: 'Dashboard', i: LayoutDashboard, roles: ['Jefe', 'Administrador', 'Lector'] },
+  { a: '/usuarios', t: 'Usuarios', i: Users, roles: ['Administrador'] },
+  { a: '/auditoria', t: 'Auditoría', i: ScrollText, roles: ['Administrador'] },
+  { a: '/revision', t: 'Para revisar', i: ShieldAlert, roles: ['Administrador'] },
 ];
 
 export function App() {
@@ -55,14 +56,14 @@ export function App() {
   return (
     <div className="app">
       <header className="top">
-        <span className="marca">🌳 Dictaminado</span>
+        <span className="marca"><TreeDeciduous className="ico" aria-hidden /> Dictaminado</span>
         <Sincronizacion />
-        <button onClick={() => logout()} aria-label={`${usuario.nombre_usuario} · Salir (cerrar sesión)`}>{usuario.nombre_usuario} · Salir</button>
+        <button onClick={() => logout()} aria-label={`${usuario.nombre_usuario} · Salir (cerrar sesión)`}><span className="ocultar-celu">{usuario.nombre_usuario}</span><LogOut className="ico" aria-hidden /></button>
       </header>
       <nav className="nav" aria-label="Principal">
         {nav.map((n) => (
           <NavLink key={n.a} to={n.a} className={({ isActive }) => (isActive ? 'activo' : '')}>
-            {n.t}{n.a === '/tormenta' && hayTormenta && <span className="tormenta-pulso" aria-label="Hay solicitudes de tormenta pendientes" />}
+            <n.i className="ico" aria-hidden />{n.t}{n.a === '/tormenta' && hayTormenta && <span className="tormenta-pulso" aria-label="Hay solicitudes de tormenta pendientes" />}
           </NavLink>
         ))}
       </nav>

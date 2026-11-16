@@ -120,7 +120,7 @@ export function Dashboard() {
       {error && <div className="error" role="alert">{error}</div>}
       {d && (<>
         <Tarjetas m={d.general} titulo="General (incluye tormenta)" />
-        <Tarjetas m={d.tormenta} titulo="⛈ Solo tormenta" />
+        <Tarjetas m={d.tormenta} titulo="Solo tormenta" />
         <p className="ayuda">Cada re-derivación por vencimiento cuenta como un evento independiente, aunque sea el mismo Número de SUA-Año.</p>
         <div className="grid2 graficos">
           <Dona m={d.general} titulo="Avance general" />

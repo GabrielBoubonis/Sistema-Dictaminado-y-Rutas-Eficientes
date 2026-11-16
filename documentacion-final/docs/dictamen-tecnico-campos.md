@@ -32,6 +32,7 @@ equivalente en `er-modelo.md` (entidad `Dictamen`)._
 | Extracción (Bloque 2) | Casillero booleano | `es_extraccion` |
 | Perímetro del tronco (Bloque 2) | Numérico en metros (hasta 20), visible solo si Extracción está marcada | `perimetro_tronco` |
 | Motivo de extracción (Bloque 2) | Selección entre 12 opciones, visible solo si Extracción está marcada | `motivo_extraccion` |
+| Plantar (Bloque 2) | Plantar otro árbol en reemplazo del que se extrae: Vereda jardín / Cazuela libre / Construir cazuela / no se planta. Visible solo si Extracción está marcada | `plantar` |
 | Sin trabajo (Bloque 5) | Casillero booleano | `es_sin_trabajo` |
 | Motivo de sin trabajo (Bloque 5) | Selección entre 6 opciones; "Sin trabajo" es excluyente con Extracción y con los trabajos (RF-61) | `motivo_sin_trabajo` |
 
@@ -56,7 +57,6 @@ _Deshabilitado por completo si en el Paso 2 se marcó Extracción (RF-46; ver no
 | Media tensión | Casillero booleano | `media_tension` |
 | De oficio | Casillero booleano | `de_oficio` |
 | Descopado | Casillero booleano | `descopado` |
-| Plantar | Plantar árboles. Selección: Vereda jardín / Cazuela libre / Construir cazuela / ninguna | `plantar` |
 | Fotografías del ejemplar\* | Mínimo 1, obligatorio (RF-45) | Entidad `Fotografia` (`archivo_referencia`, `orden`) |
 
 ## Paso 5 — Observaciones y firma
@@ -90,13 +90,13 @@ _Transcriptas del formulario físico "Dictamen Técnico de Arbolado" (Secretarí
 | Casilleros de información adicional | Urgente, Árbol frente a garage, Media tensión, De oficio, Descopado |
 | Especie | Catálogo de 76 nombres comunes del reporte real (Fresno, Plátano, Ficus, Ligustro, Jacarandá…, más "Sin determinar"); se puede agregar una desde el selector |
 
-_Nota: en el papel el casillero de cada bloque (Extracción, Trabajos subterráneos, Trabajos aéreos, Sin trabajo) se marca primero y después los motivos o ítems. "Sin trabajo" es excluyente con los otros tres (RF-61). En el papel la lista de extracción es de casilleros; el sistema la modela como una selección única (`motivo_extraccion`), a confirmar con la Dirección si un mismo ejemplar puede tener más de un motivo. Según el reporte real, "Agrandamiento de cazuela" es un trabajo subterráneo y no una opción de Plantar (decisión del usuario, 13/11/2026)._
+_Nota: en el papel el casillero de cada bloque (Extracción, Trabajos subterráneos, Trabajos aéreos, Sin trabajo) se marca primero y después los motivos o ítems. "Sin trabajo" es excluyente con los otros tres (RF-61). En el papel la lista de extracción es de casilleros; el sistema la modela como una selección única (`motivo_extraccion`), a confirmar con la Dirección si un mismo ejemplar puede tener más de un motivo. Según el reporte real, "Agrandamiento de cazuela" es un trabajo subterráneo y no una opción de Plantar (decisión del usuario, 13/11/2026). Solo se planta otro árbol cuando se extrae el existente (decisión del usuario, 16/11/2026; en el reporte real, 610 de los 655 casos con Plantar tienen extracción)._
 
 ---
 
 ## Conteo total
 
-12 (Paso 1) + 6 (Paso 2) + 2 (Paso 3, cada una admite múltiples filas) + 8 (Paso 4) + 3
+12 (Paso 1) + 7 (Paso 2) + 2 (Paso 3, cada una admite múltiples filas) + 7 (Paso 4) + 3
 (Paso 5) ≈ 26 campos de carga directa, sin contar los derivados automáticamente por el
 sistema (fecha de emisión, hash de firma) ni los de solo lectura precargados desde la
 Solicitud.

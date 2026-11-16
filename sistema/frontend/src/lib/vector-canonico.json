@@ -36,7 +36,7 @@
   "media_tension": false,
   "de_oficio": false,
   "descopado": true,
-  "plantar": "Cazuela libre",
+  "plantar": null,
   "nivel_prioridad": "Media",
   "observaciones": "Ñandú: acentos y \"comillas\"",
   "fotos": [
@@ -46,5 +46,5 @@
   "firmado_sin_conexion": false
  },
  "usuario": "mrossi0",
- "hash": "ce56bbd88a9b984a77651cc582be518b7444751705b2956618eb4f3c71d6386f"
+ "hash": "3e3a7062b5fc01dcf256c7653b33eb8929fd2d1111a5f39fd8b1ec6f73793759"
 }

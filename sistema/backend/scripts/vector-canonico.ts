@@ -7,7 +7,7 @@ const p = dictamenSchema.parse({
   distancia_medianera_referencia: 1.4, cantidad_frente: 2, nivel_dano_vereda: 'Alto', es_extraccion: false, es_sin_trabajo: false,
   trabajos_aereos: ['4.2 Liberación de conductores aéreos', '4.10 Reducción de altura de copa'],
   trabajos_subterraneos: [{ tipo_trabajo: 'Corte vertical de raíces', distancia_borde: 0.8 }, { tipo_trabajo: 'Corte horizontal de raíces', profundidad_cm: 15 }],
-  descopado: true, complejidad: 'Baja', plantar: 'Cazuela libre', nivel_prioridad: 'Media', observaciones: 'Ñandú: acentos y "comillas"',
+  descopado: true, complejidad: 'Baja', plantar: null, nivel_prioridad: 'Media', observaciones: 'Ñandú: acentos y "comillas"',
   fotos: [{ contenido_base64: Buffer.from('/9j/AAAAAAAAAA==').toString('base64') }, { contenido_base64: 'QUJDREVGR0g=' }],
 });
 console.log(JSON.stringify({ entrada: { ...p, fotos: p.fotos.map((f) => f.contenido_base64) }, usuario: 'mrossi0', hash: calcularHash(p, 'mrossi0').hash }, null, 1));

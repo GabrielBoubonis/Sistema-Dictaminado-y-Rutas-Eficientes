@@ -78,6 +78,7 @@ entity "Dictamen" as dictamen {
   es_extraccion : boolean
   perimetro_tronco : decimal
   motivo_extraccion : enum
+  plantar : enum
   --
   es_sin_trabajo : boolean
   motivo_sin_trabajo : enum
@@ -88,7 +89,6 @@ entity "Dictamen" as dictamen {
   media_tension : boolean
   de_oficio : boolean
   descopado : boolean
-  plantar : enum
   --
   nivel_prioridad : enum
   observaciones : string

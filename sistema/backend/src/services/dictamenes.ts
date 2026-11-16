@@ -110,6 +110,10 @@ export function validarReglas(p: DictamenPayload, ahora = new Date()) {
   } else if (p.motivo_extraccion || p.perimetro_tronco) {
     errores.push({ campo: 'motivo_extraccion', mensaje: 'El motivo y el perímetro solo aplican si se marca Extracción' });
   }
+  // Se planta otro árbol solo en reemplazo de uno que se extrae.
+  if (p.plantar && !p.es_extraccion) {
+    errores.push({ campo: 'plantar', mensaje: 'Solo se planta otro árbol cuando se extrae el existente' });
+  }
   if (p.es_sin_trabajo) {
     if (!p.motivo_sin_trabajo) errores.push({ campo: 'motivo_sin_trabajo', mensaje: 'Indicá el motivo de "Sin trabajo"' });
     if (hayTrabajos) errores.push({ campo: 'trabajos', mensaje: '"Sin trabajo" es excluyente con los trabajos aéreos y subterráneos (RF-61)' });
