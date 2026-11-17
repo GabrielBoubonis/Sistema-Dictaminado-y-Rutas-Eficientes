@@ -42,9 +42,9 @@ Los nombres de usuario siempre terminan en un número: inicial del nombre + apel
 | Usuario | Rol | Para probar |
 |---|---|---|
 | `mrossi0`, `cbenite0`, `lfernan0` | Operador | rutas, dictámenes, captor |
-| `pgimene0` | Jefe | dashboard, elegir dictamen vigente cuando hay dos |
+| `pgimene0` | Jefe | dashboard, pestaña Dictaminadas |
 | `asuarez0` | Administrador | usuarios, desbloquear captor, auditoría, "Para revisar" |
-| `tmolina0` | Lector | dashboard y tormenta (solo lectura) |
+| `tmolina0` | Lector | dashboard, tormenta y Dictaminados con descarga de PDF (solo lectura) |
 | `jdiaz0` | Operador | existe localmente pero NO está vigente en la Autenticación Institucional simulada: no puede ingresar |
 
 Un usuario creado desde "Gestión de usuarios" solo puede ingresar si además figura como vigente en la Autenticación Institucional. Como es simulada, en desarrollo se lo da de alta con `POST /api/dev/institucional {"nombre_usuario": "..."}`.
@@ -72,9 +72,9 @@ docker compose logs tunel | grep trycloudflare      # la URL https para abrir en
 
 La URL cambia cada vez y el túnel funciona mientras la PC esté encendida. Sirve para demostrar, no como instalación definitiva.
 
-**Opción B: servidor permanente (recomendada: VM gratuita de Oracle Cloud, paso a paso en [DESPLIEGUE.md](DESPLIEGUE.md)).** `docker-compose.prod.yml` levanta base, app, Caddy (HTTPS automático) y backup diario. La app necesita un proceso Node siempre activo (tareas programadas, envío al SUA con reintentos), PostgreSQL y disco para las fotos, por eso **Vercel no es adecuado** (funciones sin estado, sin disco persistente ni procesos de fondo). Sirven Render, Fly.io o Railway (o un VPS) con la imagen del `Dockerfile` y una base PostgreSQL (la propia del proveedor o Neon, que tiene plan gratuito). Definir `DATABASE_URL`, `JWT_SECRET` (largo y aleatorio), `WEBAUTHN_RP_ID` y `WEBAUTHN_ORIGIN` con el dominio final y montar un volumen en `/data/uploads`. **Cloudflare Pages/Workers tampoco** corre este backend; sí sirve su túnel (Opción A).
+**Opción B: servidor permanente (la que usa la demo).** Una VM gratuita de Oracle Cloud corre `docker-compose.prod.yml`: base, app, Caddy (HTTPS automático) y copia diaria. Paso a paso en [DESPLIEGUE.md](DESPLIEGUE.md). La app necesita un proceso Node siempre activo (tareas programadas, envío al SUA con reintentos), PostgreSQL y disco para las fotos; por eso se descartaron Vercel, Cloudflare Pages/Workers, Render (se duerme y la base vence), Fly.io, Railway y Koyeb (sin plan gratuito real). Detalle en `documentacion-final/docs/decisiones-tecnicas.md`.
 
-Nada de esto pudo probarse acá (no hay Docker daemon ni salida a internet en el entorno de desarrollo): el `Dockerfile` y el `docker-compose.yml` están escritos pero **sin ejecutar**; la derivación del origen de WebAuthn sí tiene test.
+La demo está en `https://proyecto-dictaminadoyrutaseficientes.duckdns.org/`. Para actualizarla, en la VM: `git pull` y `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build` (aplica `init.sql` solo al arrancar).
 
 La primera vez que un ingeniero firma, la app le pide registrar su huella (una sola vez por usuario y captor).
 
@@ -85,27 +85,31 @@ El mapa usa teselas de OpenStreetMap. La geocodificación usa por defecto **Geor
 ### Tests
 
 ```bash
-cd backend && npm test              # 66 tests contra una PostgreSQL real (crea la base arbolado_test sola)
-cd frontend && npm test             # 11 tests (hash de firma compartido con el servidor, cola cifrada, reanudar sin señal, reglas del formulario)
+cd backend && npm test              # 86 tests contra una PostgreSQL real (crea la base arbolado_test sola)
+cd frontend && npm test             # 15 tests (hash de firma compartido con el servidor, cola cifrada, reanudar sin señal, reglas del formulario)
 ```
 
-`TEST_DATABASE_URL` cambia la base de pruebas (por defecto `postgresql://postgres:postgres@localhost:5432/arbolado_test`).
+`TEST_DATABASE_URL` cambia la base de pruebas (por defecto `postgresql://postgres:postgres@localhost:5432/arbolado_test`). Si la primera corrida tras arrancar Docker falla por tiempo (30 s), repetirla: es la base recién levantada.
 
 Prueba de punta a punta (con el servidor corriendo y la PWA compilada): `pip install playwright && playwright install chromium`, y desde `e2e/`: `E2E_DATABASE_URL=postgresql://... python3 e2e.py`. Usa un autenticador WebAuthn virtual y simula la pérdida de conexión. Reinicia los datos de prueba al empezar. Deja capturas en `e2e/capturas/`.
 
 ## Qué se probó y qué no
 
 **Probado automáticamente**
-- Backend (66 tests con PostgreSQL real): login y mensaje genérico (RF-50), límite de intentos con espera creciente (RNF-19), caída de la Autenticación Institucional sin contar como intento, tope de sesión de 7 días (RNF-20), bloqueo, desbloqueo y revocación de captores con auditoría (RF-52, RF-60), auditoría inmutable a nivel de base de datos (RF-54), rutas (distrito opcional, cantidades por prioridad, zona, franjas de 2 días, vecino más próximo, caída de ORS, reservas sin duplicar aunque dos ingenieros pidan a la vez, corte de las 18:00), dictámenes (RF-45, RF-46, RF-56, RF-61, RF-21 con dos envíos simultáneos, idempotencia por UUID), segundo factor WebAuthn con un autenticador por software (la aserción tiene que corresponder al contenido y a una credencial del mismo usuario), hash de firma, sincronización offline con integridad no verificada (RF-53), conflicto entre dos dictámenes y elección del Jefe (RF-59), envío al SUA con reintentos de espera creciente (RF-25), dashboard (RF-37 y RF-44), tormenta, validación de datos del SUA (RNF-18).
-- Frontend (11 tests): el hash de firma calculado en el navegador coincide con el del servidor para el mismo dictamen; la cola offline se guarda cifrada y no se puede alterar; reanudar sin señal solo el mismo día y antes de los 7 días; reglas del formulario.
-- Prueba de punta a punta en Chromium con pantalla de celular: login, generar ruta, completar los 5 pasos, registrar huella y firmar (autenticador virtual), repetir **sin conexión** (queda cifrado en IndexedDB y no llega al servidor), volver la conexión (se sincroniza solo y se vacía la cola), reanudar sin señal, bloqueo a los 5 intentos con código y desbloqueo por un Administrador, y las pantallas de Administrador y Jefe.
+- Backend (86 tests con PostgreSQL real): login y mensaje genérico (RF-50), límite de intentos (RNF-19), tope de sesión (RNF-20), captores bloqueados y revocados (RF-52, RF-60), auditoría inmutable (RF-54), rutas (criterios, franjas de 2 días, vecino más próximo, recorrido por calles RF-63, caída de ORS, reservas sin duplicar, corte de las 18:00), dictámenes (RF-45, RF-46, RF-56, RF-61, RF-21, fecha del día de la firma, Plantar solo con extracción, idempotencia), firma con WebAuthn por software, sincronización offline e integridad (RF-53), dictamen duplicado: queda el primero que llegó (RF-59), dictaminados con PDF para el Lector (RF-64), envío al SUA con reintentos (RF-25), dashboard, tormenta, catálogo de especies, y carga con 7 ingenieros a la vez (RNF-02, RNF-03, RNF-15).
+- Frontend (15 tests): hash de firma idéntico al del servidor, cola offline cifrada, reanudar sin señal, reglas del formulario y fecha en hora de Argentina.
 
-**NO probado — conviene que lo verifique quien tenga el celular**
-- Un Android real: huella o reconocimiento facial reales, cámara, "Instalar app", comportamiento del service worker y de IndexedDB con poca memoria, rendimiento.
-- OpenRouteService real: no había clave ni salida a internet, así que se usó el simulador (distancias en línea recta × 1,3). El código que llama a la API real está escrito pero no se ejecutó.
+**Verificado a mano**
+- Android real: la PWA se instala y la firma con huella funciona.
+- OpenRouteService real con la clave del equipo (matriz en alrededor de 1 s; recorrido por calles).
+- Docker y la demo en Oracle Cloud: HTTPS, encabezados de seguridad, `/api/dev` apagado y copia diaria.
+- Capturas en tamaño celular y escritorio de las pantallas rediseñadas.
+
+**NO probado**
+- En el celular real: cámara y modo sin señal.
 - El SUA y la Autenticación Institucional son simulados (tablas locales). Los contratos reales pueden ser distintos.
-- Mapa sin conexión: solo se ven las teselas que ya se miraron con señal; los puntos y la ruta sí se dibujan.
-- No se hizo una auditoría formal de accesibilidad (hay etiquetas, foco visible, contraste alto y botones de 48 px, pero no se corrió una herramienta como axe), ni pruebas de carga (RNF-15), ni backups (RNF-11). RNF-22 (captor dedicado, sin apagado ni modo avión sin PIN) es configuración del dispositivo, no del software.
+- Auditoría de accesibilidad con herramienta (axe) y revisión en distintos modelos de celular (RNF-09).
+- RNF-22 (captor dedicado, sin apagar datos ni Wi-Fi sin desbloquear) es configuración del dispositivo, no del software.
 
 ## Decisiones y desvíos respecto de `arquitectura-tecnica.md`
 
@@ -114,7 +118,7 @@ Prueba de punta a punta (con el servidor corriendo y la PWA compilada): `pip ins
 - La API cuelga de **`/api`**. Endpoints agregados a los del resumen: `GET /auth/webauthn/estado`, `GET /auth/webauthn/credenciales`, `POST /auth/webauthn/registro/{opciones,verificar}`, `POST /auth/dispositivo/bloqueo`, `GET /auth/dispositivo/:id`.
 - **El desafío de WebAuthn es el hash SHA-256 del dictamen**, no un valor emitido por el servidor. Así la huella queda atada a ese contenido exacto y funciona igual sin conexión; la repetición se evita con el UUID único del dictamen. Por eso no se exige el contador de la credencial.
 - La cola offline se cifra con AES-GCM (RNF-16) con una clave **no exportable** guardada en IndexedDB. Protege contra la lectura casual y los volcados, pero no reemplaza el cifrado de disco ni el PIN del captor.
-- Las solicitudes en conflicto (dos dictámenes firmados, RF-59) no entran en rutas y no se pueden dictaminar en línea hasta que un Jefe elige.
+- Dictamen duplicado (RF-59): en línea el segundo se rechaza; si llega por sincronización, queda vigente el primero que llegó y el otro se guarda en el historial como no vigente. Ya no elige un Jefe (16/11/2026).
 - Endpoints solo de desarrollo (no existen con `NODE_ENV=production`): `/api/dev/simular` (caídas de SUA, ORS, geocodificador y Autenticación), `/api/dev/institucional`, `/api/dev/reset-throttle`. Los retos de registro de WebAuthn se guardan en memoria (una sola instancia del servidor).
 
 ## Pendientes y cuestiones abiertas

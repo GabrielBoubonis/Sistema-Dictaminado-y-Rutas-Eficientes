@@ -40,10 +40,11 @@ sistema/                               código
     src/providers/index.ts             SUA y autenticación simulados (interfaces IAuthProvider, IReclamoProvider), geocodificadores y matriz de distancias
     src/routes/*.ts  src/services/*.ts auth, usuarios, solicitudes, rutas, dictamenes, sync, especies, revision, auditoria, dashboard, tormenta
     src/catalogos.json                 listas cerradas del dictamen (copia en frontend/src y en datos-prueba)
-    test/*.test.ts                     66+ tests; test/soft-authenticator.ts simula una huella por software
+    test/*.test.ts                     86 tests; test/soft-authenticator.ts simula una huella por software
   frontend/src/{pages,components,lib}  lib/offline (cola cifrada), lib/canonical.ts (hash de firma), lib/reglas.ts (validación del formulario)
   e2e/e2e.py                           prueba de punta a punta con Chromium
-  Dockerfile, docker-compose.yml       sin ejecutar nunca (ver sección 8)
+  Dockerfile, docker-compose.prod.yml  imagen y despliegue de producción (probados; ver sección 8 y DESPLIEGUE.md)
+README.md                              presentación del proyecto (raíz)
 registro-de-cambios.md                 qué se cambió y por qué, para que lo lea el usuario (agregar una entrada por cambio)
 datos-prueba/                          datos de prueba (el seed los lee de sistema/backend/src/../../../datos-prueba)
 documentacion-final/                   documentos del TP (ver sección 9)
@@ -89,7 +90,7 @@ Equipo del usuario: Windows 11, Node 24, Docker Desktop instalado; PostgreSQL no
 
 ## 7. Estado actual
 
-Hecho y verificado (16/10/2026, equipo del usuario): 76 tests de backend (incluye `test/carga.test.ts`: 7 ingenieros a la vez + 70 dictámenes, y 100 de tormenta; p95 < 200 ms), 13 de frontend (incluye RNF-04), prueba de punta a punta (login, ruta, 5 pasos del dictamen, firma con autenticador virtual, repetir sin conexión, sincronizar, bloqueo/desbloqueo, pantallas de Administrador y Jefe).
+Hecho y verificado (16/11/2026, equipo del usuario): 86 tests de backend (incluye `test/carga.test.ts`: 7 ingenieros a la vez + 70 dictámenes, y 100 de tormenta), 15 de frontend (incluye RNF-04). Prueba de punta a punta corrida por última vez el 16/10/2026; hoy en la PC del usuario faltan Playwright para Python y `psql`. Cubre: login, ruta, 5 pasos del dictamen, firma con autenticador virtual, repetir sin conexión, sincronizar, bloqueo/desbloqueo, pantallas de Administrador y Jefe.
 
 ## 8. Pendiente y problemas abiertos (empezá por acá)
 
@@ -108,6 +109,6 @@ Hecho y verificado (16/10/2026, equipo del usuario): 76 tests de backend (incluy
 
 ## 9. Documentación
 
-Vive en `documentacion-final/` (`docs/` y `diagramas/`): `stakeholders`, `requisitos`, `alcance`, `historias-de-usuario`, `casos-de-uso`, `DoR`, `slicing`, `er-modelo`, `diseño-ui`, `dictamen-tecnico-campos`, `arquitectura-tecnica`, más `diagramas/` (PlantUML y wireframes SVG). Los datos de prueba están en `datos-prueba/`.
+Vive en `documentacion-final/` (`docs/` y `diagramas/`): `stakeholders`, `requisitos`, `alcance`, `historias-de-usuario`, `casos-de-uso`, `DoR`, `slicing`, `er-modelo`, `diseño-ui`, `dictamen-tecnico-campos`, `arquitectura-tecnica`, `decisiones-tecnicas` (defensa de cada tecnología frente a sus alternativas, 17/11/2026), `resumen-tecnologico` (tecnologías por capa y alojamiento de la demo), más `diagramas/` (PlantUML y wireframes SVG). Los datos de prueba están en `datos-prueba/`.
 
 Convenciones: **la documentación se mantiene al día con cada cambio de código y su formato no se negocia** (tablas, ancho de línea, notas breves, PlantUML). Los gemelos `*_word.txt` no están en `documentacion-final/` y el usuario dijo que no hace falta mantenerlos (16/10/2026). Las notas dentro de los `.md` son breves; el detalle técnico va en `arquitectura-tecnica.md`. Devolución del profe (13/10/2026): 64/65; ya se corrigieron la tabla de Entregas del README, `slicing.md` en minúscula, la oración duplicada de la Decisión 10 y RNF-02 ("hasta 7 ingenieros"). La nota final todavía no está cerrada.

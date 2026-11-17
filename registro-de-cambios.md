@@ -4,6 +4,36 @@ Cambios hechos al sistema y a la documentación, del más nuevo al más viejo.
 
 ---
 
+## 17/11/2026 — Orden del repositorio
+
+- `README.md` nuevo en la raíz: qué resuelve el sistema, la demo en línea, cómo está
+  organizado el repo y qué leer primero para evaluarlo.
+- Se borró el `package-lock.json` vacío de la raíz (lo había creado un `npx` por error).
+- `documentacion-final/README.md`: el árbol de carpetas ahora refleja el repo real (no
+  existen `RECURSOS.md` ni `cuestionario/`; suma los documentos nuevos y `sistema/`).
+- `sistema/README.md` al día: 86 y 15 tests, qué se verificó a mano (Android, ORS real,
+  Oracle), la demo en producción, sin la elección del Jefe y sin los proveedores
+  descartados como opción.
+- `CLAUDE.md`: estructura y estado actual al día.
+- `documentacion-final/integrantes.md` creado con los integrantes del grupo.
+
+---
+
+## 17/11/2026 — Documentos de defensa técnica y resumen tecnológico
+
+- `documentacion-final/docs/decisiones-tecnicas.md` (nuevo): por qué elegimos cada
+  tecnología (PWA, React, Node, PostgreSQL, Prisma, SHA-256, WebAuthn, JWT, bcrypt,
+  AES-GCM, Leaflet, OpenRouteService, Georef, zod, PDFKit, pruebas, Docker y Caddy en
+  Oracle), qué alternativas comparamos y por qué no. Cierra con los límites conocidos,
+  entre ellos que la firma es **electrónica**, no "firma digital" con certificado (Ley
+  25.506).
+- `documentacion-final/docs/resumen-tecnologico.md` (nuevo): tecnologías por capa con su
+  versión, servicios externos (costo y qué pasa si no responden), cómo está alojada la
+  demo y qué está verificado y qué no.
+- Agregados a la estructura del `README.md` de la documentación y a `CLAUDE.md`.
+
+---
+
 ## 16/11/2026 — Dashboard nuevo, sección de dictaminados y sin elección del Jefe
 
 ### Ya no elige el Jefe entre dos dictámenes (RF-59)

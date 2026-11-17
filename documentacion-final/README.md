@@ -60,34 +60,40 @@ Cronograma del cuatrimestre (2026). Las fechas son las de la cátedra.
 
 ## Estructura del repositorio
 
-Todos los nombres de archivo y de carpeta van en minúscula y con guiones medios. Las únicas excepciones son los nombres que ya existían así: `README.md`, `DoR.md`, `integrantes.md` y `RECURSOS.md`.
+Todos los nombres de archivo y de carpeta van en minúscula y con guiones medios. Las únicas excepciones son los nombres que ya existían así: `README.md`, `DoR.md`, `CLAUDE.md` e `integrantes.md`.
 
 ```
 /
-├── README.md
-├── integrantes.md
-├── RECURSOS.md                    ← leer antes de empezar: prerrequisitos, cheatsheet de git, recursos
-├── docs/
-│   ├── stakeholders.md
-│   ├── requisitos.md
-│   ├── alcance.md
-│   ├── historias-de-usuario.md
-│   ├── casos-de-uso.md
-│   ├── DoR.md
-│   ├── slicing.md
-│   ├── er-modelo.md
-│   ├── diseño-ui.md
-│   ├── dictamen-tecnico-campos.md  ← detalle de campos del formulario físico (respaldo de diseño-ui.md)
-│   └── arquitectura-tecnica.md     ← decisiones técnicas de implementación (stack, API, seguridad); no forma parte de las plantillas de la cátedra
-├── datos-prueba/                   ← datos ficticios para cargar la demo (ver README-datos-prueba.md)
-├── diagramas/
-│   ├── casos-de-uso.puml
-│   ├── er.puml
-│   ├── estados-solicitud.puml      ← estados de la Solicitud y del Dictamen
-│   ├── actividad-dictamen.puml     ← flujo de emitir dictamen, con modo offline y sincronización
-│   ├── secuencia-login-firma.puml  ← login y firma con segundo factor
-│   └── wireframes/
-└── cuestionario/
+├── README.md                          ← presentación del proyecto y punto de partida
+├── CLAUDE.md                          ← contexto para asistentes de código (Claude Code, Antigravity)
+├── registro-de-cambios.md             ← qué se cambió y por qué, del más nuevo al más viejo
+├── documentacion-final/
+│   ├── README.md                      ← este archivo
+│   ├── integrantes.md
+│   ├── docs/
+│   │   ├── stakeholders.md
+│   │   ├── requisitos.md
+│   │   ├── alcance.md
+│   │   ├── historias-de-usuario.md
+│   │   ├── casos-de-uso.md
+│   │   ├── DoR.md
+│   │   ├── slicing.md
+│   │   ├── er-modelo.md
+│   │   ├── diseño-ui.md
+│   │   ├── dictamen-tecnico-campos.md ← detalle de campos del formulario físico (respaldo de diseño-ui.md)
+│   │   ├── arquitectura-tecnica.md    ← cómo está construido (stack, API, seguridad); no forma parte de las plantillas de la cátedra
+│   │   ├── decisiones-tecnicas.md     ← por qué elegimos cada tecnología y qué alternativas descartamos
+│   │   └── resumen-tecnologico.md     ← todas las tecnologías del sistema y cómo está alojada la demo
+│   └── diagramas/
+│       ├── casos-de-uso.puml
+│       ├── er.puml
+│       ├── estados-solicitud.puml     ← estados de la Solicitud y del Dictamen
+│       ├── actividad-dictamen.puml    ← flujo de emitir dictamen, con modo offline y sincronización
+│       ├── secuencia-login-firma.puml ← login y firma con segundo factor
+│       └── wireframes/
+├── datos-prueba/                      ← datos ficticios para cargar la demo (ver README-datos-prueba.md)
+├── sistema/                           ← código: backend, frontend, prueba e2e, Docker (ver sistema/README.md)
+└── .claude/skills/                    ← skill de diseño de interfaces usado en el rediseño (ui-ux-pro-max, MIT)
 ```
 
 ## Uso de inteligencia artificial
