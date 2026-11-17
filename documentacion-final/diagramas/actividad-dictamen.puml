@@ -40,8 +40,8 @@ if (¿Hay conexión?) then (sí)
   |Servidor|
   :Recibe el dictamen (UUID como\nclave de idempotencia);
   :Recalcula el hash (RF-53)\ny revalida que no exista otro\ndictamen activo (RF-21);
-  if (¿Conflicto con otro dictamen activo?) then (sí)
-    :La Solicitud pasa a Pendiente-revisión\npara decisión de un Jefe;
+  if (¿Ya hay otro dictamen vigente?) then (sí)
+    :En línea: se rechaza (RF-21).\nPor sincronización: se guarda como\nno vigente en el historial (RF-59);
     stop
   else (no)
     :Guarda el dictamen y\nmarca la Solicitud como Dictaminada;

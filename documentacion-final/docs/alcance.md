@@ -79,8 +79,10 @@ seguimiento para la Dirección.
 - **Solo puede existir un dictamen activo por ejemplar en un momento dado.** Si dos
   ingenieros intentan dictaminar el mismo caso, se acepta el primero que confirma el
   envío; el segundo intento es rechazado por el sistema. Si uno de los dos dictámenes se firmó sin
-  conexión y recién llega al sincronizar, el sistema conserva ambos y un **Jefe** elige cuál
-  queda vigente; el otro queda en el historial como no vigente (RF-59).
+  conexión y recién llega al sincronizar, queda vigente el que llegó primero y el otro se
+  guarda en el historial como no vigente, sin que nadie tenga que decidir (RF-59).
+- Las solicitudes dictaminadas se consultan en una sección propia, desde donde se descarga
+  el PDF de su dictamen; también la ve el Lector (RF-64).
 - "Sin trabajo" es excluyente con Extracción y con los trabajos aéreos y subterráneos, y un
   dictamen no puede firmarse sin alguna intervención marcada ni "Sin trabajo" (RF-61).
 - El dictamen completo, firmado digitalmente (hash + timestamp + usuario), se guarda en la

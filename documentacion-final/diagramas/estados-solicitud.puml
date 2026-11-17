@@ -30,10 +30,11 @@ note right of SOL
 end note
 
 note right of DIC
-  Conflicto: si al sincronizar ya existe otro
-  dictamen activo para el mismo ejemplar (RF-21),
-  la Solicitud pasa a Pendiente-revisión para que
-  un Jefe decida cuál prevalece.
+  Dictamen duplicado: si al sincronizar ya existe otro
+  dictamen vigente para el mismo ejemplar (RF-21),
+  queda vigente el primero que llegó y el nuevo se
+  guarda como no vigente; la Solicitud sigue
+  Dictaminada (RF-59).
 end note
 
 @enduml

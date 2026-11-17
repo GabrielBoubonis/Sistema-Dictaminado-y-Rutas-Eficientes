@@ -456,31 +456,33 @@ _Cada historia debe incluir formato clásico, criterios de aceptación y validac
 
 ---
 
-## HU-17 — Elegir qué dictamen queda vigente cuando hay dos para el mismo caso
+## HU-17 — Consultar los casos dictaminados y descargar su PDF
 
 | Campo | Detalle |
 |-------|---------|
-| Historia | Como Jefe, quiero ver los dos dictámenes firmados para el mismo caso y elegir cuál queda vigente, para que el caso tenga un único dictamen válido sin perder el otro. |
+| Historia | Como Operador, Jefe, Lector o Administrador, quiero ver en un solo lugar las solicitudes ya dictaminadas y descargar el PDF de cada dictamen, para tener a mano la documentación de los casos cerrados. |
 | Módulo | Dictaminación |
-| Requisitos relacionados | RF-21, RF-59 |
+| Requisitos relacionados | RF-26, RF-64 |
+
+_Reemplaza a la historia "Elegir qué dictamen queda vigente cuando hay dos para el mismo caso", eliminada el 16/11/2026: ahora queda vigente el primero que llega (RF-59)._
 
 ### Criterios de aceptación
 
-1. Dado que dos ingenieros dictaminaron el mismo caso (uno de ellos sin señal), la solicitud pasa a Pendiente-revisión y no se descarta ninguno de los dos dictámenes.
-2. Dado que soy Jefe, cuando abro el detalle del caso, veo ambos dictámenes con autor, fecha de firma y contenido.
-3. Cuando elijo uno, ese queda vigente, el otro queda en el historial como no vigente y la solicitud vuelve a Dictaminada.
-4. La elección queda registrada con quién la hizo, fecha y hora.
+1. Dado que soy Operador o Jefe, en Solicitudes tengo una pestaña "Dictaminadas"; dado que soy Lector o Administrador, tengo una sección "Dictaminados" en el menú.
+2. La lista muestra las solicitudes dictaminadas, la más reciente primero, y puedo buscar por dirección, N.° de SUA o ingeniero, y filtrar por distrito.
+3. Cuando toco "Descargar PDF", se descarga el PDF del dictamen vigente de esa solicitud.
+4. Dado que no tengo conexión, el sistema me avisa que la lista necesita señal.
 
 ### Validación INVEST
 
 | Criterio | ¿Se cumple? | Observación |
 |----------|-------------|-------------|
-| Independiente | Parcial | Depende de HU-06 y HU-09 para que existan dos dictámenes; se prueba cargando dos dictámenes del mismo caso. |
-| Negociable | Sí | La forma de mostrar los dos dictámenes (lado a lado o en pestañas) se define en la UI sin cambiar el valor. |
-| Valiosa | Sí | Se verifica con el criterio 3: el caso queda con un solo dictamen vigente y nada se pierde. |
-| Estimable | Sí | Es una pantalla de comparación y una acción de elegir, sobre datos que ya existen. |
-| Pequeña | Sí | No incluye volver a dictaminar ni notificaciones a los ingenieros. |
-| Verificable | Sí | Se comprueba con los criterios 3 y 4: un dictamen vigente, el otro no vigente y la elección registrada. |
+| Independiente | Parcial | Depende de HU-06 (que existan dictámenes) y reutiliza el PDF de la descarga de dictámenes. |
+| Negociable | Sí | La ubicación (pestaña o sección) y los filtros pueden ajustarse sin cambiar el valor. |
+| Valiosa | Sí | Se verifica con el criterio 3: el Lector, que antes no podía, obtiene el PDF. |
+| Estimable | Sí | Es una lista con filtros sobre datos que ya existen y una descarga que ya existe. |
+| Pequeña | Sí | No incluye editar ni reenviar dictámenes. |
+| Verificable | Sí | Se comprueba con los criterios 1 y 3 ingresando con cada rol y descargando un PDF. |
 
 ---
 

@@ -10,7 +10,7 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
 **Actores principales** (inician los casos de uso, son los roles del sistema):
 
 - **Operador** — ingeniero de campo. Consulta solicitudes, arma rutas, dictamina.
-- **Jefe** — mismo acceso operativo que el Operador, más el dashboard y la resolución de dictámenes en conflicto.
+- **Jefe** — mismo acceso operativo que el Operador, más el dashboard.
 - **Administrador** — personal del CIL. Gestiona usuarios y roles, desbloquea captores y revisa los casos
   que quedan "para revisar"; en el resto del sistema se comporta como lector.
 - **Lector** — consulta pasiva del dashboard y del protocolo por tormenta.
@@ -30,8 +30,9 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
 | `<<include>>` | CU-12 incluye CU-04 | El protocolo por tormenta reutiliza el mecanismo de generación de ruta, con criterios propios. |
 | `<<extend>>` | CU-09 extiende CU-06 | Solo se consulta el dictamen anterior si la solicitud está en estado Pendiente-revisión. |
 | `<<extend>>` | CU-10 extiende CU-06 | Solo aplica si el dispositivo no tiene conexión al momento de firmar. |
+| `<<include>>` | CU-15 incluye CU-08 | Desde la lista de dictaminadas se descarga el PDF de cada dictamen. |
 
-CU-13, CU-14, CU-15 y CU-16 no participan de relaciones `<<include>>`/`<<extend>>`: son casos de uso independientes. CU-13, CU-14 y CU-16 son accesibles únicamente para el Administrador; CU-15, para el Jefe.
+CU-13, CU-14 y CU-16 no participan de relaciones `<<include>>`/`<<extend>>`: son casos de uso independientes y accesibles únicamente para el Administrador. CU-15 incluye CU-08 (descargar el PDF).
 
 ---
 
@@ -304,7 +305,7 @@ CU-13, CU-14, CU-15 y CU-16 no participan de relaciones `<<include>>`/`<<extend>
 | Identificador | CU-08 |
 | Nombre | Descargar dictamen en formato imprimible |
 | Descripción | Un ingeniero descarga un dictamen firmado en formato PDF, para poder imprimirlo como documento legal cuando sea requerido. |
-| Actores | Principal: Operador, Jefe / Secundario: — |
+| Actores | Principal: Operador, Jefe, Lector, Administrador / Secundario: — |
 | Precondiciones | Existe un dictamen firmado para la solicitud consultada. |
 | Postcondiciones | Éxito: el usuario obtiene un archivo con el contenido completo del dictamen y sus datos de firma. / Fallo: no se genera el archivo y el dictamen permanece disponible en el sistema. |
 
@@ -312,7 +313,7 @@ CU-13, CU-14, CU-15 y CU-16 no participan de relaciones `<<include>>`/`<<extend>
 
 | # | Acción (actor) | Reacción (sistema) |
 |---|----------------|--------------------|
-| 1 | El usuario accede al detalle de una solicitud dictaminada. | El sistema muestra el dictamen firmado y la opción de descarga. |
+| 1 | El usuario accede al detalle de una solicitud dictaminada o a la lista de dictaminadas (CU-15). | El sistema muestra el dictamen firmado y la opción de descarga. |
 | 2 | El usuario selecciona la opción de descargar. | El sistema genera el documento con el contenido del dictamen y los datos de la firma (autor y fecha de emisión). |
 | 3 | — | El sistema entrega el archivo al usuario para su descarga. |
 
@@ -395,7 +396,7 @@ CU-13, CU-14, CU-15 y CU-16 no participan de relaciones `<<include>>`/`<<extend>
 | E2 | La señal es intermitente durante el envío. | El sistema no bloquea la interfaz: mantiene el dictamen en cola y reintenta cuando la conexión se estabiliza. |
 | E3 | El usuario termina la jornada con dictámenes sin sincronizar. | El sistema los conserva en el dispositivo y los envía en cuanto haya conexión, aun en jornadas posteriores. |
 | E4 | La sesión se cierra por inactividad estando sin señal. | El sistema permite reanudarla con la contraseña local si se cumplen las condiciones de CU-01, excepción E3 (RF-57), para que el ingeniero pueda seguir dictaminando. |
-| E5 | Al sincronizar, el dictamen firmado sin conexión resulta ser el segundo para un caso que otro ingeniero ya dictaminó. | El sistema no lo descarta: conserva ambos dictámenes, pasa la solicitud a Pendiente-revisión y deja la decisión a un Jefe (CU-15). |
+| E5 | Al sincronizar, el dictamen firmado sin conexión resulta ser el segundo para un caso que otro ingeniero ya dictaminó. | El sistema no lo descarta: queda vigente el que llegó primero, este se guarda en el historial como no vigente (no se envía al SUA) y se le avisa al ingeniero (RF-59). La solicitud sigue Dictaminada. |
 
 | Campo | Detalle |
 |-------|---------|
@@ -548,35 +549,36 @@ CU-13, CU-14, CU-15 y CU-16 no participan de relaciones `<<include>>`/`<<extend>
 
 ---
 
-## CU-15 — Resolver dictámenes en conflicto
+## CU-15 — Consultar solicitudes dictaminadas
 
 | Campo | Detalle |
 |-------|---------|
 | Identificador | CU-15 |
-| Nombre | Resolver dictámenes en conflicto |
-| Descripción | Un Jefe elige cuál de los dos dictámenes firmados para la misma solicitud queda vigente. |
-| Actores | Principal: Jefe / Secundario: — |
-| Precondiciones | El Jefe inició sesión (CU-01) y una solicitud está en Pendiente-revisión por tener dos dictámenes firmados (CU-10, excepción E5). |
-| Postcondiciones | Éxito: un dictamen queda vigente y el otro queda en el historial como no vigente; la solicitud vuelve a Dictaminada. / Fallo: ambos dictámenes se conservan y la solicitud sigue en Pendiente-revisión. |
+| Nombre | Consultar solicitudes dictaminadas |
+| Descripción | Un usuario consulta las solicitudes ya dictaminadas y descarga el PDF de su dictamen vigente. Reemplaza al caso de uso "Resolver dictámenes en conflicto", que se eliminó el 16/11/2026: los dictámenes duplicados ya no los resuelve un Jefe (RF-59). |
+| Actores | Principal: Operador, Jefe, Lector, Administrador / Secundario: — |
+| Precondiciones | El usuario inició sesión (CU-01) y tiene conexión. |
+| Postcondiciones | Éxito: el usuario ve la lista y obtiene el PDF que eligió. / Fallo: no se descarga nada y la lista sigue disponible. |
 
 ### Secuencia normal
 
 | # | Acción (actor) | Reacción (sistema) |
 |---|----------------|--------------------|
-| 1 | El Jefe abre el detalle de una solicitud con dos dictámenes en conflicto. | El sistema muestra ambos dictámenes lado a lado, con autor, fecha de firma y contenido (RF-59). |
-| 2 | El Jefe elige cuál queda vigente y confirma. | El sistema marca el elegido como vigente y el otro como no vigente, lo conserva en el historial, registra quién eligió, fecha y hora, y devuelve la solicitud a Dictaminada. |
+| 1 | El usuario abre la pestaña "Dictaminadas" de Solicitudes (Operador, Jefe) o la sección "Dictaminados" del menú (Lector, Administrador). | El sistema lista las solicitudes dictaminadas, la más reciente primero, con dirección, distrito, especie, resultado, autor y fecha de firma (RF-64). |
+| 2 | El usuario busca por dirección, N.° de SUA o ingeniero, o filtra por distrito. | El sistema muestra solo las que coinciden. |
+| 3 | El usuario toca "Descargar PDF" en una de ellas. | El sistema descarga el PDF del dictamen vigente (CU-08). |
 
 ### Excepciones
 
 | # | Situación | Respuesta del sistema |
 |---|-----------|-----------------------|
-| E1 | El Jefe cierra la pantalla sin confirmar. | El sistema no cambia nada: ambos dictámenes siguen sin resolver. |
-| E2 | Otro Jefe resolvió el conflicto mientras tanto. | El sistema informa que el caso ya fue resuelto y muestra el dictamen vigente. |
+| E1 | El dispositivo no tiene conexión. | El sistema informa que la lista de dictaminadas necesita señal. |
+| E2 | No hay dictaminadas con los filtros elegidos. | El sistema lo informa y permite cambiar los filtros. |
 
 | Campo | Detalle |
 |-------|---------|
-| Rendimiento | El sistema deberá mostrar los dos dictámenes sin demora perceptible. |
-| Frecuencia | Baja: solo cuando dos ingenieros dictaminan el mismo caso, en especial uno de ellos sin señal. |
+| Rendimiento | El sistema deberá mostrar la lista y generar el PDF sin demora perceptible. |
+| Frecuencia | Varias veces por semana: consulta de casos cerrados y pedidos de documentación. |
 | Importancia | Importante |
 | Urgencia | Puede esperar |
 

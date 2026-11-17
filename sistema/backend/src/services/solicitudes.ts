@@ -22,12 +22,10 @@ async function registrarCasoInvalido(ref: string, motivo: string) {
   if (!ya) await prisma.casoRevision.create({ data: { tipo: 'Datos inválidos del SUA', referencia_solicitud: ref, motivo } });
 }
 
-/** Estado de una solicitud, calculado a partir de sus dictámenes (RF-11, RF-12, RF-59). */
+/** Estado de una solicitud, calculado a partir de su dictamen vigente (RF-11, RF-12). */
 export async function calcularEstado(db: Tx, numeroSua: string, anio: number): Promise<string> {
   const sol = await db.solicitud.findUniqueOrThrow({ where: { numero_sua_anio: { numero_sua: numeroSua, anio } } });
   const dicts = await db.dictamen.findMany({ where: { numero_sua: numeroSua, anio }, orderBy: { fecha_firma: 'desc' } });
-  // RF-59: dos dictámenes pendientes de elección → Pendiente-revisión
-  if (dicts.filter((d) => d.vigente === null).length >= 2) return 'Pendiente-revisión';
   const vigente = dicts.find((d) => d.vigente === true);
   if (!vigente) return 'Pendiente';
   // RF-12: re-derivada después de su último dictamen → Pendiente-revisión

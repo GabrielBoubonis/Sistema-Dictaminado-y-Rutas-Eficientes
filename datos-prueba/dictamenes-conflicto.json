@@ -1,5 +1,5 @@
 {
-  "descripcion": "Dos dictámenes firmados para la misma solicitud (48495-2026). Al cargarlos, la solicitud debe quedar en Pendiente-revisión y un Jefe (pgimene0) elige cuál queda vigente (RF-59, CU-15). Ambos tienen vigente = null hasta que se elige.",
+  "descripcion": "Dos dictámenes firmados sin señal para la misma solicitud (48495-2026) por dos ingenieros. Queda vigente el que llegó primero al servidor (101) y el otro (102) queda en el historial como no vigente (RF-59).",
   "dictamenes": [
     {
       "id_dictamen": 101,
@@ -41,7 +41,7 @@
         }
       ],
       "nota_prueba": "Uno de los dos dictámenes en conflicto para la misma solicitud (RF-59). El segundo se firmó sin conexión.",
-      "vigente": null,
+      "vigente": true,
       "descopado": false
     },
     {
@@ -88,7 +88,7 @@
         }
       ],
       "nota_prueba": "Uno de los dos dictámenes en conflicto para la misma solicitud (RF-59). El segundo se firmó sin conexión.",
-      "vigente": null,
+      "vigente": false,
       "descopado": false
     }
   ]

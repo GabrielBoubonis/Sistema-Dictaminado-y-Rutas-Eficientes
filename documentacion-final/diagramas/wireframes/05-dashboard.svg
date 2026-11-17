@@ -1,49 +1,58 @@
-<svg viewBox="0 0 375 812" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo4NGY4Y2Y3My0yODg0LTQ4YzgtOGJkZS0xNjQxNTlhZTljNmEAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaKscjWEovoBkix5o8Xw32n8AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpjYTBkZjIyZC1hMmQ1LTQ1ZjEtOTc1MS1jOTY1Nzk4NTcxYWJscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoC+u5N7ID1d/BtpdqHYKmQwAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggcj2rcej2KRcTeOyJHaYpicFPyGUTGjvKsBda+22YEaGkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaPY+Byx02Rj5GxvzrbPzsl4AAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCCuYEw41f8l1Lz5179xKR6sZA23DgnGMGcyro6ooIlEbWRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBidZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjg0ZjhjZjczLTI4ODQtNDhjOC04YmRlLTE2NDE1OWFlOWM2YS9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjE0ODY0OWJjLWY1YWMtNDllMy04YjhlLTE5NTM1NzUyYjdlZnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCByPatx6PYpFxN47IkdpimJwU/IZRMaO8qwF1r7bZgRoaJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggHdNIqkFZjcIZwuI+XTAJB9X1vKyscEDaqZNSWFa4T86iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggyNOqic/Fpksliqm5TTen0XFLkmMPkKNDpAPm8st2Ajh0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQA6e5PIzPTCYcwQVqu2JYp7z2anls/lUQcPWQFSw2v5qy0ohfDw+U52P37w672pxRIn5KXbJ5BHgFZOPrcXBKHs=</c2pa:manifest></metadata>
+<svg viewBox="0 0 375 812" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
   <rect width="375" height="812" fill="#ffffff"/>
   <rect width="375" height="24" fill="#eeeeee"/>
-
   <rect x="0" y="24" width="375" height="56" fill="#2c3e50"/>
-  <text x="20" y="58" font-size="16" fill="#ffffff" font-weight="bold">Dashboard</text>
-  <rect x="255" y="38" width="100" height="28" rx="6" fill="#34495e"/>
-  <text x="305" y="57" font-size="10" fill="#fff" text-anchor="middle">Sep 2026 ▾</text>
+  <text x="20" y="58" font-size="16" fill="#fff" font-weight="bold">Dashboard</text>
+  <text x="12" y="100" font-size="9" fill="#666">Solicitudes derivadas a la Dirección Técnica · Año 2026</text>
 
-  <!-- tabs -->
-  <rect x="0" y="80" width="375" height="40" fill="#f5f5f5"/>
-  <rect x="12" y="88" width="170" height="24" rx="12" fill="#2c3e50"/>
-  <text x="97" y="104" font-size="10" fill="#fff" text-anchor="middle">General</text>
-  <rect x="192" y="88" width="170" height="24" rx="12" fill="#ffffff" stroke="#ccc"/>
-  <text x="277" y="104" font-size="10" fill="#555" text-anchor="middle">⛈ Tormenta</text>
+  <!-- Filtros de período en una fila, arriba de todo -->
+  <text x="12" y="122" font-size="10" fill="#222" font-weight="bold">Mes</text>
+  <rect x="12" y="128" width="170" height="32" rx="6" fill="#fff" stroke="#999"/><text x="22" y="148" font-size="10" fill="#555">Todo el año ▾</text>
+  <text x="193" y="122" font-size="10" fill="#222" font-weight="bold">Año</text>
+  <rect x="193" y="128" width="170" height="32" rx="6" fill="#fff" stroke="#999"/><text x="203" y="148" font-size="10" fill="#555">2026 ▾</text>
 
-  <!-- KPI cards -->
-  <rect x="12" y="132" width="351" height="70" rx="8" fill="#eaf2f8" stroke="#aed6f1"/>
-  <text x="28" y="158" font-size="11" fill="#2874a6">Solicitudes derivadas</text>
-  <text x="28" y="188" font-size="24" fill="#1b4f72" font-weight="bold">240</text>
+  <!-- Indicadores (KPI) -->
+  <rect x="12" y="172" width="170" height="70" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="24" y="192" font-size="9" fill="#666" font-weight="bold">Derivadas</text><text x="24" y="220" font-size="22" fill="#222" font-weight="bold">42</text><text x="24" y="234" font-size="8" fill="#888">Incluye tormenta</text>
+  <rect x="193" y="172" width="170" height="70" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="205" y="192" font-size="9" fill="#27ae60" font-weight="bold">Dictaminadas</text><text x="205" y="220" font-size="22" fill="#222" font-weight="bold">7</text>
+  <rect x="12" y="250" width="170" height="70" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="24" y="270" font-size="9" fill="#2a78d6" font-weight="bold">Sin dictaminar</text><text x="24" y="298" font-size="22" fill="#222" font-weight="bold">35</text>
+  <rect x="193" y="250" width="170" height="70" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="205" y="270" font-size="9" fill="#666" font-weight="bold">Avance</text><text x="205" y="298" font-size="22" fill="#222" font-weight="bold">17 %</text>
+  <rect x="205" y="306" width="146" height="6" rx="3" fill="#eee"/><rect x="205" y="306" width="25" height="6" rx="3" fill="#27ae60"/>
 
-  <rect x="12" y="212" width="168" height="70" rx="8" fill="#eafaf1" stroke="#a9dfbf"/>
-  <text x="26" y="238" font-size="10" fill="#1e8449">Dictaminadas</text>
-  <text x="26" y="266" font-size="20" fill="#145a32" font-weight="bold">205</text>
+  <!-- Tormenta -->
+  <rect x="12" y="330" width="351" height="56" rx="8" fill="#fff" stroke="#ddd"/><rect x="12" y="330" width="4" height="56" fill="#c0392b"/>
+  <text x="24" y="350" font-size="10" fill="#222" font-weight="bold">Protocolo por tormenta</text>
+  <text x="24" y="366" font-size="9" fill="#666">8 derivadas · 0 dictaminadas · 8 sin dictaminar · 0 %</text>
+  <rect x="24" y="374" width="327" height="5" rx="2" fill="#eee"/>
 
-  <rect x="195" y="212" width="168" height="70" rx="8" fill="#fdecea" stroke="#f5b7b1"/>
-  <text x="209" y="238" font-size="10" fill="#c0392b">Sin dictaminar</text>
-  <text x="209" y="266" font-size="20" fill="#922b21" font-weight="bold">35</text>
+  <!-- Columnas apiladas por mes -->
+  <rect x="12" y="396" width="351" height="176" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="24" y="416" font-size="10" fill="#222" font-weight="bold">Derivadas por mes</text>
+  <rect x="24" y="424" width="8" height="8" rx="2" fill="#27ae60"/><text x="36" y="432" font-size="8" fill="#666">Dictaminadas</text>
+  <rect x="96" y="424" width="8" height="8" rx="2" fill="#2a78d6"/><text x="108" y="432" font-size="8" fill="#666">Sin dictaminar</text>
+  <line x1="24" y1="540" x2="351" y2="540" stroke="#999"/>
+  <rect x="242" y="520" width="14" height="20" fill="#27ae60"/><text x="249" y="514" font-size="8" fill="#222" text-anchor="middle">4</text>
+  <rect x="269" y="454" width="14" height="76" fill="#2a78d6"/><rect x="269" y="530" width="14" height="10" fill="#27ae60"/><text x="276" y="448" font-size="8" fill="#222" text-anchor="middle">24</text>
+  <rect x="296" y="496" width="14" height="44" fill="#2a78d6"/><text x="303" y="490" font-size="8" fill="#222" text-anchor="middle">14</text>
+  <text x="24" y="554" font-size="7" fill="#888">Ene  Feb  Mar  Abr  May  Jun  Jul  Ago  Sep  Oct  Nov  Dic</text>
+  <text x="24" y="566" font-size="8" fill="#2a6ebb">Ver como tabla</text>
 
-  <!-- chart -->
-  <text x="24" y="318" font-size="12" font-weight="bold" fill="#333">Evolución mensual</text>
-  <rect x="24" y="326" width="327" height="150" rx="8" fill="#fafafa" stroke="#ddd"/>
-  <polyline points="40,440 90,400 140,420 190,370 240,390 290,350 330,360" fill="none" stroke="#2c3e50" stroke-width="2"/>
-  <text x="187" y="465" font-size="9" fill="#999" text-anchor="middle">Ene · Feb · Mar · Abr · May · Jun · Jul</text>
+  <!-- Barras apiladas por distrito -->
+  <rect x="12" y="582" width="351" height="160" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="24" y="602" font-size="10" fill="#222" font-weight="bold">Por distrito</text>
+  <text x="70" y="626" font-size="8" fill="#666" text-anchor="end">Centro</text><rect x="76" y="618" width="200" height="12" rx="3" fill="#eee"/><rect x="76" y="618" width="34" height="12" fill="#27ae60"/><rect x="112" y="618" width="164" height="12" fill="#2a78d6"/><text x="284" y="627" font-size="8" fill="#222" font-weight="bold">24</text><text x="351" y="627" font-size="8" fill="#666" text-anchor="end">17 %</text>
+  <text x="70" y="648" font-size="8" fill="#666" text-anchor="end">Norte</text><rect x="76" y="640" width="200" height="12" rx="3" fill="#eee"/><rect x="76" y="640" width="17" height="12" fill="#27ae60"/><rect x="95" y="640" width="41" height="12" fill="#2a78d6"/><text x="284" y="649" font-size="8" fill="#222" font-weight="bold">7</text><text x="351" y="649" font-size="8" fill="#666" text-anchor="end">29 %</text>
+  <text x="70" y="670" font-size="8" fill="#666" text-anchor="end">Oeste</text><rect x="76" y="662" width="200" height="12" rx="3" fill="#eee"/><rect x="76" y="662" width="42" height="12" fill="#2a78d6"/><text x="284" y="671" font-size="8" fill="#222" font-weight="bold">5</text><text x="351" y="671" font-size="8" fill="#666" text-anchor="end">0 %</text>
+  <text x="24" y="700" font-size="8" fill="#888">Al pasar el dedo o el mouse: cartel con los valores.</text>
+  <text x="24" y="716" font-size="8" fill="#2a6ebb">Ver como tabla</text>
+  <text x="24" y="732" font-size="8" fill="#888">Debajo: "Por prioridad", con el mismo formato.</text>
 
-  <!-- re-derivaciones note -->
-  <rect x="24" y="495" width="327" height="46" rx="6" fill="#f4ecf7" stroke="#d2b4de"/>
-  <text x="36" y="514" font-size="9" fill="#6c3483">Cada re-derivación por vencimiento se</text>
-  <text x="36" y="528" font-size="9" fill="#6c3483">cuenta como evento independiente.</text>
-
-  <!-- bottom nav -->
-  <rect x="0" y="748" width="375" height="64" fill="#ffffff" stroke="#eee"/>
-  <text x="90" y="775" font-size="16" text-anchor="middle">📊</text>
-  <text x="90" y="795" font-size="9" fill="#2c3e50" text-anchor="middle" font-weight="bold">Dashboard</text>
-  <text x="200" y="775" font-size="16" text-anchor="middle">⛈</text>
-  <text x="200" y="795" font-size="9" fill="#999" text-anchor="middle">Tormenta</text>
-  <text x="300" y="775" font-size="16" text-anchor="middle">👤</text>
-  <text x="300" y="795" font-size="9" fill="#999" text-anchor="middle">Perfil</text>
+  <rect x="0" y="756" width="375" height="56" fill="#fff" stroke="#ddd"/>
+  <text x="47" y="790" font-size="9" fill="#888" text-anchor="middle">Solicitudes</text>
+  <text x="140" y="790" font-size="9" fill="#888" text-anchor="middle">Mi ruta</text>
+  <text x="234" y="790" font-size="9" fill="#888" text-anchor="middle">Tormenta</text>
+  <text x="328" y="790" font-size="9" fill="#27ae60" font-weight="bold" text-anchor="middle">Dashboard</text>
 </svg>

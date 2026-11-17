@@ -17,6 +17,7 @@ import { revisionRouter } from './routes/revision';
 import { auditoriaRouter } from './routes/auditoria';
 import { dashboardRouter } from './routes/dashboard';
 import { tormentaRouter } from './routes/tormenta';
+import { dictaminadosRouter } from './routes/dictaminados';
 import { origenDelPedido } from './config';
 import { providers, MockAuthProvider, MockReclamoProvider, MockMatriz, MockGeocoder } from './providers';
 
@@ -47,6 +48,7 @@ export function createApp() {
   api.use('/auditoria', auditoriaRouter);
   api.use('/dashboard', dashboardRouter);
   api.use('/tormenta', tormentaRouter);
+  api.use('/dictaminados', dictaminadosRouter);
 
   // Solo desarrollo: simular caídas de servicios externos para probar los casos de borde.
   if (process.env.NODE_ENV !== 'production') {

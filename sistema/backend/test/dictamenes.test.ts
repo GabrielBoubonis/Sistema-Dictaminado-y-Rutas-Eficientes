@@ -307,36 +307,50 @@ describe('Sincronización offline (RF-31 a RF-33, RF-53, RF-59)', () => {
     expect(rev.body.some((c: any) => c.tipo === 'Integridad no verificada' && c.id_dictamen === guardado.id_dictamen)).toBe(true);
   });
 
-  it('RF-59: dos dictámenes firmados para el mismo caso → Pendiente-revisión y el Jefe elige cuál queda vigente', async () => {
+  it('RF-59: dos dictámenes firmados para el mismo caso → queda vigente el primero que llegó; el otro, en el historial', async () => {
     const tA = await token('mrossi0'); await registrarHuella('mrossi0', tA);
     const tB = await token('cbenite0'); await registrarHuella('cbenite0', tB);
     const s = await pendiente();
-    expect((await enviar(tA, firmar('mrossi0', armar('mrossi0', s)))).status).toBe(201); // en línea
+    expect((await enviar(tA, firmar('mrossi0', armar('mrossi0', s)))).status).toBe(201); // llega primero (en línea)
     const offline = firmar('cbenite0', armar('cbenite0', s, { firmado_sin_conexion: true, observaciones: 'Versión offline' }));
     const r = await sync(tB, [{ dictamen: (({ segundo_factor, ...x }) => x)(offline), segundo_factor: offline.segundo_factor }]);
-    expect(r.body.resultados[0]).toMatchObject({ estado: 'sincronizado', conflicto: true, estado_solicitud: 'Pendiente-revisión', vigente: null });
+    expect(r.body.resultados[0]).toMatchObject({ estado: 'sincronizado', estado_solicitud: 'Dictaminada', vigente: false });
+    expect(r.body.resultados[0].mensaje).toContain('historial');
 
     const sol = await prisma.solicitud.findUniqueOrThrow({ where: { numero_sua_anio: { numero_sua: s.numero_sua, anio: s.anio } } });
-    expect(sol.estado).toBe('Pendiente-revisión');
-    // tampoco se puede dictaminar en línea mientras haya conflicto
-    expect((await enviar(tA, firmar('mrossi0', armar('mrossi0', s)))).status).toBe(409);
+    expect(sol.estado).toBe('Dictaminada');
+    const h = await api().get(`/api/dictamenes/${s.numero_sua}/${s.anio}/historial`).set(auth(tA));
+    expect(h.body.filter((d: any) => d.vigente === true).map((d: any) => d.nombre_usuario)).toEqual(['mrossi0']);
+    expect(h.body.filter((d: any) => d.vigente === false).map((d: any) => d.nombre_usuario)).toEqual(['cbenite0']);
+    // el que llegó después no se envía al SUA y nadie tiene que elegir
+    const segundo = h.body.find((d: any) => d.nombre_usuario === 'cbenite0');
+    expect(segundo.estado_sincronizacion).not.toBe('pendiente_sua');
+    expect((await api().get(`/api/dictamenes/${s.numero_sua}/${s.anio}/conflicto`).set(auth(await token('pgimene0')))).status).toBe(404);
+    expect((await api().get(`/api/dictamenes/${segundo.id_dictamen}/pdf`).set(auth(tA))).status).toBe(200);
+  });
+});
 
-    const jefe = await token('pgimene0');
-    const c = await api().get(`/api/dictamenes/${s.numero_sua}/${s.anio}/conflicto`).set(auth(jefe));
-    expect(c.body.hay_conflicto).toBe(true);
-    expect(c.body.dictamenes).toHaveLength(2);
-    expect((await api().get(`/api/dictamenes/${s.numero_sua}/${s.anio}/conflicto`).set(auth(tA))).status).toBe(403);
-
-    const elegido = c.body.dictamenes.find((d: any) => d.nombre_usuario === 'cbenite0');
-    expect((await api().post(`/api/dictamenes/${elegido.id_dictamen}/vigente`).set(auth(tA)).send({})).status).toBe(403);
-    const ok = await api().post(`/api/dictamenes/${elegido.id_dictamen}/vigente`).set(auth(jefe)).send({});
-    expect(ok.body.estado_solicitud).toBe('Dictaminada');
-    const h = await api().get(`/api/dictamenes/${s.numero_sua}/${s.anio}/historial`).set(auth(jefe));
-    expect(h.body.filter((d: any) => d.vigente === true).map((d: any) => d.nombre_usuario)).toEqual(['cbenite0']);
-    expect(h.body.filter((d: any) => d.vigente === false)).toHaveLength(1);
-    const aud = await prisma.registroAuditoria.findFirstOrThrow({ where: { accion: 'Elección de dictamen vigente' } });
-    expect(aud).toMatchObject({ nombre_usuario: 'pgimene0', entidad_afectada: `solicitud ${s.numero_sua}-${s.anio}` });
-    expect((await api().post(`/api/dictamenes/${elegido.id_dictamen}/vigente`).set(auth(jefe)).send({})).status).toBe(409);
+describe('Dictaminados (RF-64)', () => {
+  it('lista las dictaminadas con su dictamen vigente para Operador, Jefe, Lector y Administrador, y el Lector baja el PDF', async () => {
+    for (const u of ['mrossi0', 'pgimene0', 'tmolina0', 'asuarez0']) {
+      const r = await api().get('/api/dictaminados').set(auth(await token(u)));
+      expect(r.status).toBe(200);
+      expect(r.body.length).toBeGreaterThan(0);
+    }
+    const lector = await token('tmolina0');
+    const r = await api().get('/api/dictaminados').set(auth(lector));
+    const dictaminadas = await prisma.solicitud.count({ where: { estado: 'Dictaminada' } });
+    expect(r.body).toHaveLength(dictaminadas);
+    expect(r.body[0]).toMatchObject({ dictamen: { id_dictamen: expect.any(Number), autor: expect.any(String), especie: expect.any(String) } });
+    // ordenadas por fecha de firma, la más reciente primero
+    const fechas = r.body.map((x: any) => x.dictamen.fecha_firma);
+    expect([...fechas].sort().reverse()).toEqual(fechas);
+    const pdf = await api().get(`/api/dictamenes/${r.body[0].dictamen.id_dictamen}/pdf`).set(auth(lector));
+    expect(pdf.status).toBe(200);
+    expect(pdf.headers['content-type']).toContain('application/pdf');
+    const filtrado = await api().get(`/api/dictaminados?q=${r.body[0].numero_sua}`).set(auth(lector));
+    expect(filtrado.body.every((x: any) => x.numero_sua.includes(r.body[0].numero_sua))).toBe(true);
+    expect((await api().get('/api/dictaminados?distrito=Marte').set(auth(lector))).status).toBe(422);
   });
 });
 

@@ -131,7 +131,7 @@ _Visualizar en [plantuml.com](https://www.plantuml.com/plantuml/uml/)._
   formulario, junto a `observaciones`, como el último dato que se completa antes de firmar.
   Ver Decisión 6.
 - `observaciones` (`string`): texto libre. **Opcional.**
-- `vigente` (`boolean`): verdadero por defecto. Queda nulo mientras un caso tiene dos dictámenes firmados en conflicto, y pasa a falso en el que no elige el Jefe (RF-59, CU-15); el dictamen no vigente se conserva en el historial.
+- `vigente` (`boolean`): verdadero por defecto. Si llega un segundo dictamen firmado sin conexión para un caso que ya tiene uno vigente, el que llega después se guarda con `vigente = false` (RF-59); también es falso en el dictamen anterior de un caso re-derivado y en el que no pasó la verificación de integridad. El dictamen no vigente se conserva en el historial.
 - `hash_firma` (`string`), `estado_sincronizacion` (`string`): generados por el sistema al
   firmar, no los completa el usuario (RF-22, RF-25).
 - `firmado_sin_conexion` (`boolean`): si llegó por la cola offline (CU-10, RF-53).

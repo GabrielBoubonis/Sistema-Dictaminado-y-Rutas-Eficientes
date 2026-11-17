@@ -163,7 +163,6 @@ export async function generarRuta(p: ParametrosRuta) {
       where: {
         estado: { in: ['Pendiente', 'Pendiente-revisión'] }, es_tormenta: p.tipo === 'Tormenta',
         latitud: { not: null }, longitud: { not: null },
-        dictamenes: { none: { vigente: null } }, // los casos con conflicto esperan la decisión de un Jefe (RF-59)
         ...(p.distrito ? { distrito: p.distrito } : {}),
       },
     });

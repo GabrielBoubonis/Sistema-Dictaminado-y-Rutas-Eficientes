@@ -170,7 +170,7 @@ Se definen cuatro roles de sistema:
 
 | Rol | Descripción | Acceso |
 |---|---|---|
-| **Lector** | Consulta pasiva, sin edición | Dashboard (RF-35, RF-36, RF-37, RF-44), Protocolo por tormenta — solo lectura (RF-38, RF-39, RF-40) |
+| **Lector** | Consulta pasiva, sin edición | Dashboard (RF-35, RF-36, RF-37, RF-44), Protocolo por tormenta — solo lectura (RF-38, RF-39, RF-40), Dictaminados con descarga del PDF (RF-64) |
 | **Operador** | Rol operativo de campo | Ver solicitudes (RF-09 a RF-13), generar y restablecer rutas (RF-14 a RF-19), completar y firmar dictámenes (RF-20 a RF-29), trabajo offline y sincronización (RF-30 a RF-34), Protocolo por tormenta completo (RF-38 a RF-43) |
 | **Jefe** | Supervisión operativa | Mismo acceso que Operador (RF-09 a RF-34, RF-38 a RF-43), más Dashboard (RF-35 a RF-37, RF-44) |
 | **Administrador** | Personal del CIL | Gestión de usuarios y roles (RF-06, RF-07, RF-08), configuración de endpoints/credenciales de conexión con el SUA y la Autenticación Institucional (tarea de despliegue, fuera de los RF), Dashboard (RF-35 a RF-37, RF-44), Protocolo por tormenta — solo lectura (RF-38, RF-39, RF-40) |

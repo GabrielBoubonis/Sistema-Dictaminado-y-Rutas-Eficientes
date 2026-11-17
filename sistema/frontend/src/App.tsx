@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CircleCheck, ClipboardList, CloudLightning, CloudUpload, LayoutDashboard, LogOut, RefreshCw, Route as IconoRuta, ScrollText, ShieldAlert, TreeDeciduous, Users, WifiOff, type LucideIcon } from 'lucide-react';
+import { CircleCheck, ClipboardList, CloudLightning, CloudUpload, FileCheck2, LayoutDashboard, LogOut, RefreshCw, Route as IconoRuta, ScrollText, ShieldAlert, TreeDeciduous, Users, WifiOff, type LucideIcon } from 'lucide-react';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth, type Rol } from './auth';
 import { useSync } from './lib/sync';
@@ -15,6 +15,7 @@ import { Usuarios } from './pages/Usuarios';
 import { Auditoria } from './pages/Auditoria';
 import { Revision } from './pages/Revision';
 import { Pendientes } from './pages/Pendientes';
+import { Dictaminados } from './components/Dictaminados';
 
 function Sincronizacion() {
   const s = useSync();
@@ -27,6 +28,7 @@ function Sincronizacion() {
 const NAV: Array<{ a: string; t: string; i: LucideIcon; roles: Rol[] }> = [
   { a: '/solicitudes', t: 'Solicitudes', i: ClipboardList, roles: ['Operador', 'Jefe'] },
   { a: '/ruta', t: 'Mi ruta', i: IconoRuta, roles: ['Operador', 'Jefe'] },
+  { a: '/dictaminados', t: 'Dictaminados', i: FileCheck2, roles: ['Administrador', 'Lector'] },
   { a: '/tormenta', t: 'Tormenta', i: CloudLightning, roles: ['Operador', 'Jefe', 'Administrador', 'Lector'] },
   { a: '/dashboard', t: 'Dashboard', i: LayoutDashboard, roles: ['Jefe', 'Administrador', 'Lector'] },
   { a: '/usuarios', t: 'Usuarios', i: Users, roles: ['Administrador'] },
@@ -77,6 +79,7 @@ export function App() {
           <Route path="/ruta" element={R(OJ, <MiRuta />)} />
           <Route path="/dictamen/:sua/:anio" element={R(OJ, <DictamenForm />)} />
           <Route path="/tormenta" element={<Tormenta />} />
+          <Route path="/dictaminados" element={<Dictaminados />} />
           <Route path="/dashboard" element={R(['Jefe', 'Administrador', 'Lector'], <Dashboard />)} />
           <Route path="/usuarios" element={R(['Administrador'], <Usuarios />)} />
           <Route path="/auditoria" element={R(['Administrador'], <Auditoria />)} />

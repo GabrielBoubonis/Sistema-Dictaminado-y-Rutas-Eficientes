@@ -84,3 +84,11 @@ export async function descargarBlob(path: string): Promise<string> {
   if (!r.ok) throw new ApiError(r.status, 'error', 'No se pudo descargar');
   return URL.createObjectURL(await r.blob());
 }
+
+/** Descarga el PDF de un dictamen como archivo (RF-26, RF-64). */
+export async function descargarPdfDictamen(idDictamen: number, nombre: string) {
+  const url = await descargarBlob(`/dictamenes/${idDictamen}/pdf`);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}

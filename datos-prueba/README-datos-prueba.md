@@ -13,7 +13,7 @@ Datos **ficticios** para cargar las dos bases simuladas (SUA y Autenticación In
 | `historial-derivaciones.json` | Un evento por solicitud, más la derivación original de las 2 re-derivadas. | Tabla `HistorialDerivacion` |
 | `dictamenes-ejemplo.json` | 8 dictámenes ya firmados y sincronizados (6 solicitudes dictaminadas + el dictamen anterior de las 2 re-derivadas). | Tabla `Dictamen` y tablas hijas |
 | `catalogos.json` | Todas las listas cerradas del formulario en papel (distritos, motivos de extracción, trabajos, motivos de "sin trabajo", etc.). | Constantes o tablas de catálogo |
-| `dictamenes-conflicto.json` | Dos dictámenes firmados para la solicitud 48495-2026 (uno de extracción y otro de poda firmado sin conexión). | Para probar RF-59 y CU-15 |
+| `dictamenes-conflicto.json` | Dos dictámenes firmados para la solicitud 48495-2026 por dos ingenieros (uno de extracción y otro de poda firmado sin conexión). | Para probar RF-59: queda vigente el que llegó primero (101) y el otro (102) queda en el historial como no vigente. |
 | `dispositivos.json` | 3 captores: uno bloqueado (K7M2-X9QD), uno revocado y uno activo. | Tabla `Dispositivo` (RF-60, CU-16) |
 | `casos-revision.json` | 2 casos para el apartado "Para revisar" (integridad no verificada y datos inválidos del SUA). | Tabla `CasoRevision` (RF-58, CU-14) |
 | `fotos/` | 3 imágenes de relleno para las fotografías de los dictámenes. | Almacenamiento de fotos |
@@ -26,7 +26,7 @@ Datos **ficticios** para cargar las dos bases simuladas (SUA y Autenticación In
 | Solicitud con dirección no ubicable | 1 | Falla de geocodificación (Decisión 9): queda disponible para consulta, pero fuera del cálculo de rutas. Es la de dirección "Pasaje sin nombre s/n". |
 | Solicitudes de tormenta | 8 | Sección "Protocolo por tormenta" (RF-38 a RF-43). Fechas repetidas a propósito (2 por día) para probar el orden por antigüedad y pedir, por ejemplo, 5 de las 8. No deben aparecer en el listado general. |
 | Solicitudes ya dictaminadas | 6 | Dashboard, historial y descarga de PDF. Con estado `Dictaminada`. |
-| Solicitud con dos dictámenes | 1 | La 48495 (cuenta entre las 25 pendientes del CSV, pero al cargar `dictamenes-conflicto.json` pasa a `Pendiente-revisión`): un Jefe elige cuál queda vigente (RF-59, CU-15). |
+| Solicitud con dos dictámenes | 1 | La 48495: queda Dictaminada con el dictamen 101 vigente y el 102 en el historial como no vigente (RF-59). |
 | Solicitudes re-derivadas | 2 | `es_rederivacion = true` y año de origen 2025: deben quedar en `Pendiente-revisión` (RF-12, HU-14). Tienen un dictamen anterior. |
 
 Las fechas de derivación van del 17/08 al 06/10/2026, para que el dashboard tenga datos en agosto, septiembre y octubre. Hay días con más de una solicitud para probar los tramos de antigüedad de la ruta.
@@ -50,7 +50,7 @@ Todos usan la misma contraseña de demostración: `Demo2026!` (solo para la demo
 2. Los estados de las solicitudes no vienen en el mock del SUA: se calculan al leerlas. Los valores esperados están en la columna `estado_esperado_en_sistema` del CSV.
 3. Geocodificar la dirección de cada solicitud **una sola vez** y guardar `latitud` y `longitud` (Decisión 9), para no gastar la cuota gratuita de OpenRouteService en cada ruta.
 4. En `dictamenes-ejemplo.json`: reemplazar `hash_firma` (`<CALCULAR_EN_SEED>`) con el SHA-256 real del contenido, y completar `latitud_ejemplar` y `longitud_ejemplar` con las de la solicitud. El campo `nota_prueba` no es parte del modelo, se puede ignorar.
-5. Cargar también `dispositivos.json` y `casos-revision.json`. La solicitud 48495 queda en Pendiente-revisión por tener dos dictámenes: cargar `dictamenes-conflicto.json` después de los dictámenes de ejemplo.
+5. Cargar también `dispositivos.json` y `casos-revision.json`. La solicitud 48495 tiene dos dictámenes: el 101 vigente y el 102 no vigente (`dictamenes-conflicto.json`).
 6. Las rutas, los registros de auditoría y los dictámenes pendientes de sincronizar no se precargan: se generan usando el sistema durante la demo.
 
 ## Catálogos del formulario

@@ -4,7 +4,8 @@ export interface ItemCola {
   uuid: string; usuario: string; numero_sua: string; anio: number; creada: number;
   iv: Uint8Array; datos: ArrayBuffer; // dictamen + fotos + aserción WebAuthn, cifrados con AES-GCM (RNF-16)
 }
-export interface Rechazado { uuid: string; usuario: string; numero_sua: string; anio: number; motivo: string; fecha: number }
+/** Rechazado por el servidor, o aceptado como no vigente porque otro dictamen del caso llegó primero (RF-59). */
+export interface Rechazado { uuid: string; usuario: string; numero_sua: string; anio: number; motivo: string; fecha: number; tipo?: 'rechazado' | 'no_vigente' }
 export interface Borrador { clave: string; datos: unknown; actualizado: number } // sin fotos grandes: solo campos
 export interface SesionLocal {
   usuario: string; nombre_completo: string; rol: string; salt: Uint8Array; verificador: ArrayBuffer;

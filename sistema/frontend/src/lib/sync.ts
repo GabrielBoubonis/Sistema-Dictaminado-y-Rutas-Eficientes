@@ -40,7 +40,7 @@ export function sincronizar(): Promise<void> {
         const lote = (await db.cola.orderBy('creada').limit(1).toArray());
         if (!lote.length) break;
         const items = await Promise.all(lote.map(async (f) => ({ fila: f, ...(await descifrar<DictamenFirmado>(f)) })));
-        let r: { resultados: Array<{ uuid_dictamen: string; estado: string; mensaje?: string; error?: string }> };
+        let r: { resultados: Array<{ uuid_dictamen: string; estado: string; mensaje?: string; error?: string; vigente?: boolean }> };
         try { r = await api('/sync/dictamenes', { body: { dictamenes: items.map(({ dictamen, segundo_factor }) => ({ dictamen, segundo_factor })) } }); }
         catch (e) {
           if (e instanceof ErrorRed) break;
@@ -53,7 +53,9 @@ export function sincronizar(): Promise<void> {
           if (!fila) continue;
           if (res.estado === 'reintentar') continue;
           if (res.estado === 'rechazado') {
-            await db.rechazados.put({ uuid: fila.uuid, usuario: fila.usuario, numero_sua: fila.numero_sua, anio: fila.anio, motivo: res.mensaje ?? res.error ?? 'Rechazado por el servidor', fecha: Date.now() });
+            await db.rechazados.put({ uuid: fila.uuid, usuario: fila.usuario, numero_sua: fila.numero_sua, anio: fila.anio, motivo: res.mensaje ?? res.error ?? 'Rechazado por el servidor', fecha: Date.now(), tipo: 'rechazado' });
+          } else if (res.estado === 'sincronizado' && res.vigente === false && res.mensaje) { // RF-59: otro dictamen llegó primero
+            await db.rechazados.put({ uuid: fila.uuid, usuario: fila.usuario, numero_sua: fila.numero_sua, anio: fila.anio, motivo: res.mensaje, fecha: Date.now(), tipo: 'no_vigente' });
           }
           await db.cola.delete(fila.uuid);
           avanzo = true;

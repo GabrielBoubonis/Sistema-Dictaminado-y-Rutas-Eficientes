@@ -22,7 +22,7 @@ export async function generarPdf(idDictamen: number): Promise<PDFKit.PDFDocument
   doc.moveDown(0.3).fontSize(10).text(`Solicitud SUA N.° ${d.numero_sua}-${d.anio}`, { align: 'center' });
   if (d.vigente !== true) {
     doc.moveDown(0.3).fillColor('#b00020').fontSize(10)
-      .text(d.vigente === null ? 'PENDIENTE DE ELECCIÓN (conflicto entre dictámenes)' : d.estado_sincronizacion === 'integridad_no_verificada' ? 'INTEGRIDAD NO VERIFICADA' : 'NO VIGENTE (reemplazado)', { align: 'center' })
+      .text(d.estado_sincronizacion === 'integridad_no_verificada' ? 'INTEGRIDAD NO VERIFICADA' : 'NO VIGENTE (reemplazado)', { align: 'center' })
       .fillColor('#000');
   }
   doc.moveDown();

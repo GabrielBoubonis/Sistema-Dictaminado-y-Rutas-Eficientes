@@ -1,0 +1,47 @@
+<svg viewBox="0 0 375 812" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <rect width="375" height="812" fill="#ffffff"/>
+  <rect width="375" height="24" fill="#eeeeee"/>
+  <rect x="0" y="24" width="375" height="56" fill="#2c3e50"/>
+  <text x="20" y="58" font-size="16" fill="#fff" font-weight="bold">Solicitudes</text>
+
+  <!-- Pestañas: Dictaminadas activa (Operador y Jefe). Lector y Administrador ven la misma lista como sección propia. -->
+  <rect x="12" y="92" width="62" height="28" rx="14" fill="#fff" stroke="#ccc"/><text x="43" y="110" font-size="10" fill="#666" text-anchor="middle">Todas</text>
+  <rect x="80" y="92" width="80" height="28" rx="14" fill="#fff" stroke="#ccc"/><text x="120" y="110" font-size="10" fill="#666" text-anchor="middle">Pendientes</text>
+  <rect x="166" y="92" width="82" height="28" rx="14" fill="#fff" stroke="#ccc"/><text x="207" y="110" font-size="10" fill="#666" text-anchor="middle">En revisión</text>
+  <rect x="254" y="92" width="100" height="28" rx="14" fill="#27ae60"/><text x="304" y="110" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Dictaminadas</text>
+
+  <text x="12" y="146" font-size="10" fill="#222" font-weight="bold">Distrito</text>
+  <rect x="12" y="152" width="351" height="34" rx="6" fill="#fff" stroke="#999"/><text x="22" y="174" font-size="10" fill="#555">Todos ▾</text>
+  <text x="12" y="206" font-size="10" fill="#222" font-weight="bold">Buscar</text>
+  <rect x="12" y="212" width="351" height="34" rx="6" fill="#fff" stroke="#999"/><text x="22" y="234" font-size="10" fill="#aaa">Dirección, N.° de SUA o ingeniero</text>
+  <text x="12" y="266" font-size="9" fill="#666">Mostrando 1–30 de 128 · ‹ Anterior · Siguiente ›</text>
+
+  <rect x="12" y="278" width="351" height="128" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="24" y="300" font-size="12" fill="#222" font-weight="bold">48495-2026</text>
+  <rect x="200" y="288" width="78" height="18" rx="9" fill="#fde0e0"/><text x="239" y="301" font-size="8" fill="#8a0018" text-anchor="middle">Prioridad alta</text>
+  <rect x="284" y="288" width="70" height="18" rx="9" fill="#e3f3e6"/><text x="319" y="301" font-size="8" fill="#145a2a" text-anchor="middle">Dictaminada</text>
+  <text x="24" y="320" font-size="10" fill="#333">Av. Ovidio Lagos 2764</text>
+  <text x="24" y="336" font-size="9" fill="#666">Centro · Aguaribay · Extracción · 2.3 Con riesgo de caída…</text>
+  <text x="24" y="352" font-size="9" fill="#666">Firmado por mrossi0 el 10/10/2026, 09:00</text>
+  <rect x="24" y="364" width="130" height="32" rx="8" fill="#fff" stroke="#27ae60" stroke-width="2"/>
+  <text x="89" y="384" font-size="10" fill="#27ae60" font-weight="bold" text-anchor="middle">↓ Descargar PDF</text>
+
+  <rect x="12" y="416" width="351" height="128" rx="8" fill="#fff" stroke="#ddd"/>
+  <text x="24" y="438" font-size="12" fill="#222" font-weight="bold">48480-2026</text>
+  <rect x="200" y="426" width="78" height="18" rx="9" fill="#e3f3e6"/><text x="239" y="439" font-size="8" fill="#145a2a" text-anchor="middle">Prioridad baja</text>
+  <rect x="284" y="426" width="70" height="18" rx="9" fill="#e3f3e6"/><text x="319" y="439" font-size="8" fill="#145a2a" text-anchor="middle">Dictaminada</text>
+  <text x="24" y="458" font-size="10" fill="#333">Maipú 780</text>
+  <text x="24" y="474" font-size="9" fill="#666">Centro · Fresno · Trabajos de mantenimiento</text>
+  <text x="24" y="490" font-size="9" fill="#666">Firmado por lfernan0 el 09/09/2026, 09:00</text>
+  <rect x="24" y="502" width="130" height="32" rx="8" fill="#fff" stroke="#27ae60" stroke-width="2"/>
+  <text x="89" y="522" font-size="10" fill="#27ae60" font-weight="bold" text-anchor="middle">↓ Descargar PDF</text>
+
+  <text x="12" y="572" font-size="9" fill="#888">El PDF es el del dictamen vigente. Los no vigentes se consultan en el detalle</text>
+  <text x="12" y="586" font-size="9" fill="#888">de la solicitud (historial). Necesita conexión (RF-64).</text>
+
+  <rect x="0" y="756" width="375" height="56" fill="#fff" stroke="#ddd"/>
+  <text x="47" y="790" font-size="9" fill="#27ae60" font-weight="bold" text-anchor="middle">Solicitudes</text>
+  <text x="140" y="790" font-size="9" fill="#888" text-anchor="middle">Mi ruta</text>
+  <text x="234" y="790" font-size="9" fill="#888" text-anchor="middle">Tormenta</text>
+  <text x="328" y="790" font-size="9" fill="#888" text-anchor="middle">Dashboard</text>
+</svg>

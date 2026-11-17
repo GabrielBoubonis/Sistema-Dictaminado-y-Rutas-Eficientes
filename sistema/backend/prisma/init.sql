@@ -247,3 +247,13 @@ ALTER TABLE dictamen DROP COLUMN IF EXISTS numero_esquina;
 -- Datos reales de la Dirección (13/11/2026): descopado del ejemplar y profundidad del corte horizontal de raíces (cm).
 ALTER TABLE dictamen ADD COLUMN IF NOT EXISTS descopado BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE trabajo_subterraneo ADD COLUMN IF NOT EXISTS profundidad_cm DOUBLE PRECISION;
+
+-- RF-59 sin elección del Jefe (16/11/2026): los casos que quedaron con dos dictámenes "pendientes de elección"
+-- (vigente NULL) se resuelven con la regla nueva: queda vigente el que llegó primero (id menor), el resto no vigente.
+UPDATE dictamen d SET vigente = (d.id_dictamen = (
+  SELECT MIN(x.id_dictamen) FROM dictamen x WHERE x.numero_sua = d.numero_sua AND x.anio = d.anio AND x.vigente IS NULL))
+WHERE d.vigente IS NULL;
+UPDATE solicitud s SET estado = 'Dictaminada'
+WHERE s.estado = 'Pendiente-revisión' AND EXISTS (
+  SELECT 1 FROM dictamen d WHERE d.numero_sua = s.numero_sua AND d.anio = s.anio AND d.vigente = TRUE
+    AND d.fecha_emision >= s.fecha_ultima_derivacion);

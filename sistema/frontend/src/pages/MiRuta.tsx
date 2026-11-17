@@ -56,7 +56,7 @@ function GenerarRuta({ alGenerar }: { alGenerar: () => void }) {
 
   // Resumen en vivo: cuántas solicitudes cumplen los criterios (diseño-ui.md, módulo 3)
   const disponibles = useMemo(() => {
-    const base = sols.filter((s) => !s.reservada_por && !s.sin_ubicar && !s.en_conflicto && (!distrito || s.distrito === distrito)
+    const base = sols.filter((s) => !s.reservada_por && !s.sin_ubicar && (!distrito || s.distrito === distrito)
       && (zona.length < 3 || puntoEnPoligono({ lat: s.latitud!, lng: s.longitud! }, zona)));
     return { Alta: base.filter((s) => s.prioridad === 'Alta').length, Media: base.filter((s) => s.prioridad === 'Media').length, Baja: base.filter((s) => s.prioridad === 'Baja').length };
   }, [sols, distrito, zona]);

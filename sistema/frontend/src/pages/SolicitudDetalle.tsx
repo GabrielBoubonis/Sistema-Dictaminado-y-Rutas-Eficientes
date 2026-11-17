@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, Lock, MapPinOff, Scale } from 'lucide-react';
+import { ChevronLeft, Download, FileText, Lock, MapPinOff } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { api, descargarBlob } from '../lib/api';
+import { api, descargarBlob, descargarPdfDictamen } from '../lib/api';
 import { useAuth } from '../auth';
-import { Estado, Modal, Prioridad, fechaCorta, fechaHora, textoError } from '../components/ui';
+import { Estado, Prioridad, fechaCorta, fechaHora, textoError } from '../components/ui';
 import { Mapa } from '../components/Mapa';
 
 interface DictamenResumen {
@@ -19,7 +19,7 @@ function ResumenDictamen({ d, acciones }: { d: DictamenResumen; acciones?: React
   return (
     <div className="card">
       <div className="fila sb"><strong>{d.nombre_usuario}</strong>
-        <span className="badge">{d.vigente === true ? 'Vigente' : d.vigente === null ? 'Pendiente de elección' : d.estado_sincronizacion === 'integridad_no_verificada' ? 'Integridad no verificada' : 'No vigente'}</span></div>
+        <span className="badge">{d.vigente === true ? 'Vigente' : d.estado_sincronizacion === 'integridad_no_verificada' ? 'Integridad no verificada' : 'No vigente'}</span></div>
       <div className="ayuda">Emitido {fechaCorta(d.fecha_emision)} · firmado {fechaHora(d.fecha_firma)}{d.firmado_sin_conexion ? ' · firmado sin conexión' : ''}</div>
       <div>Especie: {d.especie.nombre_comun} · Daño en vereda: {d.nivel_dano_vereda ?? '—'} · Complejidad: {d.complejidad} · Prioridad: {d.nivel_prioridad}</div>
       <div>Intervención: {intervencion || '—'}</div>
@@ -34,37 +34,30 @@ export function SolicitudDetalle() {
   const { usuario } = useAuth();
   const [s, setS] = useState<any>(null);
   const [historial, setHistorial] = useState<DictamenResumen[]>([]);
-  const [conflicto, setConflicto] = useState<DictamenResumen[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [ok, setOk] = useState<string | null>(null);
-  const [elegir, setElegir] = useState<DictamenResumen | null>(null);
   const puedeDictaminar = usuario && ['Operador', 'Jefe'].includes(usuario.rol);
 
   const cargar = async () => {
     try {
       setS(await api(`/solicitudes/${sua}/${anio}`));
       setHistorial(await api(`/dictamenes/${sua}/${anio}/historial`));
-      if (usuario?.rol === 'Jefe') { const c = await api(`/dictamenes/${sua}/${anio}/conflicto`); setConflicto(c.hay_conflicto ? c.dictamenes : []); }
     } catch (e) { setError(textoError(e)); }
   };
   useEffect(() => { void cargar(); }, [sua, anio]); // eslint-disable-line
 
   const abrirPdf = async (id: number) => { try { window.open(await descargarBlob(`/dictamenes/${id}/pdf`), '_blank'); } catch (e) { setError(textoError(e)); } };
-  const confirmar = async () => {
-    if (!elegir) return;
-    try { await api(`/dictamenes/${elegir.id_dictamen}/vigente`, { body: {} }); setOk('Listo: el dictamen elegido quedó vigente.'); setElegir(null); await cargar(); }
-    catch (e) { setError(textoError(e)); setElegir(null); }
+  const bajarPdf = async (d: DictamenResumen) => {
+    try { await descargarPdfDictamen(d.id_dictamen, `dictamen-${s.numero_sua}-${s.anio}-${d.id_dictamen}.pdf`); } catch (e) { setError(textoError(e)); }
   };
 
   if (error && !s) return <div className="error" role="alert">{error}</div>;
   if (!s) return <p role="status">Cargando…</p>;
-  const hayConflicto = s.dictamenes?.some((d: any) => d.vigente === null);
   return (
     <section>
       <p><Link to="/solicitudes" className="fila" style={{ display: 'inline-flex', gap: 4 }}><ChevronLeft className="ico" aria-hidden />Volver al listado</Link></p>
       <h1>Solicitud {s.numero_sua}-{s.anio}</h1>
       <div className="fila"><Estado estado={s.estado} /><Prioridad p={s.prioridad} />{s.es_tormenta && <span className="badge off">Tormenta</span>}</div>
-      {error && <div className="error" role="alert">{error}</div>}{ok && <div className="ok" role="status">{ok}</div>}
+      {error && <div className="error" role="alert">{error}</div>}
       <div className="card" style={{ marginTop: '.8rem' }}>
         <div><strong>{s.direccion}</strong> · {s.distrito}</div>
         <p>{s.descripcion_reclamo}</p>
@@ -75,29 +68,17 @@ export function SolicitudDetalle() {
         <ul>{s.historial.map((h: any) => <li key={h.id_derivacion}>{fechaCorta(h.fecha_derivacion)} — {h.motivo}</li>)}</ul>
       </div>
 
-      {puedeDictaminar && s.estado !== 'Dictaminada' && !hayConflicto && (
+      {puedeDictaminar && s.estado !== 'Dictaminada' && (
         <Link className="btn block" to={`/dictamen/${s.numero_sua}/${s.anio}`}>Dictaminar</Link>
       )}
-      {hayConflicto && <div className="aviso"><Scale className="ico" aria-hidden /><span>Hay dos dictámenes firmados para este caso. Un Jefe debe elegir cuál queda vigente.</span></div>}
-
-      {conflicto.length > 0 && (<>
-        <h2>Elegir dictamen vigente</h2>
-        <div className="grid2">{conflicto.map((d) => (
-          <ResumenDictamen key={d.id_dictamen} d={d} acciones={<button className="btn chico" onClick={() => setElegir(d)}>Dejar este como vigente</button>} />
-        ))}</div>
-      </>)}
-
       <h2>Dictámenes del caso</h2>
       {s.estado === 'Pendiente-revisión' && historial.length > 0 && <div className="aviso">Esta solicitud fue re-derivada: abajo podés consultar el dictamen anterior (no se precarga en el formulario nuevo).</div>}
       {!historial.length && <p className="vacio">Todavía no tiene dictámenes.</p>}
-      {historial.map((d) => <ResumenDictamen key={d.id_dictamen} d={d} acciones={<button className="btn sec chico" onClick={() => abrirPdf(d.id_dictamen)}>Ver PDF</button>} />)}
+      {historial.map((d) => <ResumenDictamen key={d.id_dictamen} d={d} acciones={<>
+        <button className="btn sec chico" onClick={() => abrirPdf(d.id_dictamen)}><FileText className="ico" aria-hidden /> Ver PDF</button>
+        <button className="btn sec chico" onClick={() => bajarPdf(d)}><Download className="ico" aria-hidden /> Descargar</button>
+      </>} />)}
 
-      {elegir && (
-        <Modal titulo="Confirmar elección" onCerrar={() => setElegir(null)}>
-          <p>El dictamen de <strong>{elegir.nombre_usuario}</strong> quedará vigente y el otro pasará al historial como no vigente. Queda registrado quién lo eligió.</p>
-          <div className="fila"><button className="btn" onClick={confirmar}>Confirmar</button><button className="btn sec" onClick={() => setElegir(null)}>Cancelar</button></div>
-        </Modal>
-      )}
     </section>
   );
 }

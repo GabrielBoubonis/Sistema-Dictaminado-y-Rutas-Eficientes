@@ -4,6 +4,52 @@ Cambios hechos al sistema y a la documentación, del más nuevo al más viejo.
 
 ---
 
+## 16/11/2026 — Dashboard nuevo, sección de dictaminados y sin elección del Jefe
+
+### Ya no elige el Jefe entre dos dictámenes (RF-59)
+
+- Antes: si dos ingenieros dictaminaban el mismo caso (uno sin señal), la solicitud quedaba
+  en "Pendiente-revisión" hasta que un Jefe elegía cuál valía.
+- Ahora: queda vigente el **primero que llegó** al servidor (como elegiste). El segundo no se
+  pierde: queda en el historial del caso como no vigente, con su PDF, y no se envía al SUA.
+  Al ingeniero que lo firmó la app le muestra un aviso. La solicitud queda Dictaminada.
+- Se borraron la pantalla de elección, sus dos rutas de la API y el estado "pendiente de
+  elección". Los casos que hubiera en la base con la regla vieja se resuelven solos con la
+  regla nueva al arrancar el servidor (`init.sql`).
+- Documentación: RF-59 reescrito; el caso de uso CU-15 y la historia HU-17 (que eran la
+  elección del Jefe) ahora describen la sección de dictaminados; pantalla 11 de
+  `diseño-ui.md` con wireframe nuevo (`11-dictaminados.svg`, se borró
+  `11-conflicto-dictamenes.svg`); `alcance.md`, `casos-de-uso.md` (CU-10 E5, actores),
+  `er-modelo.md`, `arquitectura-tecnica.md` y los diagramas de actividad, estados y casos
+  de uso.
+
+### Sección de dictaminados con descarga del PDF (RF-64, nuevo)
+
+- Operador y Jefe: pestaña "Dictaminadas" arriba, en Solicitudes. Lector y Administrador:
+  sección "Dictaminados" en el menú (no ven Solicitudes). Misma lista para todos.
+- Cada caso muestra dirección, distrito, especie, resultado, quién lo firmó y cuándo, con
+  un botón "Descargar PDF" (el del dictamen vigente). Búsqueda por dirección, N.° de SUA o
+  ingeniero, y filtro por distrito. Necesita conexión.
+- En el detalle de una solicitud, cada dictamen del historial tiene "Ver PDF" y "Descargar".
+
+### Dashboard nuevo
+
+- Cuatro indicadores (derivadas, dictaminadas, sin dictaminar, avance con barra), un bloque
+  aparte para tormenta y gráficos por mes, distrito y prioridad, con leyenda, valores
+  escritos, cartel al pasar el dedo o el mouse y "Ver como tabla".
+- Colores elegidos con el skill dataviz y su validador: dictaminadas en verde y sin
+  dictaminar en azul. Probé verde y naranja, pero no pasa para daltonismo rojo-verde.
+- Los gráficos se dibujan al ancho real de la pantalla, así el texto se lee igual en el
+  celular y en la computadora. Wireframe `05-dashboard.svg` actualizado.
+
+### Verificado y pendiente
+
+- Verificado: 86 tests de backend y 15 de frontend; la PWA compila; capturas del dashboard
+  (celular y escritorio), de la pestaña Dictaminadas y de la sección del Lector.
+- **No verificado**: en un celular real ni en el servidor.
+
+---
+
 ## 16/11/2026 — Plantar solo con extracción y rediseño visual
 
 ### Plantar otro árbol solo si se extrae el existente

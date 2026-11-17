@@ -28,13 +28,11 @@ solicitudesRouter.get('/', ah(async (req, res) => {
     },
     include: {
       enRutas: { where: { liberada: false }, include: { ruta: { select: { nombre_usuario: true } } } },
-      dictamenes: { where: { vigente: null }, select: { id_dictamen: true } },
     },
     orderBy: [{ fecha_ultima_derivacion: 'asc' }, { numero_sua: 'asc' }],
   });
-  res.json(sols.map(({ enRutas, dictamenes, ...s }) => ({
+  res.json(sols.map(({ enRutas, ...s }) => ({
     ...s,
-    en_conflicto: dictamenes.length > 0, // dos dictámenes firmados esperando la elección de un Jefe (RF-59)
     sin_ubicar: s.latitud === null,
     reservada_por: enRutas[0]?.ruta.nombre_usuario ?? null,
   })));

@@ -89,20 +89,19 @@ export async function registrarDictamen(usuario: string, raw: unknown, segundoFa
       const sol = await tx.solicitud.findUniqueOrThrow({ where: { numero_sua_anio: { numero_sua: p.numero_sua, anio: p.anio } } });
       const previos = await tx.dictamen.findMany({ where: { numero_sua: p.numero_sua, anio: p.anio } });
       const activos = previos.filter((d) => d.vigente === true && d.fecha_emision >= sol.fecha_ultima_derivacion);
-      const enConflicto = previos.filter((d) => d.vigente === null);
 
-      let vigente: boolean | null = true;
-      let hayConflicto = false;
+      let vigente = true;
+      let llegoDespues = false;
       if (falla) {
         vigente = false; // nunca cuenta para el estado de la solicitud
-      } else if (activos.length || enConflicto.length) {
+      } else if (activos.length) {
         // RF-21: en línea se acepta el primero y se rechaza el segundo.
         if (origen === 'online') {
           throw new AppError(409, 'solicitud_ya_dictaminada', 'La solicitud ya fue dictaminada por otro ingeniero. Actualizá el listado.');
         }
-        // RF-59: dos dictámenes firmados → un Jefe elige cuál queda vigente.
-        vigente = null; hayConflicto = true;
-        await tx.dictamen.updateMany({ where: { id_dictamen: { in: activos.map((d) => d.id_dictamen) } }, data: { vigente: null } });
+        // RF-59: firmado sin señal y sincronizado después de otro: queda vigente el que llegó primero; este se guarda
+        // en el historial del caso como no vigente (no se pierde, tiene su PDF) y no se envía al SUA.
+        vigente = false; llegoDespues = true;
       } else {
         await tx.dictamen.updateMany({ where: { numero_sua: p.numero_sua, anio: p.anio, vigente: true }, data: { vigente: false } });
       }
@@ -120,7 +119,7 @@ export async function registrarDictamen(usuario: string, raw: unknown, segundoFa
           complejidad: p.complejidad, urgente: p.urgente, arbol_frente_garage: p.arbol_frente_garage, media_tension: p.media_tension,
           de_oficio: p.de_oficio, descopado: p.descopado, plantar: p.plantar ?? null, nivel_prioridad: p.nivel_prioridad, observaciones: p.observaciones ?? null,
           vigente, hash_firma: p.hash_firma!, firmado_sin_conexion: origen === 'sync' || p.firmado_sin_conexion,
-          estado_sincronizacion: falla ? 'integridad_no_verificada' : 'pendiente_sua', sua_proximo_intento: new Date(),
+          estado_sincronizacion: falla ? 'integridad_no_verificada' : llegoDespues ? 'sincronizado' : 'pendiente_sua', sua_proximo_intento: llegoDespues ? null : new Date(),
           aereos: { create: p.trabajos_aereos.map((t) => ({ tipo_trabajo: t })) },
           subterraneos: { create: p.trabajos_subterraneos.map((t) => ({ tipo_trabajo: t.tipo_trabajo, distancia_borde: t.distancia_borde ?? null, profundidad_cm: t.profundidad_cm ?? null })) },
           fotos: { create: archivos.map((a, i) => ({ archivo_referencia: a, orden: i + 1 })) },
@@ -132,18 +131,19 @@ export async function registrarDictamen(usuario: string, raw: unknown, segundoFa
         await tx.casoRevision.create({
           data: { tipo: 'Integridad no verificada', referencia_solicitud: `${p.numero_sua}-${p.anio}`, id_dictamen: creado.id_dictamen, motivo: falla.mensaje },
         });
-        return { creado, estado: sol.estado, hayConflicto: false };
+        return { creado, estado: sol.estado, llegoDespues: false };
       }
       await liberarPorDictamen(tx, p.numero_sua, p.anio); // RF-17
       const estado = await recalcularEstado(tx, p.numero_sua, p.anio);
-      return { creado, estado, hayConflicto };
+      return { creado, estado, llegoDespues };
     });
 
     if (falla) throw new AppError(422, 'integridad_no_verificada', 'El dictamen fue rechazado: no se pudo verificar su integridad. Queda en revisión del Administrador.');
     const enviado = resultado.creado.vigente === true ? await intentarEnvioSua(resultado.creado.id_dictamen) : false;
     return {
       duplicado: false, id_dictamen: resultado.creado.id_dictamen, uuid_dictamen: p.uuid_dictamen, estado_solicitud: resultado.estado,
-      vigente: resultado.creado.vigente, conflicto: resultado.hayConflicto, hash_firma: p.hash_firma, enviado_sua: enviado,
+      vigente: resultado.creado.vigente, hash_firma: p.hash_firma, enviado_sua: enviado,
+      ...(resultado.llegoDespues ? { mensaje: 'Otro ingeniero ya había dictaminado este caso: tu dictamen quedó en el historial como no vigente.' } : {}),
     };
   } catch (e) {
     if (!idNuevo) fs.rmSync(dir('dictamenes', carpeta), { recursive: true, force: true });
@@ -204,19 +204,4 @@ export async function reintentarEnviosSua(ahora = new Date()): Promise<number> {
   let ok = 0;
   for (const d of pend) if (await intentarEnvioSua(d.id_dictamen)) ok++;
   return ok;
-}
-
-// ---------- Elección del dictamen vigente (RF-59) ----------
-export async function elegirVigente(idDictamen: number, jefe: string) {
-  const d = await prisma.dictamen.findUnique({ where: { id_dictamen: idDictamen } });
-  if (!d) throw new AppError(404, 'dictamen_no_encontrado');
-  if (d.vigente !== null) throw new AppError(409, 'sin_conflicto', 'Este dictamen no está pendiente de elección');
-  const estado = await prisma.$transaction(async (tx: Tx) => {
-    await tx.dictamen.update({ where: { id_dictamen: idDictamen }, data: { vigente: true } });
-    await tx.dictamen.updateMany({ where: { numero_sua: d.numero_sua, anio: d.anio, vigente: null }, data: { vigente: false } });
-    await auditar(tx, jefe, 'Elección de dictamen vigente', `solicitud ${d.numero_sua}-${d.anio}`, null, `dictamen ${idDictamen}`);
-    return recalcularEstado(tx, d.numero_sua, d.anio);
-  });
-  await intentarEnvioSua(idDictamen);
-  return { estado_solicitud: estado };
 }

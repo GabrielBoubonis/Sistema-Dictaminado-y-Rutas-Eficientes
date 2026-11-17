@@ -214,16 +214,19 @@ ingeniero está tomando la decisión, no varios pasos después.
 
 **Wireframe:** `diagramas/wireframes/05-dashboard.svg`
 
-**Patrones de diseño utilizados:** Tarjetas (Card Layout) para KPIs, Navegación en
-pestañas (Tab Navigation).
+**Patrones de diseño utilizados:** Tarjetas de indicadores (KPI) con barra de avance,
+gráficos de barras apiladas con leyenda, valores escritos, cartel al pasar y vista de tabla.
 
 **Justificación:** Las tarjetas de KPI (derivadas / dictaminadas / sin dictaminar) buscan
 que el Jefe o el Director puedan leer el estado general sin interpretar una tabla —
 resuelve directamente el objetivo de "ver de un vistazo" que motivó el pedido original del
-dashboard. Las pestañas General/Tormenta separan las dos vistas que definimos en Alcance
-(2.6 y 2.7) sin duplicar la pantalla: la información de tormenta está incluida en las
-métricas generales y además tiene su propio desglose (RF-44), y la pestaña es la forma más
-directa de alternar entre ambas lecturas sin perder el filtro de mes/año ya seleccionado.
+dashboard. Rediseño del 16/11/2026: cuatro indicadores arriba (derivadas, dictaminadas,
+sin dictaminar y avance), un bloque propio para tormenta (RF-44, incluido también en las
+métricas generales) y gráficos por mes, distrito y prioridad. Los filtros de mes y año van
+en una sola fila arriba de todo. Dictaminadas es verde y sin dictaminar es azul: el par se
+validó para daltonismo, y además nunca se depende solo del color (leyenda, números
+escritos y tabla). Los gráficos se dibujan al ancho real de la pantalla para que el texto
+mantenga su tamaño en el celular y en la computadora.
 
 **Formulario (si aplica):** No aplica (el único control de entrada es el selector de
 período, no un formulario de carga).
@@ -354,18 +357,18 @@ sin explicación.
 
 ---
 
-## Pantalla / Módulo 11 — Dictámenes en conflicto (Jefe)
+## Pantalla / Módulo 11 — Dictaminados
 
-**Wireframe:** `diagramas/wireframes/11-conflicto-dictamenes.svg`
+**Wireframe:** `diagramas/wireframes/11-dictaminados.svg`
 
-**Patrones de diseño utilizados:** Comparación lado a lado (dos tarjetas) con confirmación en Modal.
+**Patrones de diseño utilizados:** Navegación en pestañas (la cuarta pestaña de Solicitudes), lista de tarjetas con acción principal por tarjeta, filtros arriba de la lista.
 
-**Justificación:** Resuelve CU-15 y RF-59. Cuando dos ingenieros dictaminaron el mismo caso, el Jefe necesita ver los dos juntos para elegir. En el celular las dos tarjetas se apilan una sobre la otra con los mismos datos en el mismo orden (autor, fecha de firma, intervención, motivo, prioridad), para que se comparen de un vistazo sin cambiar de pantalla. Elegir es una acción con consecuencia (el otro dictamen pasa a no vigente), por eso se confirma en un Modal que lo dice con esas palabras. No se ofrece borrar ningún dictamen: el que no se elige queda en el historial.
+**Justificación:** Resuelve CU-15, CU-08 y RF-64. Los casos cerrados necesitan su documento, y hasta ahora el PDF solo se llegaba entrando al detalle de cada solicitud; además el Lector no tenía acceso. Para Operador y Jefe es una pestaña más de Solicitudes, así no se suma un ítem al menú inferior (máximo 5); el Lector y el Administrador, que no ven Solicitudes, la tienen como sección propia con la misma lista. Cada tarjeta repite lo necesario para reconocer el caso (N.° de SUA, dirección, especie, resultado, autor y fecha) y un único botón "Descargar PDF". Reemplaza a la pantalla "Dictámenes en conflicto", eliminada el 16/11/2026 junto con la elección del Jefe (RF-59).
 
 **Formulario (si aplica):**
-- Cantidad de campos: 1 (elegir cuál dictamen queda vigente).
-- Flujo: una pantalla con confirmación en Modal.
-- Validaciones relevantes: el botón de confirmar se habilita solo con un dictamen elegido; si otro Jefe ya resolvió el caso, se informa y se muestra el dictamen vigente (CU-15, excepción E2).
+- Cantidad de campos: 2 filtros (distrito y búsqueda).
+- Flujo: una pantalla; la descarga no sale de la lista.
+- Validaciones relevantes: necesita conexión; sin señal se avisa en lugar de mostrar una lista vacía (CU-15, excepción E1).
 
 ---
 

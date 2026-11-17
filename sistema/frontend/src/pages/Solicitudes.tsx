@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Lock, MapPinOff, Scale } from 'lucide-react';
+import { Lock, MapPinOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cargarSolicitudes, type Solicitud } from '../lib/datos';
 import { Estado, Paginacion, Prioridad, fechaCorta, textoError } from '../components/ui';
+import { ListaDictaminados } from '../components/Dictaminados';
 import catalogos from '../catalogos.json';
 
 const POR_PAGINA = 30; // paginación explícita (diseño-ui.md, módulo 2)
@@ -12,7 +13,7 @@ export function Solicitudes() {
   const [desdeCache, setDesdeCache] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [pestana, setPestana] = useState<'todas' | 'Pendiente' | 'Pendiente-revisión'>('todas');
+  const [pestana, setPestana] = useState<'todas' | 'Pendiente' | 'Pendiente-revisión' | 'dictaminadas'>('todas');
   const [distrito, setDistrito] = useState('');
   const [prioridad, setPrioridad] = useState('');
   const [anio, setAnio] = useState('');
@@ -38,10 +39,11 @@ export function Solicitudes() {
       {desdeCache && <div className="aviso">Sin conexión: se muestra la última lista descargada.</div>}
       {error && <div className="error" role="alert">{error}</div>}
       <div className="tabs" role="tablist">
-        {([['todas', 'Todas'], ['Pendiente', 'Pendientes'], ['Pendiente-revisión', 'En revisión']] as const).map(([k, t]) => (
+        {([['todas', 'Todas'], ['Pendiente', 'Pendientes'], ['Pendiente-revisión', 'En revisión'], ['dictaminadas', 'Dictaminadas']] as const).map(([k, t]) => (
           <button key={k} role="tab" aria-selected={pestana === k} className={pestana === k ? 'activo' : ''} onClick={() => cambiar(setPestana)(k)}>{t}</button>
         ))}
       </div>
+      {pestana === 'dictaminadas' ? <ListaDictaminados /> : (<>
       <div className="grid2">
         <div><label htmlFor="f-d">Distrito</label><select id="f-d" value={distrito} onChange={(e) => cambiar(setDistrito)(e.target.value)}><option value="">Todos</option>{catalogos.distritos.map((d) => <option key={d}>{d}</option>)}</select></div>
         <div><label htmlFor="f-p">Prioridad</label><select id="f-p" value={prioridad} onChange={(e) => cambiar(setPrioridad)(e.target.value)}><option value="">Todas</option>{catalogos.nivel_prioridad.map((d) => <option key={d}>{d}</option>)}</select></div>
@@ -58,11 +60,11 @@ export function Solicitudes() {
             <div>{s.direccion}</div>
             <div className="ayuda">{s.distrito} · derivada el {fechaCorta(s.fecha_ultima_derivacion)}
               {s.reservada_por && <> · <Lock className="ico" aria-hidden /> en la ruta de {s.reservada_por}</>}
-              {s.sin_ubicar && <> · <MapPinOff className="ico" aria-hidden /> sin ubicar en el mapa</>}
-              {s.en_conflicto && <> · <Scale className="ico" aria-hidden /> esperando decisión del Jefe</>}</div>
+              {s.sin_ubicar && <> · <MapPinOff className="ico" aria-hidden /> sin ubicar en el mapa</>}</div>
           </article>
         </Link>
       ))}
+      </>)}
     </section>
   );
 }

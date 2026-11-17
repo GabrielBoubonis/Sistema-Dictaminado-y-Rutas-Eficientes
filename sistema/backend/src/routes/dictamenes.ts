@@ -5,7 +5,7 @@ import { prisma } from '../db';
 import { config } from '../config';
 import { AppError, ah } from '../errors';
 import { requireAuth, requireRol } from '../middleware/auth';
-import { elegirVigente, registrarDictamen } from '../services/registro-dictamen';
+import { registrarDictamen } from '../services/registro-dictamen';
 import { generarPdf } from '../services/pdf';
 
 export const dictamenesRouter = Router();
@@ -41,19 +41,6 @@ dictamenesRouter.get('/:numeroSua/:anio/historial', ah(async (req, res) => {
     where: { numero_sua: String(req.params.numeroSua), anio }, include: incluir, orderBy: { fecha_firma: 'desc' },
   });
   res.json(ds.map(publico));
-}));
-
-/** RF-59: solo un Jefe ve ambos dictámenes y elige cuál queda vigente. */
-dictamenesRouter.get('/:numeroSua/:anio/conflicto', requireRol('Jefe'), ah(async (req, res) => {
-  const anio = entero(req.params.anio, 'Año');
-  const ds = await prisma.dictamen.findMany({
-    where: { numero_sua: String(req.params.numeroSua), anio, vigente: null }, include: incluir, orderBy: { fecha_firma: 'asc' },
-  });
-  res.json({ hay_conflicto: ds.length >= 2, dictamenes: ds.map(publico) });
-}));
-
-dictamenesRouter.post('/:id/vigente', requireRol('Jefe'), ah(async (req, res) => {
-  res.json({ ok: true, ...(await elegirVigente(entero(req.params.id, 'Id'), req.sesion!.usuario)) });
 }));
 
 dictamenesRouter.get('/:id/pdf', ah(async (req, res) => {

@@ -4,7 +4,7 @@ import { cacheGet, cacheSet } from './db';
 export interface Solicitud {
   numero_sua: string; anio: number; distrito: string; prioridad: string; direccion: string; latitud: number | null; longitud: number | null;
   descripcion_reclamo: string; estado: string; es_tormenta: boolean; fecha_ultima_derivacion: string;
-  sin_ubicar: boolean; reservada_por: string | null; en_conflicto?: boolean;
+  sin_ubicar: boolean; reservada_por: string | null;
 }
 export interface ItemRuta {
   orden: number; liberada: boolean; motivo_liberacion: string | null; numero_sua: string; anio: number; direccion: string; distrito: string;
