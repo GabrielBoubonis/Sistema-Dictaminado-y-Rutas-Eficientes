@@ -39,6 +39,11 @@ seguridad que ya definimos en Requisitos (RF-01 a RF-03, RF-50): el texto es id�
 si el usuario no existe como si la contraseña es incorrecta, para no darle a un atacante
 una pista de cuáles nombres de usuario son válidos.
 
+**En la demo:** debajo del formulario hay un recuadro "Usuarios de demostración" con un
+usuario por rol y la contraseña común, para copiar o tocar "Usar" y que se completen solos.
+Es solo para que quien evalúe pueda entrar fácil; en una instalación real se oculta
+compilando la app con `VITE_MOSTRAR_DEMO=0`.
+
 **Formulario (si aplica):**
 - Cantidad de campos: 2 (usuario, contraseña).
 - Flujo: todo en una pantalla.
@@ -260,7 +265,7 @@ con más de un criterio cuando la única regla es "las más antiguas primero" (R
 
 ## Pantalla / Módulo 7 — Gestión de usuarios (Administrador)
 
-**Wireframe:** `diagramas/wireframes/07-gestion-usuarios.svg` y `diagramas/wireframes/07b-desbloquear-captor.svg` (sección "Captores bloqueados", RF-60)
+**Wireframe:** `diagramas/wireframes/07-gestion-usuarios.svg` y `diagramas/wireframes/07b-desbloquear-captor.svg` (sección "Captores bloqueados y revocados", RF-60 y RF-65)
 
 **Patrones de diseño utilizados:** Tarjetas/listado (equivalente mobile de Tabla con
 paginación), Modal para alta de usuario.
@@ -277,6 +282,12 @@ porque es una acción breve y acotada (tres campos), y mantenerla como superposi
 que el Administrador pierda el listado de contexto mientras la completa. El campo de
 usuario se muestra como de solo lectura con el formato ya definido (inicial + apellido +
 número incremental), para que quede claro que no lo tipea manualmente.
+
+**Confirmaciones (RF-65):** revocar un captor, desbloquearlo, volver a ponerlo en
+circulación, dar de baja o reactivar un usuario y cambiar su rol abren primero un Modal que
+dice qué va a pasar (por ejemplo, que revocar borra los dictámenes no enviados del celular).
+Las acciones que quitan acceso usan el botón rojo. Un captor revocado muestra "Volver a
+circulación" en lugar de "Desbloquear".
 
 **Formulario (si aplica):**
 - Cantidad de campos: 3 (usuario autogenerado — solo lectura, contraseña, rol).

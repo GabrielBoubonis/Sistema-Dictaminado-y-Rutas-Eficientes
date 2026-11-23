@@ -4,6 +4,49 @@ Cambios hechos al sistema y a la documentación, del más nuevo al más viejo.
 
 ---
 
+## 23/11/2026 — Confirmaciones, captor revocado de vuelta en circulación, usuarios de demo y carátula
+
+### Confirmar antes de actuar
+- En Gestión de usuarios, **revocar un captor, desbloquearlo, volver a ponerlo en
+  circulación, dar de baja o reactivar un usuario y cambiarle el rol** abren primero una
+  ventana que explica qué va a pasar. Ejemplo: revocar avisa que se borran del celular los
+  dictámenes que todavía no se enviaron. Las acciones que quitan acceso tienen el botón rojo.
+
+### Captor revocado de vuelta en circulación (RF-65, nuevo)
+- La pantalla del captor revocado ahora muestra su código (antes no mostraba nada).
+- En "Captores bloqueados y revocados", un captor revocado tiene el botón **Volver a
+  circulación**: el Administrador confirma, el captor queda activo y queda en la auditoría
+  ("Reactivación de captor"). El celular se entera solo en unos segundos y vuelve al ingreso.
+- Sus datos locales no vuelven: se borraron al revocarlo.
+- Servidor: `POST /api/usuarios/captores/:codigo/reactivar` (solo Administrador; solo
+  captores revocados). Test nuevo en `test/auth.test.ts`.
+
+### Usuarios de demostración en la pantalla de ingreso
+- Debajo del formulario: la contraseña `Demo2026!` con botón Copiar y un usuario por rol
+  (dos Operadores, Jefe, Administrador y Lector) con Copiar y **Usar**, que completa usuario
+  y contraseña. Después solo hay que tocar Ingresar.
+- Para una instalación real se oculta compilando con `VITE_MOSTRAR_DEMO=0`.
+- **Ojo:** con esto, cualquiera que tenga el link entra a la demo, también como
+  Administrador, y puede revocar captores o dar de baja usuarios. Si eso pasa, en el
+  servidor se recargan los datos de prueba.
+
+### Carátula de la presentación
+- Dice "Trabajo práctico · Práctica Profesionalizante II" y "Grupo N.° 1 · Comisión 3.° 2.ª
+  · Terciario Urquiza · Analista Funcional de Sistemas". Se sacó el nombre del docente.
+- Para el PDF: abrir la presentación y volver a exportarla.
+
+### Documentación
+- `requisitos.md` (RF-65), `alcance.md`, `casos-de-uso.md` (CU-16: E2 nuevo y E3),
+  `historias-de-usuario.md` (HU-18, criterio 5), `diseño-ui.md` (login de demo y
+  confirmaciones) y `arquitectura-tecnica.md`.
+
+### Verificado y pendiente
+- Verificado: tests de backend y de la app; en el navegador, el panel de demo, ingreso
+  con Usar, la ventana de confirmación y volver a circulación el captor `R3TB-44LN`.
+- **No verificado**: en un celular real (la pantalla de revocado que se actualiza sola).
+
+---
+
 ## 17/11/2026 — Orden del repositorio
 
 - `README.md` nuevo en la raíz: qué resuelve el sistema, la demo en línea, cómo está

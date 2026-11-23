@@ -79,6 +79,22 @@ usuariosRouter.post('/captores/:codigo/desbloquear', ah(async (req, res) => {
   res.json({ ok: true, codigo });
 }));
 
+/** RF-65: un captor revocado (por ejemplo, perdido y después recuperado) vuelve a ponerse en circulación con su código. */
+usuariosRouter.post('/captores/:codigo/reactivar', ah(async (req, res) => {
+  const codigo = String(req.params.codigo).toUpperCase();
+  const d = await prisma.dispositivo.findUnique({ where: { codigo_visible: codigo } });
+  if (!d) throw new AppError(404, 'captor_no_encontrado', 'No hay un captor con ese código');
+  if (d.estado !== 'Revocado') throw new AppError(409, 'captor_no_revocado', 'Ese captor no está revocado');
+  await prisma.$transaction(async (tx) => {
+    await tx.dispositivo.update({
+      where: { id_dispositivo: d.id_dispositivo },
+      data: { estado: 'Activo', fecha_desbloqueo: new Date(), desbloqueado_por: req.sesion!.usuario },
+    });
+    await auditar(tx, req.sesion!.usuario, 'Reactivación de captor', `captor ${codigo}`, 'Revocado', 'Activo');
+  });
+  res.json({ ok: true, codigo });
+}));
+
 usuariosRouter.patch('/:id', ah(async (req, res) => {
   const id = String(req.params.id);
   const b = validar(z.object({ rol: z.enum(ROLES).optional(), activo: z.boolean().optional() }), req.body);

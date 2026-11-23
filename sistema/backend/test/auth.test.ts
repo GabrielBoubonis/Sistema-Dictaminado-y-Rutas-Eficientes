@@ -155,6 +155,28 @@ describe('Captor: bloqueo, desbloqueo y revocación (RF-52, RF-60, CU-16)', () =
     expect((await login('lfernan0', PASS, did)).status).toBe(403);
   });
 
+  it('RF-65: un captor revocado vuelve a circular con su código, queda auditado y su usuario puede volver a ingresar', async () => {
+    const did = randomUUID();
+    expect((await login('lfernan0', PASS, did)).status).toBe(200);
+    const admin = await token('asuarez0');
+    const rev = await api().post('/api/usuarios/lfernan0/revocar-captor').set(auth(admin)).send({});
+    expect((await login('lfernan0', PASS, did)).status).toBe(403);
+    const codigo = (await api().get(`/api/auth/dispositivo/${did}`)).body.codigo as string;
+    expect(rev.body.revocados).toContain(codigo);
+
+    expect((await api().post(`/api/usuarios/captores/${codigo}/reactivar`).set(auth(await token('pgimene0')))).status).toBe(403);
+    expect((await api().post(`/api/usuarios/captores/${codigo.toLowerCase()}/reactivar`).set(auth(admin))).status).toBe(200);
+    expect((await api().get(`/api/auth/dispositivo/${did}`)).body.estado).toBe('Activo');
+    expect((await login('lfernan0', PASS, did)).status).toBe(200);
+    const aud = await prisma.registroAuditoria.findFirst({ where: { accion: 'Reactivación de captor' }, orderBy: { id_auditoria: 'desc' } });
+    expect(aud).toMatchObject({ nombre_usuario: 'asuarez0', entidad_afectada: `captor ${codigo}`, valor_anterior: 'Revocado', valor_nuevo: 'Activo' });
+
+    // solo se reactiva lo revocado: uno activo o bloqueado no, y un código inexistente da 404
+    expect((await api().post(`/api/usuarios/captores/${codigo}/reactivar`).set(auth(admin))).status).toBe(409);
+    expect((await api().post('/api/usuarios/captores/K7M2-X9QD/reactivar').set(auth(admin))).status).toBe(409);
+    expect((await api().post('/api/usuarios/captores/ZZZZ-ZZZZ/reactivar').set(auth(admin))).status).toBe(404);
+  });
+
   it('solo el Administrador puede desbloquear', async () => {
     const t = await token('pgimene0');
     expect((await api().post('/api/usuarios/captores/K7M2-X9QD/desbloquear').set(auth(t))).status).toBe(403);

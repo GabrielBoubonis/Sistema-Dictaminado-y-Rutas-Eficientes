@@ -22,6 +22,10 @@ export function Usuarios() {
     catch (e) { setMsg({ tipo: 'error', texto: textoError(e) }); }
   };
   useEffect(() => { void cargar(); }, [codigo]); // eslint-disable-line
+  // Toda acción del Administrador que cambia algo se confirma antes, diciendo qué va a pasar.
+  const [confirmar, setConfirmar] = useState<{ titulo: string; texto: string; boton: string; peligro?: boolean; hacer: () => Promise<void> } | null>(null);
+  const preguntar = (c: { titulo: string; texto: string; boton: string; peligro?: boolean }, f: () => Promise<unknown>, ok: string) =>
+    setConfirmar({ ...c, hacer: () => accion(f, ok) });
   const accion = async (f: () => Promise<unknown>, ok: string) => { try { await f(); setMsg({ tipo: 'ok', texto: ok }); await cargar(); } catch (e) { setMsg({ tipo: 'error', texto: textoError(e) }); } };
 
   const crear = async (e: React.FormEvent) => {
@@ -35,14 +39,15 @@ export function Usuarios() {
       {msg && <div className={msg.tipo === 'ok' ? 'ok' : 'error'} role={msg.tipo === 'ok' ? 'status' : 'alert'}>{msg.texto}</div>}
 
       <div className="card">
-        <h2 style={{ marginTop: 0 }}>Captores bloqueados</h2>
+        <h2 style={{ marginTop: 0 }}>Captores bloqueados y revocados</h2>
         <label htmlFor="cod">Código que figura en la pantalla del captor</label>
         <input id="cod" type="text" placeholder="XXXX-XXXX" value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase())} />
-        {!captores.length && <p className="ayuda">No hay captores bloqueados con ese código.</p>}
+        {!captores.length && <p className="ayuda">No hay captores bloqueados ni revocados con ese código.</p>}
         {captores.map((c) => (
           <div key={c.codigo} className="fila sb" style={{ padding: '.5rem 0', borderTop: '1px solid #eee' }}>
             <span><strong>{c.codigo}</strong> · {c.usuario ?? 'sin usuario'} · <span className="badge warn">{c.estado}</span></span>
-            {c.estado === 'Bloqueado' && <button className="btn chico" onClick={() => accion(() => api(`/usuarios/captores/${c.codigo}/desbloquear`, { body: {} }), `Captor ${c.codigo} desbloqueado.`)}>Desbloquear</button>}
+            {c.estado === 'Bloqueado' && <button className="btn chico" onClick={() => preguntar({ titulo: `¿Desbloquear el captor ${c.codigo}?`, texto: `El captor de ${c.usuario ?? 'sin usuario'} vuelve a permitir el ingreso. Hacelo solo si el ingeniero te pasó este código desde su celular. Queda registrado en la auditoría.`, boton: 'Sí, desbloquear' }, () => api(`/usuarios/captores/${c.codigo}/desbloquear`, { body: {} }), `Captor ${c.codigo} desbloqueado.`)}>Desbloquear</button>}
+            {c.estado === 'Revocado' && <button className="btn sec chico" onClick={() => preguntar({ titulo: `¿Volver a poner en circulación el captor ${c.codigo}?`, texto: `El captor fue revocado (por ejemplo, por pérdida o robo). Si se recuperó y lo tenés en tus manos, vuelve a quedar activo y se puede ingresar desde él otra vez. Sus datos locales ya fueron borrados al revocarlo. Queda registrado en la auditoría.`, boton: 'Sí, volver a circulación' }, () => api(`/usuarios/captores/${c.codigo}/reactivar`, { body: {} }), `Captor ${c.codigo} de nuevo en circulación.`)}>Volver a circulación</button>}
           </div>
         ))}
       </div>
@@ -54,13 +59,13 @@ export function Usuarios() {
           <tr key={u.nombre_usuario}>
             <td>{u.nombre_usuario}</td><td>{u.nombre_completo}</td>
             <td><select aria-label={`Rol de ${u.nombre_usuario}`} value={u.rol} disabled={u.nombre_usuario === usuario?.nombre_usuario}
-              onChange={(e) => accion(() => api(`/usuarios/${u.nombre_usuario}`, { method: 'PATCH', body: { rol: e.target.value } }), `Rol de ${u.nombre_usuario} actualizado.`)}>{ROLES.map((r) => <option key={r}>{r}</option>)}</select></td>
+              onChange={(e) => { const rol = e.target.value; preguntar({ titulo: `¿Cambiar el rol de ${u.nombre_usuario}?`, texto: `Pasa de ${u.rol} a ${rol}: cambia lo que puede ver y hacer en el sistema desde su próximo pedido. Queda registrado en la auditoría.`, boton: 'Sí, cambiar el rol' }, () => api(`/usuarios/${u.nombre_usuario}`, { method: 'PATCH', body: { rol } }), `Rol de ${u.nombre_usuario} actualizado.`); }}>{ROLES.map((r) => <option key={r}>{r}</option>)}</select></td>
             <td>{u.activo ? <span className="badge">Activo</span> : <span className="badge off">Baja</span>}</td>
             <td>{fechaCorta(u.fecha_alta)}</td>
             <td className="fila">
               <button className="btn sec chico" onClick={() => setPass({ usuario: u.nombre_usuario })}>Restablecer contraseña</button>
-              {u.nombre_usuario !== usuario?.nombre_usuario && <button className="btn sec chico" onClick={() => accion(() => api(`/usuarios/${u.nombre_usuario}`, { method: 'PATCH', body: { activo: !u.activo } }), u.activo ? `${u.nombre_usuario} dado de baja.` : `${u.nombre_usuario} reactivado.`)}>{u.activo ? 'Dar de baja' : 'Reactivar'}</button>}
-              <button className="btn sec chico" onClick={() => accion(() => api(`/usuarios/${u.nombre_usuario}/revocar-captor`, { body: {} }), `Captor de ${u.nombre_usuario} revocado.`)}>Revocar captor</button>
+              {u.nombre_usuario !== usuario?.nombre_usuario && <button className="btn sec chico" onClick={() => preguntar(u.activo ? { titulo: `¿Dar de baja a ${u.nombre_usuario}?`, texto: 'No va a poder ingresar más al sistema. Sus dictámenes y su historial se conservan. Se puede reactivar después.', boton: 'Sí, dar de baja', peligro: true } : { titulo: `¿Reactivar a ${u.nombre_usuario}?`, texto: 'Vuelve a poder ingresar con su contraseña.', boton: 'Sí, reactivar' }, () => api(`/usuarios/${u.nombre_usuario}`, { method: 'PATCH', body: { activo: !u.activo } }), u.activo ? `${u.nombre_usuario} dado de baja.` : `${u.nombre_usuario} reactivado.`)}>{u.activo ? 'Dar de baja' : 'Reactivar'}</button>}
+              <button className="btn sec chico" onClick={() => preguntar({ titulo: `¿Revocar el captor de ${u.nombre_usuario}?`, texto: 'Usalo si el celular se perdió o lo robaron. Se cierra la sesión en ese celular y, cuando vuelva a tener señal, se borran sus datos locales, incluidos los dictámenes que todavía no se hayan enviado. Después se puede volver a poner en circulación con su código.', boton: 'Sí, revocar', peligro: true }, () => api(`/usuarios/${u.nombre_usuario}/revocar-captor`, { body: {} }), `Captor de ${u.nombre_usuario} revocado.`)}>Revocar captor</button>
             </td>
           </tr>))}</tbody></table></div>
 
@@ -74,6 +79,15 @@ export function Usuarios() {
             <p className="ayuda">Mínimo 8 caracteres con mayúscula, minúscula, número y carácter especial. El nombre de usuario se genera solo.</p>
             <div className="fila"><button className="btn">Crear</button><button type="button" className="btn sec" onClick={() => setNuevo(false)}>Cancelar</button></div>
           </form>
+        </Modal>
+      )}
+      {confirmar && (
+        <Modal titulo={confirmar.titulo} onCerrar={() => setConfirmar(null)}>
+          <p>{confirmar.texto}</p>
+          <div className="fila">
+            <button className={`btn ${confirmar.peligro ? 'rojo' : ''}`} onClick={async () => { const c = confirmar; setConfirmar(null); await c.hacer(); }}>{confirmar.boton}</button>
+            <button className="btn sec" onClick={() => setConfirmar(null)}>Cancelar</button>
+          </div>
         </Modal>
       )}
       {pass && (

@@ -105,6 +105,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(t);
   }, [fase]);
 
+  // Captor revocado: muestra su código y consulta si un Administrador lo volvió a poner en circulación (RF-65)
+  useEffect(() => {
+    if (fase !== 'revocado') return;
+    void codigoDispositivo(dispositivoId()).then((c) => setCodigo((actual) => actual ?? c));
+    const t = setInterval(async () => {
+      try {
+        const d = await api<{ estado: string; codigo?: string }>(`/auth/dispositivo/${dispositivoId()}`, { sinAuth: true });
+        if (d.codigo) setCodigo(d.codigo);
+        if (d.estado === 'Activo') { localStorage.removeItem('captorRevocado'); intentos.set(0); setFase('anonimo'); setAviso('El captor volvió a ponerse en circulación. Ya podés ingresar.'); }
+      } catch { /* sin señal: sigue revocado */ }
+    }, 8000);
+    return () => clearInterval(t);
+  }, [fase]);
+
   // Sesión sin señal: al volver la conexión se revalida contra la Autenticación Institucional (RF-57)
   useEffect(() => {
     if (!sinConexion) return;

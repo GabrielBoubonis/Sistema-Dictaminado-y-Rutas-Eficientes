@@ -492,7 +492,7 @@ _Reemplaza a la historia "Elegir qué dictamen queda vigente cuando hay dos para
 |-------|---------|
 | Historia | Como Administrador, quiero desbloquear un captor bloqueado por intentos fallidos identificándolo con el código de su pantalla, para que el ingeniero pueda volver a trabajar. |
 | Módulo | Autenticación y gestión de usuarios |
-| Requisitos relacionados | RF-52, RF-54, RF-60 |
+| Requisitos relacionados | RF-52, RF-54, RF-60, RF-65 |
 
 ### Criterios de aceptación
 
@@ -500,6 +500,7 @@ _Reemplaza a la historia "Elegir qué dictamen queda vigente cuando hay dos para
 2. Dado que soy Administrador, cuando ingreso ese código en Gestión de usuarios, veo el captor y puedo desbloquearlo.
 3. Cuando el captor tiene conexión, el desbloqueo se aplica y el ingeniero puede volver a ingresar.
 4. El desbloqueo queda registrado en el log de auditoría (quién, cuándo y qué captor).
+5. Dado que un captor revocado se recuperó, su pantalla muestra el código y, al ingresarlo, puedo volver a ponerlo en circulación; antes de aplicarlo el sistema me pide confirmación.
 
 ### Validación INVEST
 

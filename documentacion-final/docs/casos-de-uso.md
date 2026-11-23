@@ -590,17 +590,17 @@ CU-13, CU-14 y CU-16 no participan de relaciones `<<include>>`/`<<extend>>`: son
 |-------|---------|
 | Identificador | CU-16 |
 | Nombre | Desbloquear captor |
-| Descripción | El Administrador desbloquea un captor que quedó bloqueado tras 5 intentos de ingreso fallidos, identificándolo por el código que muestra su pantalla de bloqueo. |
+| Descripción | El Administrador desbloquea un captor que quedó bloqueado tras 5 intentos de ingreso fallidos, o vuelve a poner en circulación uno revocado que se recuperó, identificándolo por el código que muestra su pantalla. |
 | Actores | Principal: Administrador / Secundario: — |
-| Precondiciones | El Administrador inició sesión (CU-01) y el captor fue bloqueado por RF-52. |
-| Postcondiciones | Éxito: el captor queda desbloqueado (RF-60) y el desbloqueo queda registrado en el log de auditoría (CU-13). / Fallo: el captor sigue bloqueado. |
+| Precondiciones | El Administrador inició sesión (CU-01) y el captor fue bloqueado o revocado por RF-52. |
+| Postcondiciones | Éxito: el captor queda activo (RF-60, RF-65) y la acción queda registrada en el log de auditoría (CU-13). / Fallo: el captor sigue bloqueado o revocado. |
 
 ### Secuencia normal
 
 | # | Acción (actor) | Reacción (sistema) |
 |---|----------------|--------------------|
-| 1 | El Administrador accede a Gestión de usuarios, sección "Captores bloqueados", e ingresa el código que le informa el ingeniero. | El sistema muestra el captor con ese código, el usuario asociado y la fecha del bloqueo. |
-| 2 | El Administrador confirma el desbloqueo. | El sistema marca el captor como desbloqueado y registra la acción en el log de auditoría (usuario que la realizó, acción, fecha y hora; RF-54). |
+| 1 | El Administrador accede a Gestión de usuarios, sección "Captores bloqueados y revocados", e ingresa el código que le informa el ingeniero. | El sistema muestra el captor con ese código, el usuario asociado y su estado. |
+| 2 | El Administrador toca "Desbloquear" y confirma en la ventana que explica qué va a pasar. | El sistema marca el captor como desbloqueado y registra la acción en el log de auditoría (usuario que la realizó, acción, fecha y hora; RF-54). |
 | 3 | El ingeniero abre la app en el captor con conexión. | El sistema aplica el desbloqueo y permite un nuevo intento de ingreso. |
 
 ### Excepciones
@@ -608,7 +608,8 @@ CU-13, CU-14 y CU-16 no participan de relaciones `<<include>>`/`<<extend>>`: son
 | # | Situación | Respuesta del sistema |
 |---|-----------|-----------------------|
 | E1 | El código ingresado no corresponde a ningún captor bloqueado. | El sistema informa que no encontró un captor bloqueado con ese código y permite corregirlo. |
-| E2 | El captor fue reportado como perdido o robado y ya se revocó (RF-52). | El sistema no permite desbloquearlo e indica que fue revocado. |
+| E2 | El captor fue reportado como perdido o robado y ya se revocó (RF-52). | El sistema no ofrece "Desbloquear" sino "Volver a circulación": si el celular se recuperó, el Administrador confirma y el captor queda activo; sus datos locales ya se borraron al revocarlo. Queda en la auditoría (RF-65). |
+| E3 | El Administrador cancela la confirmación. | El sistema no cambia nada. |
 
 | Campo | Detalle |
 |-------|---------|

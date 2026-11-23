@@ -47,7 +47,8 @@ seguimiento para la Dirección.
   locales de un dispositivo reportado como perdido o robado (RF-52), ya que ese dispositivo
   puede tener dictámenes firmados y fotografías todavía sin sincronizar. Un captor bloqueado
   lo desbloquea un Administrador desde Gestión de usuarios, identificándolo por un código que
-  muestra la pantalla de bloqueo (RF-60).
+  muestra la pantalla de bloqueo (RF-60). Si un captor revocado se recupera, el
+  Administrador lo vuelve a poner en circulación con el código de su pantalla (RF-65).
 - Si la sesión se cierra por inactividad y el captor no tiene señal, el ingeniero puede
   **reanudarla con su contraseña local**, solo si ya había ingresado con conexión ese día, no
   pasaron los 7 días de tope y el captor no fue revocado; al volver la señal el sistema

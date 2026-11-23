@@ -85,7 +85,7 @@ El mapa usa teselas de OpenStreetMap. La geocodificación usa por defecto **Geor
 ### Tests
 
 ```bash
-cd backend && npm test              # 86 tests contra una PostgreSQL real (crea la base arbolado_test sola)
+cd backend && npm test              # 87 tests contra una PostgreSQL real (crea la base arbolado_test sola)
 cd frontend && npm test             # 15 tests (hash de firma compartido con el servidor, cola cifrada, reanudar sin señal, reglas del formulario)
 ```
 
@@ -96,7 +96,7 @@ Prueba de punta a punta (con el servidor corriendo y la PWA compilada): `pip ins
 ## Qué se probó y qué no
 
 **Probado automáticamente**
-- Backend (86 tests con PostgreSQL real): login y mensaje genérico (RF-50), límite de intentos (RNF-19), tope de sesión (RNF-20), captores bloqueados y revocados (RF-52, RF-60), auditoría inmutable (RF-54), rutas (criterios, franjas de 2 días, vecino más próximo, recorrido por calles RF-63, caída de ORS, reservas sin duplicar, corte de las 18:00), dictámenes (RF-45, RF-46, RF-56, RF-61, RF-21, fecha del día de la firma, Plantar solo con extracción, idempotencia), firma con WebAuthn por software, sincronización offline e integridad (RF-53), dictamen duplicado: queda el primero que llegó (RF-59), dictaminados con PDF para el Lector (RF-64), envío al SUA con reintentos (RF-25), dashboard, tormenta, catálogo de especies, y carga con 7 ingenieros a la vez (RNF-02, RNF-03, RNF-15).
+- Backend (87 tests con PostgreSQL real): login y mensaje genérico (RF-50), límite de intentos (RNF-19), tope de sesión (RNF-20), captores bloqueados y revocados (RF-52, RF-60), auditoría inmutable (RF-54), rutas (criterios, franjas de 2 días, vecino más próximo, recorrido por calles RF-63, caída de ORS, reservas sin duplicar, corte de las 18:00), dictámenes (RF-45, RF-46, RF-56, RF-61, RF-21, fecha del día de la firma, Plantar solo con extracción, idempotencia), firma con WebAuthn por software, sincronización offline e integridad (RF-53), dictamen duplicado: queda el primero que llegó (RF-59), dictaminados con PDF para el Lector (RF-64), envío al SUA con reintentos (RF-25), dashboard, tormenta, catálogo de especies, y carga con 7 ingenieros a la vez (RNF-02, RNF-03, RNF-15).
 - Frontend (15 tests): hash de firma idéntico al del servidor, cola offline cifrada, reanudar sin señal, reglas del formulario y fecha en hora de Argentina.
 
 **Verificado a mano**
