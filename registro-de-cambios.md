@@ -4,6 +4,36 @@ Cambios hechos al sistema y a la documentación, del más nuevo al más viejo.
 
 ---
 
+## 26/11/2026 — Rutas sin optimizar: OpenRouteService cambió de dirección
+
+### Qué pasaba
+Toda ruta salía con el aviso "Orden sin optimizar (el servicio de mapas no respondió)".
+HeiGIT, la organización que mantiene OpenRouteService, **dio de baja la dirección
+`api.openrouteservice.org` el 24/11/2026**: ahora responde *410 Gone*. El sistema hacía bien
+en caer al orden por antigüedad, pero ya no podía calcular distancias ni el recorrido.
+
+### Qué cambió
+- La matriz de distancias y el recorrido por calles ahora usan
+  `https://api.heigit.org/openrouteservice`, y la geocodificación de ORS,
+  `https://api.heigit.org/pelias/v1`. La clave es la misma; no hubo que pedir otra.
+- Las dos direcciones se pueden cambiar sin tocar código con las variables `ORS_URL` y
+  `ORS_PELIAS_URL`, por si HeiGIT las vuelve a mover.
+- Se sacó la dirección vieja de la política de seguridad (CSP): el navegador nunca llama a
+  OpenRouteService, lo hace el servidor.
+- Archivos: `sistema/backend/src/config.ts`, `src/providers/index.ts`, `src/security.ts`,
+  `.env.example`.
+
+### Verificado
+- Con la clave real: matriz a pie y en auto (alrededor de 1 s), recorrido por calles y
+  geocodificación responden en las direcciones nuevas.
+- Ruta generada de punta a punta en la PC: optimizada, 12,2 km a pie, recorrido de 186
+  puntos (después se restableció).
+- Tests de rutas, autenticación y geocodificación: 56 pasan.
+- **Falta**: subirlo al servidor. Hasta entonces la demo sigue mostrando "Orden sin
+  optimizar".
+
+---
+
 ## 23/11/2026 — Confirmaciones, captor revocado de vuelta en circulación, usuarios de demo y carátula
 
 ### Confirmar antes de actuar

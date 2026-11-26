@@ -21,7 +21,7 @@ export const securityHeaders = helmet({
       imgSrc: ["'self'", 'data:', 'blob:', 'https://tile.openstreetmap.org', 'https://*.tile.openstreetmap.org'],
       styleSrc: ["'self'", "'unsafe-inline'"],
       // El service worker (Workbox) descarga las teselas con fetch() bajo la CSP de sw.js: sin esto, connect-src las bloquea.
-      connectSrc: ["'self'", 'https://api.openrouteservice.org', 'https://tile.openstreetmap.org', 'https://*.tile.openstreetmap.org'],
+      connectSrc: ["'self'", 'https://tile.openstreetmap.org', 'https://*.tile.openstreetmap.org'], // ORS lo llama el servidor, no el navegador
       workerSrc: ["'self'", 'blob:'],
     },
   },

@@ -102,7 +102,7 @@ export class MockMatriz implements IMatriz {
 export class OrsGeocoder implements IGeocoder {
   async geocodificar(direccion: string): Promise<Coord | null> {
     const sede = config.sede;
-    const url = `https://api.openrouteservice.org/geocode/search?api_key=${encodeURIComponent(config.orsKey)}` +
+    const url = `${config.peliasUrl}/search?api_key=${encodeURIComponent(config.orsKey)}` +
       `&text=${encodeURIComponent(direccion)}&boundary.country=AR&focus.point.lat=${sede.lat}&focus.point.lon=${sede.lng}&size=1`;
     const r = await fetch(url);
     if (!r.ok) throw new ProveedorNoDisponible(`ORS geocode ${r.status}`);
@@ -194,7 +194,7 @@ export function separarDireccion(direccion: string): { calle: string; numero: st
 export class OrsMatriz implements IMatriz {
   async matriz(puntos: Coord[], modo: Modo): Promise<MatrizResultado> {
     const perfil = modo === 'Caminando' ? 'foot-walking' : 'driving-car';
-    const r = await fetch(`https://api.openrouteservice.org/v2/matrix/${perfil}`, {
+    const r = await fetch(`${config.orsUrl}/v2/matrix/${perfil}`, {
       method: 'POST',
       headers: { Authorization: config.orsKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ locations: puntos.map((p) => [p.lng, p.lat]), metrics: ['distance', 'duration'] }),
@@ -242,7 +242,7 @@ export class OrsRecorrido implements IRecorrido {
     const tramos: Coord[][] = [];
     for (let i = 0; i < puntos.length - 1; i += MAX_PUNTOS_DIRECTIONS - 1) tramos.push(puntos.slice(i, i + MAX_PUNTOS_DIRECTIONS));
     const partes = await Promise.all(tramos.map(async (t) => {
-      const r = await fetch(`https://api.openrouteservice.org/v2/directions/${perfil}/geojson`, {
+      const r = await fetch(`${config.orsUrl}/v2/directions/${perfil}/geojson`, {
         method: 'POST',
         headers: { Authorization: config.orsKey, 'Content-Type': 'application/json' },
         // radiuses -1: engancha cada punto a la calle más cercana aunque la coordenada caiga dentro de una manzana.

@@ -12,6 +12,10 @@ export const config = {
   get loginMaxFails() { return Number(process.env.LOGIN_MAX_FAILS ?? 10); }, // RNF-19
   get loginWindowMs() { return Number(process.env.LOGIN_WINDOW_MS ?? 15 * 60 * 1000); },
   get orsKey() { return process.env.ORS_API_KEY || ''; },
+  // HeiGIT dio de baja api.openrouteservice.org el 24/11/2026: rutas y matriz pasan a api.heigit.org/openrouteservice
+  // y la geocodificación de ORS (Pelias) a api.heigit.org/pelias/v1. La misma clave sirve en las direcciones nuevas.
+  get orsUrl() { return (process.env.ORS_URL ?? 'https://api.heigit.org/openrouteservice').replace(/\/$/, ''); },
+  get peliasUrl() { return (process.env.ORS_PELIAS_URL ?? 'https://api.heigit.org/pelias/v1').replace(/\/$/, ''); },
   // Geocodificador: 'georef' (por defecto: altura exacta con datos del INDEC, respaldo Nominatim), 'nominatim'
   // (solo OpenStreetMap), 'ors' (requiere ORS_API_KEY) o 'mock'. Todos gratuitos.
   get geocoder() { return process.env.GEOCODER || 'georef'; },
